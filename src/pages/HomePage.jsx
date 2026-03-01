@@ -59,7 +59,7 @@ export default function HomePage() {
             marginBottom: 8,
           }}
         >
-          Do We Even Know Each Other?
+          The Us Quiz
         </h1>
 
         <p
@@ -115,7 +115,7 @@ export default function HomePage() {
                 margin: 0,
               }}
             >
-              Already have a link? Just open it!
+              Fair warning: there are no wrong answers... but there are suspicious ones 👀
             </p>
           </div>
         </div>
