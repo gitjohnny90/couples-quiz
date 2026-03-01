@@ -1,9 +1,10 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { SessionContext } from "../App";
 import { supabase } from "../lib/supabase";
 import quizPacks from "../data/quizPacks";
 import { motion, AnimatePresence } from "framer-motion";
+import PageDoodles, { SquigglyUnderline, DoodleStar } from "../components/Doodles";
 
 export default function QuizPage() {
   const { sessionId, packId } = useParams();
@@ -20,22 +21,15 @@ export default function QuizPage() {
 
   if (!pack) {
     return (
-      <div className="page">
-        <div
-          className="glass"
-          style={{ padding: 32, textAlign: "center", maxWidth: 400 }}
-        >
-          <div style={{ fontSize: "3rem", marginBottom: 16 }}>🔍</div>
-          <h2 style={{ marginBottom: 8 }}>Quiz not found</h2>
-          <p style={{ color: "var(--text-secondary)", marginBottom: 24 }}>
-            This quiz pack doesn't exist or may have been removed.
+      <div className="page" style={{ position: 'relative' }}>
+        <PageDoodles seed={99} />
+        <div className="glass" style={{ padding: 28, textAlign: "center", position: 'relative', zIndex: 1 }}>
+          <div style={{ fontSize: "2rem", marginBottom: 12 }}>📓</div>
+          <h2 style={{ fontFamily: "var(--font-hand)", fontSize: "1.6rem", marginBottom: 8 }}>can't find that quiz</h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: 20, fontStyle: "italic" }}>
+            this page seems to be missing from the notebook
           </p>
-          <button
-            className="btn btn-primary"
-            onClick={() => navigate("/")}
-          >
-            Go Home
-          </button>
+          <button className="btn btn-primary" onClick={() => navigate("/")}>go home</button>
         </div>
       </div>
     );
@@ -49,34 +43,22 @@ export default function QuizPage() {
 
   const handleSelectOption = (optionIndex) => {
     if (submitted) return;
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.id]: optionIndex,
-    }));
+    setAnswers((prev) => ({ ...prev, [currentQuestion.id]: optionIndex }));
   };
 
   const handleNext = async () => {
     if (!hasCurrentAnswer) return;
-
     if (isLastQuestion) {
       setSubmitted(true);
       try {
         const { error } = await supabase.from("responses").upsert(
-          {
-            session_id: sessionId,
-            pack_id: packId,
-            player_id: playerId,
-            player_name: playerName,
-            answers: answers,
-          },
+          { session_id: sessionId, pack_id: packId, player_id: playerId, player_name: playerName, answers },
           { onConflict: "session_id,pack_id,player_id" }
         );
-
         if (error) throw error;
-
         navigate(`/results/${sessionId}/${packId}`);
       } catch (err) {
-        console.error("Failed to save answers:", err);
+        console.error("oops, couldn't save:", err);
         setSubmitted(false);
       }
     } else {
@@ -93,80 +75,53 @@ export default function QuizPage() {
   };
 
   const slideVariants = {
-    enter: (dir) => ({
-      x: dir > 0 ? 300 : -300,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (dir) => ({
-      x: dir > 0 ? -300 : 300,
-      opacity: 0,
-    }),
+    enter: (dir) => ({ x: dir > 0 ? 200 : -200, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir) => ({ x: dir > 0 ? -200 : 200, opacity: 0 }),
   };
 
+  // Tiny rotation for each option card
+  const optionRotations = [-0.6, 0.4, -0.3, 0.7];
+
   return (
-    <div className="page">
+    <div className="page" style={{ position: 'relative' }}>
+      <PageDoodles seed={3 + currentQ} />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-          maxWidth: 500,
-        }}
+        transition={{ duration: 0.4 }}
+        style={{ width: "100%", position: 'relative', zIndex: 1 }}
       >
-        {/* Pack Title */}
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{ fontSize: "2.5rem", marginBottom: 4, lineHeight: 1 }}>
-            {pack.emoji}
-          </div>
-          <h1
-            className="text-gradient"
-            style={{ fontSize: "1.5rem", fontWeight: 700, margin: 0 }}
-          >
+        {/* Pack header */}
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <div style={{ fontSize: "2rem", marginBottom: 4 }}>{pack.emoji}</div>
+          <h1 style={{ fontFamily: "var(--font-hand)", fontSize: "1.8rem", fontWeight: 700, color: "var(--accent-coral)" }}>
             {pack.title}
           </h1>
         </div>
 
-        {/* Progress */}
-        <div style={{ width: "100%", marginBottom: 24 }}>
-          <p
-            style={{
-              color: "var(--text-secondary)",
-              fontSize: "0.85rem",
-              marginBottom: 8,
-              textAlign: "center",
-            }}
-          >
-            Question {currentQ + 1} of {questions.length}
+        {/* Crayon progress bar */}
+        <div style={{ marginBottom: 20 }}>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: 6, textAlign: "center", fontFamily: "var(--font-hand)", fontSize: "1.1rem" }}>
+            {currentQ + 1} of {questions.length}
           </p>
           <div className="progress-bar-track">
-            <div
-              className="progress-bar-fill"
-              style={{
-                width: `${progressPercent}%`,
-                transition: "width 0.3s ease",
-              }}
-            />
+            <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
           </div>
         </div>
 
-        {/* Question Card */}
+        {/* Question area — index card feel */}
         <div
           className="glass"
           style={{
-            padding: 24,
+            padding: "24px 20px",
             width: "100%",
-            minHeight: 320,
+            minHeight: 300,
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
+            transform: "rotate(0.3deg)",
           }}
         >
           <AnimatePresence mode="wait" custom={direction}>
@@ -177,42 +132,28 @@ export default function QuizPage() {
               initial="enter"
               animate="center"
               exit="exit"
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                flex: 1,
-              }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              style={{ display: "flex", flexDirection: "column", flex: 1 }}
             >
-              {/* Question Text */}
-              <h2
-                style={{
-                  fontSize: "1.15rem",
-                  fontWeight: 600,
-                  marginBottom: 20,
-                  lineHeight: 1.4,
-                }}
-              >
+              <h2 style={{
+                fontSize: "1.15rem",
+                fontFamily: "var(--font-body)",
+                fontWeight: 400,
+                marginBottom: 18,
+                lineHeight: 1.5,
+                color: "var(--text-primary)",
+              }}>
                 {currentQuestion.text}
               </h2>
 
-              {/* Options */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                  flex: 1,
-                }}
-              >
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
                 {currentQuestion.options.map((option, index) => (
                   <button
                     key={index}
-                    className={`option-btn${
-                      answers[currentQuestion.id] === index ? " selected" : ""
-                    }`}
+                    className={`option-btn${answers[currentQuestion.id] === index ? " selected" : ""}`}
                     onClick={() => handleSelectOption(index)}
                     disabled={submitted}
+                    style={{ transform: `rotate(${optionRotations[index] || 0}deg)` }}
                   >
                     {option}
                   </button>
@@ -221,40 +162,17 @@ export default function QuizPage() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Navigation Buttons */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: 20,
-              gap: 12,
-            }}
-          >
+          {/* Navigation */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 18, gap: 12 }}>
             {currentQ > 0 ? (
-              <button
-                className="btn btn-secondary"
-                onClick={handleBack}
-                disabled={submitted}
-                style={{ flex: 1 }}
-              >
-                Back
+              <button className="btn btn-secondary" onClick={handleBack} disabled={submitted} style={{ flex: 1 }}>
+                ← back
               </button>
             ) : (
               <div style={{ flex: 1 }} />
             )}
-
-            <button
-              className="btn btn-primary"
-              onClick={handleNext}
-              disabled={!hasCurrentAnswer || submitted}
-              style={{ flex: 1 }}
-            >
-              {submitted
-                ? "Saving..."
-                : isLastQuestion
-                ? "Submit Answers"
-                : "Next"}
+            <button className="btn btn-primary" onClick={handleNext} disabled={!hasCurrentAnswer || submitted} style={{ flex: 1 }}>
+              {submitted ? "saving..." : isLastQuestion ? "done!" : "next →"}
             </button>
           </div>
         </div>

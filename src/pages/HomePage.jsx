@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { SessionContext } from "../App";
 import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
+import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar, DoodleFlower } from "../components/Doodles";
 
 export default function HomePage() {
   const { setSessionId, setPlayerName } = useContext(SessionContext);
@@ -34,9 +35,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="page">
+    <div className="page" style={{ position: 'relative' }}>
+      <PageDoodles seed={1} />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         style={{
@@ -44,51 +47,81 @@ export default function HomePage() {
           flexDirection: "column",
           alignItems: "center",
           width: "100%",
+          position: "relative",
+          zIndex: 1,
         }}
       >
-        <div style={{ fontSize: "4rem", marginBottom: 8, lineHeight: 1 }}>
-          💜
+        {/* Hand-drawn hearts cluster */}
+        <div style={{ position: 'relative', marginBottom: 4, marginTop: 16 }}>
+          <DoodleHeart size={36} color="#E88D7A" opacity={0.6} rotate={-5} />
+          <div style={{ position: 'absolute', top: -8, right: -18 }}>
+            <DoodleHeart size={18} color="#D4A843" opacity={0.4} rotate={12} />
+          </div>
+          <div style={{ position: 'absolute', bottom: -4, left: -14 }}>
+            <DoodleStar size={14} opacity={0.3} rotate={-8} />
+          </div>
         </div>
 
         <h1
-          className="text-gradient"
           style={{
-            fontSize: "2rem",
-            fontWeight: 800,
+            fontFamily: "var(--font-hand)",
+            fontSize: "2.6rem",
+            fontWeight: 700,
             textAlign: "center",
-            marginBottom: 8,
+            marginBottom: 2,
+            color: "var(--text-primary)",
+            lineHeight: 1.1,
           }}
         >
           The Us Quiz
         </h1>
 
+        <SquigglyUnderline width={140} color="#E88D7A" opacity={0.5} style={{ marginBottom: 12 }} />
+
         <p
           style={{
             color: "var(--text-secondary)",
             textAlign: "center",
-            marginBottom: 32,
-            maxWidth: 320,
+            marginBottom: 28,
+            maxWidth: 300,
+            fontFamily: "var(--font-body)",
+            fontSize: "1.05rem",
+            lineHeight: 1.5,
           }}
         >
           The couples quiz that'll either bring you closer... or start a fight
         </p>
 
+        {/* Main card — looks like a note card */}
         <div
           className="glass"
           style={{
-            padding: 24,
-            marginBottom: 24,
+            padding: "28px 24px 24px",
+            marginBottom: 20,
             width: "100%",
-            maxWidth: 400,
+            maxWidth: 380,
+            transform: "rotate(-0.5deg)",
           }}
         >
+          <label
+            style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: "1.3rem",
+              color: "var(--text-secondary)",
+              display: "block",
+              marginBottom: 10,
+            }}
+          >
+            your name:
+          </label>
           <input
             className="input"
             type="text"
-            placeholder="Enter your name..."
+            placeholder="write it here..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{ width: "100%", marginBottom: 16, boxSizing: "border-box" }}
+            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+            style={{ width: "100%", marginBottom: 20, boxSizing: "border-box" }}
           />
 
           <button
@@ -97,26 +130,31 @@ export default function HomePage() {
             disabled={loading || !name.trim()}
             style={{ width: "100%" }}
           >
-            {loading ? "Creating..." : "Create Quiz Session"}
+            {loading ? "creating..." : "start a quiz session"}
           </button>
+        </div>
 
-          <div
+        {/* Bottom note */}
+        <div
+          style={{
+            textAlign: "center",
+            position: "relative",
+            maxWidth: 320,
+          }}
+        >
+          <p
             style={{
-              borderTop: "1px solid rgba(255,255,255,0.1)",
-              marginTop: 20,
-              paddingTop: 16,
-              textAlign: "center",
+              color: "var(--text-light)",
+              fontSize: "0.95rem",
+              fontFamily: "var(--font-body)",
+              fontStyle: "italic",
+              lineHeight: 1.5,
             }}
           >
-            <p
-              style={{
-                color: "var(--text-secondary)",
-                fontSize: "0.85rem",
-                margin: 0,
-              }}
-            >
-              Fair warning: there are no wrong answers... but there are suspicious ones 👀
-            </p>
+            Fair warning: there are no wrong answers... but there are suspicious ones 👀
+          </p>
+          <div style={{ position: 'absolute', right: -20, bottom: -8 }}>
+            <DoodleFlower size={18} rotate={15} opacity={0.3} />
           </div>
         </div>
       </motion.div>

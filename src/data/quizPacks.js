@@ -43,7 +43,7 @@ const quizPacks = [
       {
         id: 'dc1',
         text: "What's your primary love language?",
-        options: ['Words of Affirmation', 'Quality Time', 'Physical Touch', 'Acts of Service'],
+        options: ['Words of Affirmation', 'Quality Time', 'Physical Touch', 'Acts of Service', 'Receiving Gifts'],
       },
       {
         id: 'dc2',

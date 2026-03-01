@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { SessionContext } from "../App";
 import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
+import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleArrow } from "../components/Doodles";
 
 export default function JoinPage() {
   const { sessionId } = useParams();
@@ -25,24 +26,15 @@ export default function JoinPage() {
           .eq("id", sessionId)
           .single();
 
-        if (error || !data) {
-          setNotFound(true);
-          return;
-        }
-
+        if (error || !data) { setNotFound(true); return; }
         setPlayer1Name(data.player1_name);
-
-        if (data.player2_name) {
-          setAlreadyJoined(true);
-        }
+        if (data.player2_name) setAlreadyJoined(true);
       } catch (err) {
-        console.error("Failed to fetch session:", err);
         setNotFound(true);
       } finally {
         setLoading(false);
       }
     };
-
     fetchSession();
   }, [sessionId]);
 
@@ -54,36 +46,25 @@ export default function JoinPage() {
         .from("sessions")
         .update({ player2_name: name.trim() })
         .eq("id", sessionId);
-
       if (error) throw error;
-
       setSessionId(sessionId);
       setPlayerName(name.trim());
       localStorage.setItem("playerId", "player2");
       navigate(`/vault/${sessionId}`);
     } catch (err) {
-      console.error("Failed to join session:", err);
+      console.error("oops, couldn't join:", err);
     } finally {
       setJoining(false);
     }
   };
 
-  const handleGoToVault = () => {
-    setSessionId(sessionId);
-    setPlayerName(player1Name);
-    navigate(`/vault/${sessionId}`);
-  };
-
   if (loading) {
     return (
       <div className="page">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          style={{ textAlign: "center", color: "var(--text-secondary)" }}
-        >
-          Loading...
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: "center", paddingTop: 60 }}>
+          <p style={{ fontFamily: "var(--font-hand)", fontSize: "1.4rem", color: "var(--text-secondary)" }}>
+            flipping to the right page...
+          </p>
         </motion.div>
       </div>
     );
@@ -91,50 +72,15 @@ export default function JoinPage() {
 
   if (notFound) {
     return (
-      <div className="page">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <div style={{ fontSize: "4rem", marginBottom: 8, lineHeight: 1 }}>
-            😕
-          </div>
-          <h1
-            className="text-gradient"
-            style={{
-              fontSize: "1.8rem",
-              fontWeight: 800,
-              textAlign: "center",
-              marginBottom: 8,
-            }}
-          >
-            Session Not Found
-          </h1>
-          <p
-            style={{
-              color: "var(--text-secondary)",
-              textAlign: "center",
-              marginBottom: 32,
-              maxWidth: 320,
-            }}
-          >
-            This session doesn't exist or the link may be invalid. Ask your
-            partner for a new one!
+      <div className="page" style={{ position: 'relative' }}>
+        <PageDoodles seed={7} />
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", paddingTop: 40, position: 'relative', zIndex: 1 }}>
+          <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>📓</div>
+          <h2 style={{ fontFamily: "var(--font-hand)", fontSize: "1.8rem", marginBottom: 8 }}>hmm, can't find that page</h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: 24, fontStyle: "italic" }}>
+            this quiz session doesn't exist — maybe the link got smudged?
           </p>
-          <button
-            className="btn btn-primary"
-            onClick={() => navigate("/")}
-            style={{ maxWidth: 400 }}
-          >
-            Go Home
-          </button>
+          <button className="btn btn-primary" onClick={() => navigate("/")}>go home</button>
         </motion.div>
       </div>
     );
@@ -142,48 +88,19 @@ export default function JoinPage() {
 
   if (alreadyJoined) {
     return (
-      <div className="page">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <div style={{ fontSize: "4rem", marginBottom: 8, lineHeight: 1 }}>
-            👥
-          </div>
-          <h1
-            className="text-gradient"
-            style={{
-              fontSize: "1.8rem",
-              fontWeight: 800,
-              textAlign: "center",
-              marginBottom: 8,
-            }}
-          >
-            Session Full
-          </h1>
-          <p
-            style={{
-              color: "var(--text-secondary)",
-              textAlign: "center",
-              marginBottom: 32,
-              maxWidth: 320,
-            }}
-          >
-            This session already has two players.
-          </p>
-          <button
-            className="btn btn-primary"
-            onClick={handleGoToVault}
-            style={{ maxWidth: 400 }}
-          >
-            Go to Vault Anyway
+      <div className="page" style={{ position: 'relative' }}>
+        <PageDoodles seed={8} />
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: "center", paddingTop: 40, position: 'relative', zIndex: 1 }}>
+          <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>✌️</div>
+          <h2 style={{ fontFamily: "var(--font-hand)", fontSize: "1.8rem", marginBottom: 8 }}>two's company!</h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: 24 }}>this notebook already has two people writing in it</p>
+          <button className="btn btn-primary" onClick={() => {
+            setSessionId(sessionId);
+            setPlayerName("Player 2");
+            localStorage.setItem("playerId", "player2");
+            navigate(`/vault/${sessionId}`);
+          }}>
+            open the notebook anyway
           </button>
         </motion.div>
       </div>
@@ -191,70 +108,44 @@ export default function JoinPage() {
   }
 
   return (
-    <div className="page">
+    <div className="page" style={{ position: 'relative' }}>
+      <PageDoodles seed={2} />
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-        }}
+        style={{ position: 'relative', zIndex: 1 }}
       >
-        <div style={{ fontSize: "4rem", marginBottom: 8, lineHeight: 1 }}>
-          💌
+        <div style={{ textAlign: "center", marginBottom: 28, paddingTop: 24 }}>
+          <div style={{ fontSize: "2.5rem", marginBottom: 8 }}>💌</div>
+          <h1 style={{ fontFamily: "var(--font-hand)", fontSize: "2.2rem", fontWeight: 700, marginBottom: 4 }}>
+            you've been invited!
+          </h1>
+          <SquigglyUnderline width={160} color="#D4A843" opacity={0.5} style={{ margin: '0 auto 12px' }} />
+          <p style={{ color: "var(--text-secondary)", fontSize: "1.05rem" }}>
+            <strong style={{ color: "var(--accent-coral)" }}>{player1Name}</strong> wants to see if you two really know each other
+          </p>
         </div>
 
-        <h1
-          className="text-gradient"
-          style={{
-            fontSize: "2rem",
-            fontWeight: 800,
-            textAlign: "center",
-            marginBottom: 8,
-          }}
-        >
-          You've been invited!
-        </h1>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+          <DoodleArrow width={50} color="#B8A08A" opacity={0.5} rotate={85} />
+        </div>
 
-        <p
-          style={{
-            color: "var(--text-secondary)",
-            textAlign: "center",
-            marginBottom: 32,
-            maxWidth: 320,
-          }}
-        >
-          {player1Name} wants to see if you really know each other
-        </p>
-
-        <div
-          className="glass"
-          style={{
-            padding: 24,
-            marginBottom: 24,
-            width: "100%",
-            maxWidth: 400,
-          }}
-        >
+        <div className="glass" style={{ padding: "28px 24px 24px", width: "100%", maxWidth: 380, margin: "0 auto", transform: "rotate(0.4deg)" }}>
+          <label style={{ fontFamily: "var(--font-hand)", fontSize: "1.3rem", color: "var(--text-secondary)", display: "block", marginBottom: 10 }}>
+            and you are...?
+          </label>
           <input
             className="input"
             type="text"
-            placeholder="Enter your name..."
+            placeholder="write your name here..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{ width: "100%", marginBottom: 16, boxSizing: "border-box" }}
+            onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+            style={{ width: "100%", marginBottom: 20, boxSizing: "border-box" }}
           />
-
-          <button
-            className="btn btn-primary"
-            onClick={handleJoin}
-            disabled={joining || !name.trim()}
-            style={{ width: "100%" }}
-          >
-            {joining ? "Joining..." : "Join Session"}
+          <button className="btn btn-primary" onClick={handleJoin} disabled={joining || !name.trim()} style={{ width: "100%" }}>
+            {joining ? "joining..." : "let's do this"}
           </button>
         </div>
       </motion.div>
