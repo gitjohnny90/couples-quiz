@@ -12,6 +12,8 @@ export default function FunStuffPage() {
   const { setSessionId } = useContext(SessionContext)
 
   const [drawStatus, setDrawStatus] = useState({ count: 0, bothDone: false })
+  const [movieCount, setMovieCount] = useState(0)
+  const [bookCount, setBookCount] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -20,14 +22,17 @@ export default function FunStuffPage() {
   }, [sessionId])
 
   const fetchData = async () => {
-    const { data: responseData } = await supabase
-      .from('responses')
-      .select('*')
-      .eq('session_id', sessionId)
-      .eq('pack_id', drawingRoundMeta.id)
+    const [{ data: drawData }, { data: itemData }] = await Promise.all([
+      supabase.from('responses').select('*').eq('session_id', sessionId).eq('pack_id', drawingRoundMeta.id),
+      supabase.from('shared_items').select('type, id').eq('session_id', sessionId),
+    ])
 
-    if (responseData) {
-      setDrawStatus({ count: responseData.length, bothDone: responseData.length >= 2 })
+    if (drawData) {
+      setDrawStatus({ count: drawData.length, bothDone: drawData.length >= 2 })
+    }
+    if (itemData) {
+      setMovieCount(itemData.filter((i) => i.type === 'movie').length)
+      setBookCount(itemData.filter((i) => i.type === 'book').length)
     }
     setLoading(false)
   }
@@ -44,6 +49,41 @@ export default function FunStuffPage() {
     )
   }
 
+  const activities = [
+    {
+      emoji: drawingRoundMeta.emoji,
+      title: drawingRoundMeta.title,
+      description: drawingRoundMeta.description,
+      rotation: 0.4,
+      borderColor: drawStatus.bothDone ? 'var(--accent-blue)' : undefined,
+      statusText: drawStatus.bothDone ? 'done! ✓' : drawStatus.count >= 1 ? 'waiting...' : 'draw →',
+      statusColor: drawStatus.bothDone ? 'var(--accent-blue)' : drawStatus.count >= 1 ? 'var(--accent-mustard)' : 'var(--text-light)',
+      onClick: () => drawStatus.bothDone
+        ? navigate(`/draw-results/${sessionId}`)
+        : navigate(`/draw/${sessionId}`),
+    },
+    {
+      emoji: '🎬',
+      title: 'Movies',
+      description: 'shared watchlist, genre wheel, and pick for us',
+      rotation: -0.5,
+      borderColor: movieCount > 0 ? 'var(--accent-coral)' : undefined,
+      statusText: movieCount > 0 ? `${movieCount} saved` : 'explore →',
+      statusColor: movieCount > 0 ? 'var(--accent-coral)' : 'var(--text-light)',
+      onClick: () => navigate(`/movies/${sessionId}`),
+    },
+    {
+      emoji: '📚',
+      title: 'Books',
+      description: 'shared reading list, genre wheel, and pick for us',
+      rotation: 0.3,
+      borderColor: bookCount > 0 ? 'var(--accent-sage)' : undefined,
+      statusText: bookCount > 0 ? `${bookCount} saved` : 'explore →',
+      statusColor: bookCount > 0 ? 'var(--accent-sage)' : 'var(--text-light)',
+      onClick: () => navigate(`/books/${sessionId}`),
+    },
+  ]
+
   return (
     <div className="page" style={{ position: 'relative' }}>
       <PageDoodles seed={11} />
@@ -56,67 +96,60 @@ export default function FunStuffPage() {
           </h1>
           <SquigglyUnderline width={100} color="#6B8DAD" opacity={0.4} style={{ margin: '0 auto 8px' }} />
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-            games, drawings, and other shenanigans
+            games, lists, and other shenanigans
           </p>
         </div>
 
         {/* Activities list */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-          {/* Draw Together card */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.06 }}
-            className="glass"
-            style={{
-              padding: 18,
-              cursor: 'pointer',
-              transform: 'rotate(0.4deg)',
-              borderColor: drawStatus.bothDone ? 'var(--accent-blue)' : undefined,
-            }}
-            onClick={() => drawStatus.bothDone
-              ? navigate(`/draw-results/${sessionId}`)
-              : navigate(`/draw/${sessionId}`)}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ fontSize: 28, flexShrink: 0 }}>{drawingRoundMeta.emoji}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 600, marginBottom: 1, color: 'var(--text-primary)' }}>
-                  {drawingRoundMeta.title}
-                </h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
-                  {drawingRoundMeta.description}
-                </p>
+          {activities.map((activity, i) => (
+            <motion.div
+              key={activity.title}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06 }}
+              className="glass"
+              style={{
+                padding: 18,
+                cursor: 'pointer',
+                transform: `rotate(${activity.rotation}deg)`,
+                borderColor: activity.borderColor,
+              }}
+              onClick={activity.onClick}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ fontSize: 28, flexShrink: 0 }}>{activity.emoji}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 600, marginBottom: 1, color: 'var(--text-primary)' }}>
+                    {activity.title}
+                  </h3>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
+                    {activity.description}
+                  </p>
+                </div>
+                <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                  <div style={{
+                    fontFamily: 'var(--font-hand)', fontSize: '0.95rem',
+                    fontWeight: activity.statusText.includes('✓') || activity.statusText.includes('saved') ? 700 : 400,
+                    color: activity.statusColor,
+                  }}>
+                    {activity.statusText}
+                  </div>
+                </div>
               </div>
-              <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                {drawStatus.bothDone ? (
-                  <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent-blue)' }}>
-                    done! ✓
-                  </div>
-                ) : drawStatus.count >= 1 ? (
-                  <div style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-mustard)' }}>
-                    waiting...
-                  </div>
-                ) : (
-                  <div style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--text-light)' }}>
-                    draw →
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          ))}
 
           {/* Coming soon placeholder */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12 }}
+            transition={{ delay: 0.24 }}
             className="sticky-note"
             style={{ padding: 20, textAlign: 'center', marginTop: 8 }}
           >
             <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.15rem', color: 'var(--text-secondary)' }}>
-              more games coming soon...
+              more fun stuff coming soon...
             </p>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginTop: 4 }}>
               stay tuned ✨

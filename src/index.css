@@ -598,3 +598,85 @@ select option {
   font-weight: 600;
   margin-bottom: 6px;
 }
+
+/* ===== MEDIA PAGE TABS (Movies/Books) ===== */
+.media-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--rule-line);
+  padding: 3px;
+  border-radius: 6px;
+  border: 1px solid var(--border-pencil);
+}
+
+.media-tab {
+  flex: 1;
+  padding: 8px 6px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-hand);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.media-tab:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.media-tab.active {
+  background: var(--bg-card);
+  color: var(--accent-coral);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(61, 44, 44, 0.08);
+}
+
+/* ===== GENRE CHIPS ===== */
+.genre-chip {
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-pencil);
+  border-radius: 20px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.genre-chip:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-mustard);
+}
+
+.genre-chip.active {
+  background: var(--accent-coral);
+  color: #fff;
+  border-color: var(--accent-coral);
+  font-weight: 600;
+}
+
+/* ===== SPINNING WHEEL ===== */
+.spinning-wheel-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.spinning-wheel-pointer {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 22px solid var(--text-primary);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.15));
+}
