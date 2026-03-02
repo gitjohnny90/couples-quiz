@@ -12,6 +12,7 @@ import DrawResultsPage from "./pages/DrawResultsPage";
 import FunStuffPage from "./pages/FunStuffPage";
 import MoviesPage from "./pages/MoviesPage";
 import BooksPage from "./pages/BooksPage";
+import WatchGuidePage from "./pages/WatchGuidePage";
 
 // Guard: redirects to home if no name has been entered yet
 function RequireName({ children }) {
@@ -49,7 +50,8 @@ function BottomNav() {
       return location.pathname.startsWith("/fun") ||
              location.pathname.startsWith("/draw") ||
              location.pathname.startsWith("/movies") ||
-             location.pathname.startsWith("/books");
+             location.pathname.startsWith("/books") ||
+             location.pathname.startsWith("/watch-guide");
     }
     return location.pathname.startsWith(base);
   };
@@ -118,6 +120,7 @@ export default function App() {
           <Route path="/draw-results/:sessionId" element={<RequireName><DrawResultsPage /></RequireName>} />
           <Route path="/fun/:sessionId" element={<RequireName><FunStuffPage /></RequireName>} />
           <Route path="/movies/:sessionId" element={<RequireName><MoviesPage /></RequireName>} />
+          <Route path="/watch-guide/:sessionId" element={<RequireName><WatchGuidePage /></RequireName>} />
           <Route path="/books/:sessionId" element={<RequireName><BooksPage /></RequireName>} />
           <Route path="/vault/:sessionId" element={<RequireName><VaultPage /></RequireName>} />
           <Route path="/profiles/:sessionId" element={<RequireName><ProfilesPage /></RequireName>} />

@@ -435,8 +435,22 @@ export default function MoviesPage() {
           </div>
         )}
 
+        {/* Watch together guide link */}
+        <div
+          className="sticky-note"
+          style={{ padding: 16, marginTop: 22, textAlign: 'center', cursor: 'pointer', transform: 'rotate(-0.5deg)' }}
+          onClick={() => navigate(`/watch-guide/${sessionId}`)}
+        >
+          <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.05rem', color: 'var(--text-secondary)' }}>
+            🍿 how to actually watch together →
+          </p>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginTop: 2 }}>
+            apps & tools for long-distance movie nights
+          </p>
+        </div>
+
         {/* Back button */}
-        <button className="btn btn-secondary" style={{ width: '100%', marginTop: 22 }} onClick={() => navigate(`/fun/${sessionId}`)}>
+        <button className="btn btn-secondary" style={{ width: '100%', marginTop: 14 }} onClick={() => navigate(`/fun/${sessionId}`)}>
           ← back to fun stuff
         </button>
       </motion.div>
