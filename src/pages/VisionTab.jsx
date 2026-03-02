@@ -25,15 +25,12 @@ const STATUS_DISPLAY = {
 }
 
 const BOARD_SLOTS = [
-  { rotate: -5, marginTop: 8, width: 130, zIndex: 3, emptyPos: { top: '12%', left: '8%' } },
-  { rotate: 4, marginTop: 4, width: 140, zIndex: 1, emptyPos: { top: '55%', left: '25%' } },
-  { rotate: -3, marginTop: 16, width: 135, zIndex: 4, emptyPos: { top: '18%', left: '48%' } },
-  { rotate: 7, marginTop: 2, width: 145, zIndex: 2, emptyPos: { top: '60%', left: '65%' } },
-  { rotate: -6, marginTop: 10, width: 132, zIndex: 5, emptyPos: { top: '15%', left: '82%' } },
-  { rotate: 3, marginTop: 6, width: 138, zIndex: 1, emptyPos: { top: '52%', left: '90%' } },
+  { rotate: -4, marginTop: 12, emptyPos: { top: '20%', left: '10%' } },
+  { rotate: 3, marginTop: 4, emptyPos: { top: '55%', left: '45%' } },
+  { rotate: -6, marginTop: 14, emptyPos: { top: '22%', left: '78%' } },
 ]
 
-const PIN_COLORS = ['#E55', '#E8B84C', '#5B8FC7', '#6BAF6B', '#D47BA0', '#E88D7A']
+const PIN_COLORS = ['#E55', '#E8B84C', '#5B8FC7']
 
 const DEFAULT_DATA = { northStar: '', goals: [], board: [] }
 
@@ -262,12 +259,13 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
           msOverflowStyle: 'none',
         }}>
           {(data.board || []).some(b => b.dataUrl) ? (
-            /* Photos exist — horizontal flex with overlapping polaroids */
+            /* Photos exist — evenly spaced polaroids */
             <div style={{
               display: 'flex',
+              justifyContent: 'space-around',
               alignItems: 'flex-start',
-              minWidth: 'min-content',
-              padding: '6px 0',
+              padding: '10px 6px',
+              gap: 10,
             }}>
               {BOARD_SLOTS.map((slot, i) => {
                 const boardItem = (data.board || []).find(b => b.slot === i)
@@ -695,23 +693,20 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, onRe
   return (
     <div style={{
       position: 'relative',
-      transform: hasPhoto ? `rotate(${slot.rotate}deg)` : 'none',
-      marginTop: hasPhoto ? slot.marginTop : 0,
-      marginLeft: hasPhoto ? slot.marginLeft : index === 0 ? 8 : -10,
-      width: hasPhoto ? slot.width : 60,
-      flexShrink: 0,
-      zIndex: hasPhoto ? slot.zIndex + 5 : slot.zIndex + 10,
+      transform: `rotate(${slot.rotate}deg)`,
+      marginTop: slot.marginTop,
+      flex: '1 1 0',
+      maxWidth: 140,
     }}>
-      {/* Push pin — always visible */}
+      {/* Push pin */}
       <div
         onClick={() => !hasPhoto && openPicker()}
         style={{
-          width: hasPhoto ? 14 : 13,
-          height: hasPhoto ? 14 : 13,
+          width: 14, height: 14,
           borderRadius: '50%',
           background: `radial-gradient(circle at 40% 35%, ${PIN_COLORS[index]}, ${PIN_COLORS[index]}88)`,
-          boxShadow: `0 2px ${hasPhoto ? 4 : 3}px rgba(0,0,0,0.3)`,
-          margin: hasPhoto ? '0 auto -7px' : '0 auto',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+          margin: '0 auto -7px',
           position: 'relative',
           zIndex: 10,
           cursor: hasPhoto ? 'default' : 'pointer',
@@ -721,18 +716,20 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, onRe
         onMouseLeave={e => { if (!hasPhoto) e.currentTarget.style.transform = 'scale(1)' }}
       />
 
-      {/* Empty slot — clickable area below pin */}
+      {/* Empty slot — clickable area */}
       {!hasPhoto && (
         <div
           onClick={openPicker}
           style={{
-            width: '100%', height: 50,
+            width: '100%', height: 100,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', borderRadius: 2,
+            border: '2px dashed rgba(255,255,255,0.2)',
+            marginTop: 10,
           }}
         >
           <span style={{
-            fontFamily: 'var(--font-hand)', fontSize: '0.55rem',
+            fontFamily: 'var(--font-hand)', fontSize: '0.7rem',
             color: 'rgba(255,255,255,0.4)',
           }}>
             + add
@@ -744,7 +741,7 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, onRe
       {hasPhoto && (
         <div style={{
           background: '#fff',
-          padding: '6px 6px 20px',
+          padding: '6px 6px 22px',
           boxShadow: '2px 3px 8px rgba(0,0,0,0.18)',
           borderRadius: 1,
           position: 'relative',
@@ -780,9 +777,9 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, onRe
             maxLength={60}
             style={{
               width: '100%', border: 'none', outline: 'none',
-              fontFamily: 'var(--font-hand)', fontSize: '0.65rem',
+              fontFamily: 'var(--font-hand)', fontSize: '0.7rem',
               textAlign: 'center', color: '#666',
-              marginTop: 3, background: 'transparent',
+              marginTop: 4, background: 'transparent',
             }}
           />
         </div>
