@@ -15,7 +15,8 @@ import BooksPage from "./pages/BooksPage";
 import WatchGuidePage from "./pages/WatchGuidePage";
 import DeepDivePage from "./pages/DeepDivePage";
 import DeepDiveDeckPage from "./pages/DeepDiveDeckPage";
-import DeepDiveJournalPage from "./pages/DeepDiveJournalPage";
+import JournalPage from "./pages/JournalPage";
+import QuizPacksPage from "./pages/QuizPacksPage";
 
 // Guard: redirects to home if no name has been entered yet
 function RequireName({ children }) {
@@ -56,12 +57,18 @@ function BottomNav() {
              location.pathname.startsWith("/books") ||
              location.pathname.startsWith("/watch-guide");
     }
-    // "quizzes" tab should also highlight for /quiz, /results, /deep-dive, /deep-dive-journal
+    // "quizzes" tab should also highlight for /quiz, /results, /deep-dive, /quiz-packs
     if (base === "/vault") {
       return location.pathname.startsWith("/vault") ||
              location.pathname.startsWith("/quiz") ||
              location.pathname.startsWith("/results") ||
-             location.pathname.startsWith("/deep-dive");
+             location.pathname.startsWith("/deep-dive") ||
+             location.pathname.startsWith("/quiz-packs");
+    }
+    // "us" tab should also highlight for /journal
+    if (base === "/profiles") {
+      return location.pathname.startsWith("/profiles") ||
+             location.pathname.startsWith("/journal");
     }
     return location.pathname.startsWith(base);
   };
@@ -134,7 +141,8 @@ export default function App() {
           <Route path="/books/:sessionId" element={<RequireName><BooksPage /></RequireName>} />
           <Route path="/deep-dive/:sessionId" element={<RequireName><DeepDivePage /></RequireName>} />
           <Route path="/deep-dive/:sessionId/:deckId" element={<RequireName><DeepDiveDeckPage /></RequireName>} />
-          <Route path="/deep-dive-journal/:sessionId" element={<RequireName><DeepDiveJournalPage /></RequireName>} />
+          <Route path="/journal/:sessionId" element={<RequireName><JournalPage /></RequireName>} />
+          <Route path="/quiz-packs/:sessionId" element={<RequireName><QuizPacksPage /></RequireName>} />
           <Route path="/vault/:sessionId" element={<RequireName><VaultPage /></RequireName>} />
           <Route path="/profiles/:sessionId" element={<RequireName><ProfilesPage /></RequireName>} />
         </Routes>

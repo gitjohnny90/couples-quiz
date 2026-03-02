@@ -278,7 +278,7 @@ export default function DeepDiveDeckPage() {
             <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => navigate(`/deep-dive/${sessionId}`)}>
               ← all decks
             </button>
-            <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => navigate(`/deep-dive-journal/${sessionId}`)}>
+            <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => navigate(`/journal/${sessionId}`)}>
               journal 📖
             </button>
           </div>

@@ -269,7 +269,7 @@ export default function DeepDivePage() {
         <button
           className="btn btn-secondary"
           style={{ width: '100%', marginTop: 24 }}
-          onClick={() => navigate(`/deep-dive-journal/${sessionId}`)}
+          onClick={() => navigate(`/journal/${sessionId}`)}
         >
           📖 open journal
         </button>

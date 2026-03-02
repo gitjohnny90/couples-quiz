@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -19,6 +19,7 @@ const defaultProfile = {
 
 export default function ProfilesPage() {
   const { sessionId } = useParams()
+  const navigate = useNavigate()
   const { playerName } = useContext(SessionContext)
   const playerId = localStorage.getItem('playerId')
 
@@ -92,6 +93,15 @@ export default function ProfilesPage() {
           <SquigglyUnderline width={90} color="#E88D7A" opacity={0.4} style={{ margin: '0 auto 6px' }} />
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>personality tests, side by side</p>
         </div>
+
+        {/* Journal link */}
+        <button
+          className="btn btn-secondary"
+          style={{ width: '100%', marginBottom: 18 }}
+          onClick={() => navigate(`/journal/${sessionId}`)}
+        >
+          📖 open our journal
+        </button>
 
         {/* Tab switcher — notebook tab style */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 22 }}>
