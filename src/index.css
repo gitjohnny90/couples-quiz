@@ -465,3 +465,136 @@ select option {
 .sticky-note::before {
   display: none; /* Remove tape on sticky notes */
 }
+
+/* ===== DRAWING CANVAS ===== */
+.drawing-canvas-area {
+  margin: 16px 0;
+}
+
+.torn-paper-wrap {
+  position: relative;
+  background: #fff;
+  border: 1.5px solid var(--border-pencil);
+  border-radius: 3px 3px 0 0;
+  box-shadow:
+    2px 3px 8px rgba(61, 44, 44, 0.08),
+    0 1px 2px rgba(61, 44, 44, 0.05);
+  overflow: hidden;
+}
+
+.drawing-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  background: #fff;
+}
+
+/* Torn/ripped bottom edge */
+.torn-edge {
+  position: absolute;
+  bottom: -1px;
+  left: -2px;
+  right: -2px;
+  height: 18px;
+  background: var(--bg-paper);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='400' height='18' viewBox='0 0 400 18' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6 L8 2 L14 8 L22 3 L30 7 L36 1 L44 6 L50 4 L58 9 L66 2 L72 7 L80 3 L88 8 L94 1 L102 6 L108 3 L116 9 L124 2 L130 7 L138 4 L146 8 L152 1 L160 6 L166 3 L174 9 L182 2 L188 7 L196 4 L204 8 L210 1 L218 6 L224 3 L232 9 L240 2 L246 7 L254 4 L262 8 L268 1 L276 6 L282 3 L290 9 L298 2 L304 7 L312 4 L320 8 L326 1 L334 6 L340 3 L348 9 L356 2 L362 7 L370 4 L378 8 L384 1 L392 6 L400 3 L400 18 L0 18 Z' fill='white'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg width='400' height='18' viewBox='0 0 400 18' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6 L8 2 L14 8 L22 3 L30 7 L36 1 L44 6 L50 4 L58 9 L66 2 L72 7 L80 3 L88 8 L94 1 L102 6 L108 3 L116 9 L124 2 L130 7 L138 4 L146 8 L152 1 L160 6 L166 3 L174 9 L182 2 L188 7 L196 4 L204 8 L210 1 L218 6 L224 3 L232 9 L240 2 L246 7 L254 4 L262 8 L268 1 L276 6 L282 3 L290 9 L298 2 L304 7 L312 4 L320 8 L326 1 L334 6 L340 3 L348 9 L356 2 L362 7 L370 4 L378 8 L384 1 L392 6 L400 3 L400 18 L0 18 Z' fill='white'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* Drawing toolbar */
+.draw-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 4px 6px;
+}
+
+.color-picker {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.color-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border-pencil);
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.1s;
+  padding: 0;
+  outline: none;
+}
+
+.color-dot:hover {
+  transform: scale(1.1);
+}
+
+.color-dot.active {
+  border-color: var(--text-primary);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2.5px var(--bg-paper), 0 0 0 4.5px var(--text-primary);
+}
+
+.draw-tool-btn {
+  padding: 6px 14px !important;
+  font-size: 0.9rem !important;
+  border-width: 1.5px !important;
+  box-shadow: 1px 1px 0px var(--border-pencil) !important;
+}
+
+.draw-tool-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ===== DRAWING REVEAL ===== */
+.drawing-reveal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 420px) {
+  .drawing-reveal-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.drawing-reveal-card {
+  text-align: center;
+}
+
+.drawing-reveal-card img {
+  width: 100%;
+  height: auto;
+  border: 1.5px solid var(--border-pencil);
+  border-radius: 3px 3px 0 0;
+  background: #fff;
+  display: block;
+}
+
+.drawing-reveal-card .torn-edge-small {
+  position: relative;
+  height: 12px;
+  margin-top: -1px;
+  background: var(--bg-paper);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='400' height='12' viewBox='0 0 400 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 4 L10 1 L18 6 L26 2 L34 5 L42 1 L50 4 L58 2 L66 7 L74 1 L82 5 L90 2 L98 6 L106 1 L114 4 L122 2 L130 7 L138 1 L146 5 L154 3 L162 6 L170 1 L178 4 L186 2 L194 7 L202 1 L210 5 L218 3 L226 6 L234 1 L242 4 L250 2 L258 7 L266 1 L274 5 L282 3 L290 6 L298 1 L306 4 L314 2 L322 7 L330 1 L338 5 L346 3 L354 6 L362 1 L370 4 L378 2 L386 7 L394 1 L400 4 L400 12 L0 12 Z' fill='white'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg width='400' height='12' viewBox='0 0 400 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 4 L10 1 L18 6 L26 2 L34 5 L42 1 L50 4 L58 2 L66 7 L74 1 L82 5 L90 2 L98 6 L106 1 L114 4 L122 2 L130 7 L138 1 L146 5 L154 3 L162 6 L170 1 L178 4 L186 2 L194 7 L202 1 L210 5 L218 3 L226 6 L234 1 L242 4 L250 2 L258 7 L266 1 L274 5 L282 3 L290 6 L298 1 L306 4 L314 2 L322 7 L330 1 L338 5 L346 3 L354 6 L362 1 L370 4 L378 2 L386 7 L394 1 L400 4 L400 12 L0 12 Z' fill='white'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  border-left: 1.5px solid var(--border-pencil);
+  border-right: 1.5px solid var(--border-pencil);
+}
+
+.drawing-reveal-name {
+  font-family: var(--font-hand);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}

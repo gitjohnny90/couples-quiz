@@ -7,6 +7,8 @@ import QuizPage from "./pages/QuizPage";
 import ResultsPage from "./pages/ResultsPage";
 import VaultPage from "./pages/VaultPage";
 import ProfilesPage from "./pages/ProfilesPage";
+import DrawPage from "./pages/DrawPage";
+import DrawResultsPage from "./pages/DrawResultsPage";
 
 // Guard: redirects to home if no name has been entered yet
 function RequireName({ children }) {
@@ -101,6 +103,8 @@ export default function App() {
           <Route path="/join/:sessionId" element={<JoinPage />} />
           <Route path="/quiz/:sessionId/:packId" element={<RequireName><QuizPage /></RequireName>} />
           <Route path="/results/:sessionId/:packId" element={<RequireName><ResultsPage /></RequireName>} />
+          <Route path="/draw/:sessionId" element={<RequireName><DrawPage /></RequireName>} />
+          <Route path="/draw-results/:sessionId" element={<RequireName><DrawResultsPage /></RequireName>} />
           <Route path="/vault/:sessionId" element={<RequireName><VaultPage /></RequireName>} />
           <Route path="/profiles/:sessionId" element={<RequireName><ProfilesPage /></RequireName>} />
         </Routes>

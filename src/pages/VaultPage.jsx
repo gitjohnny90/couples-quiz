@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
+import { drawingRoundMeta } from '../data/drawingPrompts'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../components/Doodles'
 
@@ -13,6 +14,7 @@ export default function VaultPage() {
 
   const [session, setSession] = useState(null)
   const [completedPacks, setCompletedPacks] = useState({})
+  const [drawStatus, setDrawStatus] = useState({ count: 0, bothDone: false })
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
 
@@ -31,6 +33,11 @@ export default function VaultPage() {
 
     const completed = {}
     Object.entries(packMap).forEach(([packId, responses]) => {
+      // Handle drawing round separately
+      if (packId === drawingRoundMeta.id) {
+        setDrawStatus({ count: responses.length, bothDone: responses.length >= 2 })
+        return
+      }
       const pack = quizPacks.find((p) => p.id === packId)
       if (!pack) return
       const bothDone = responses.length >= 2
@@ -195,6 +202,53 @@ export default function VaultPage() {
             )
           })}
         </div>
+
+        {/* Draw Together section */}
+        <h2 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.4rem', marginBottom: 12, marginTop: 28, color: 'var(--text-secondary)' }}>
+          something different ~
+        </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: quizPacks.length * 0.06 + 0.1 }}
+          className="glass"
+          style={{
+            padding: 18,
+            cursor: 'pointer',
+            transform: 'rotate(0.4deg)',
+            borderColor: drawStatus.bothDone ? 'var(--accent-blue)' : undefined,
+          }}
+          onClick={() => drawStatus.bothDone
+            ? navigate(`/draw-results/${sessionId}`)
+            : navigate(`/draw/${sessionId}`)}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ fontSize: 28, flexShrink: 0 }}>{drawingRoundMeta.emoji}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 600, marginBottom: 1, color: 'var(--text-primary)' }}>
+                {drawingRoundMeta.title}
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
+                {drawingRoundMeta.description}
+              </p>
+            </div>
+            <div style={{ flexShrink: 0, textAlign: 'right' }}>
+              {drawStatus.bothDone ? (
+                <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent-blue)' }}>
+                  done! ✓
+                </div>
+              ) : drawStatus.count >= 1 ? (
+                <div style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-mustard)' }}>
+                  waiting...
+                </div>
+              ) : (
+                <div style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--text-light)' }}>
+                  draw →
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
     </div>
   )
