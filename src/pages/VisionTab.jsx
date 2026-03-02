@@ -688,11 +688,11 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, file
     <div style={{
       position: 'relative',
       transform: hasPhoto ? `rotate(${slot.rotate}deg)` : 'none',
-      marginTop: hasPhoto ? slot.marginTop : slot.emptyTop,
-      marginLeft: hasPhoto ? slot.marginLeft : index === 0 ? 12 : 30,
-      width: hasPhoto ? slot.width : 'auto',
+      marginTop: hasPhoto ? slot.marginTop : 0,
+      marginLeft: hasPhoto ? slot.marginLeft : index === 0 ? 8 : -10,
+      width: hasPhoto ? slot.width : 60,
       flexShrink: 0,
-      zIndex: hasPhoto ? slot.zIndex + 5 : slot.zIndex,
+      zIndex: hasPhoto ? slot.zIndex + 5 : slot.zIndex + 10,
     }}>
       {/* Push pin — always visible */}
       <div
@@ -712,6 +712,25 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, file
         onMouseEnter={e => { if (!hasPhoto) e.currentTarget.style.transform = 'scale(1.3)' }}
         onMouseLeave={e => { if (!hasPhoto) e.currentTarget.style.transform = 'scale(1)' }}
       />
+
+      {/* Empty slot — clickable area below pin */}
+      {!hasPhoto && (
+        <div
+          onClick={() => fileInputRef?.click()}
+          style={{
+            width: '100%', height: 50,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', borderRadius: 2,
+          }}
+        >
+          <span style={{
+            fontFamily: 'var(--font-hand)', fontSize: '0.55rem',
+            color: 'rgba(255,255,255,0.4)',
+          }}>
+            + add
+          </span>
+        </div>
+      )}
 
       {/* Polaroid frame — only when photo exists */}
       {hasPhoto && (
