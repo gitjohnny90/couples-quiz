@@ -96,6 +96,15 @@ export default function FunStuffPage() {
       statusColor: bookCount > 0 ? 'var(--accent-sage)' : 'var(--text-light)',
       onClick: () => navigate(`/books/${sessionId}`),
     },
+    {
+      emoji: '💕',
+      title: 'Tic-Tac-Toe',
+      description: "hearts instead of x's and o's — play on the same screen",
+      rotation: -0.3,
+      statusText: 'play →',
+      statusColor: 'var(--text-light)',
+      onClick: () => navigate(`/tictactoe/${sessionId}`),
+    },
   ]
 
   return (

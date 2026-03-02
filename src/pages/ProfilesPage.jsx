@@ -4,6 +4,7 @@ import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleFlower } from '../components/Doodles'
+import VisionTab from './VisionTab'
 
 const LOVE_LANGUAGES = ['Words of Affirmation', 'Quality Time', 'Physical Touch', 'Acts of Service', 'Receiving Gifts']
 const MBTI_TYPES = ['', 'INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP', 'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP']
@@ -11,6 +12,15 @@ const ENNEAGRAM_TYPES = ['', '1 - Reformer', '2 - Helper', '3 - Achiever', '4 - 
 const WORKING_GENIUS = ['Wonder', 'Invention', 'Discernment', 'Galvanizing', 'Enablement', 'Tenacity']
 const ATTACHMENT_STYLES = ['', 'Secure', 'Anxious', 'Avoidant', 'Fearful-Avoidant']
 const CONFLICT_STYLES = ['', 'Competing', 'Collaborating', 'Compromising', 'Avoiding', 'Accommodating']
+
+const SECTION_DESCRIPTIONS = {
+  love_languages: 'how you prefer to give and receive love — knowing each other\'s top languages helps you show care in the way that lands best',
+  mbti: 'your Myers-Briggs type — shows how you think, recharge, and make decisions, which explains a lot about your daily dynamic',
+  enneagram: 'your core motivation and fear — understanding each other\'s type builds empathy for why you react the way you do',
+  working_genius: 'what energizes vs drains you in teamwork — handy for splitting chores, planning trips, or tackling projects together',
+  attachment_style: 'how you connect and seek closeness — recognizing each other\'s style helps you navigate distance and intimacy with more patience',
+  conflict_style: 'your go-to approach when things get tense — knowing this helps you fight less and understand each other more',
+}
 
 const defaultProfile = {
   love_languages: { 'Words of Affirmation': 5, 'Quality Time': 5, 'Physical Touch': 5, 'Acts of Service': 5, 'Receiving Gifts': 5 },
@@ -82,6 +92,11 @@ export default function ProfilesPage() {
       {emoji} {text}
     </h3>
   )
+  const sectionDesc = (key) => SECTION_DESCRIPTIONS[key] ? (
+    <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 12, marginTop: -6, lineHeight: 1.4 }}>
+      {SECTION_DESCRIPTIONS[key]}
+    </p>
+  ) : null
 
   return (
     <div className="page" style={{ position: 'relative' }}>
@@ -91,7 +106,12 @@ export default function ProfilesPage() {
         <div style={{ textAlign: 'center', marginBottom: 18 }}>
           <h1 style={{ fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700 }}>about us</h1>
           <SquigglyUnderline width={90} color="#E88D7A" opacity={0.4} style={{ margin: '0 auto 6px' }} />
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>personality tests, side by side</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, maxWidth: 340, margin: '0 auto' }}>
+            a place to map out who you both are — fill in your personality tests, then compare side by side to see where you click and where you balance each other out
+          </p>
+          <p style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontStyle: 'italic', marginTop: 6, maxWidth: 320, margin: '6px auto 0' }}>
+            these are real personality frameworks — you can take the full tests on their official websites or find them in books
+          </p>
         </div>
 
         {/* Journal link */}
@@ -105,7 +125,7 @@ export default function ProfilesPage() {
 
         {/* Tab switcher — notebook tab style */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 22 }}>
-          {[['edit', 'my page'], ['compare', 'compare']].map(([key, label]) => (
+          {[['edit', 'my page'], ['compare', 'compare'], ['goals', 'our vision']].map(([key, label]) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
@@ -126,12 +146,13 @@ export default function ProfilesPage() {
         </div>
 
         <AnimatePresence mode="wait">
-          {activeTab === 'edit' ? (
+          {activeTab === 'edit' && (
             <motion.div key="edit" initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -15 }}>
 
               {/* Love Languages */}
               <div className="glass" style={sectionStyle}>
                 {sectionTitle('💕', 'love languages')}
+                {sectionDesc('love_languages')}
                 {LOVE_LANGUAGES.map((lang) => (
                   <div key={lang} style={{ marginBottom: 12 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
@@ -145,7 +166,8 @@ export default function ProfilesPage() {
 
               {/* MBTI */}
               <div className="glass" style={sectionStyle}>
-                {sectionTitle('🧠', 'mbti type')}
+                {sectionTitle('🧠', 'mbti / 16 personalities')}
+                {sectionDesc('mbti')}
                 <select value={myProfile.mbti} onChange={(e) => setMyProfile((p) => ({ ...p, mbti: e.target.value }))}>
                   <option value="">pick your type...</option>
                   {MBTI_TYPES.filter(Boolean).map((t) => <option key={t} value={t}>{t}</option>)}
@@ -155,6 +177,7 @@ export default function ProfilesPage() {
               {/* Enneagram */}
               <div className="glass" style={sectionStyle}>
                 {sectionTitle('🔢', 'enneagram')}
+                {sectionDesc('enneagram')}
                 <select value={myProfile.enneagram} onChange={(e) => setMyProfile((p) => ({ ...p, enneagram: e.target.value }))}>
                   <option value="">pick your type...</option>
                   {ENNEAGRAM_TYPES.filter(Boolean).map((t) => <option key={t} value={t}>{t}</option>)}
@@ -164,6 +187,7 @@ export default function ProfilesPage() {
               {/* Working Genius */}
               <div className="glass" style={sectionStyle}>
                 {sectionTitle('⚡', 'working genius')}
+                {sectionDesc('working_genius')}
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginBottom: 12, fontStyle: 'italic' }}>pick your top 2</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {WORKING_GENIUS.map((g) => {
@@ -185,6 +209,7 @@ export default function ProfilesPage() {
               {/* Attachment Style */}
               <div className="glass" style={sectionStyle}>
                 {sectionTitle('🔗', 'attachment style')}
+                {sectionDesc('attachment_style')}
                 <select value={myProfile.attachment_style} onChange={(e) => setMyProfile((p) => ({ ...p, attachment_style: e.target.value }))}>
                   <option value="">pick your style...</option>
                   {ATTACHMENT_STYLES.filter(Boolean).map((s) => <option key={s} value={s}>{s}</option>)}
@@ -194,6 +219,7 @@ export default function ProfilesPage() {
               {/* Conflict Style */}
               <div className="glass" style={sectionStyle}>
                 {sectionTitle('⚔️', 'conflict style')}
+                {sectionDesc('conflict_style')}
                 <select value={myProfile.conflict_style} onChange={(e) => setMyProfile((p) => ({ ...p, conflict_style: e.target.value }))}>
                   <option value="">pick your style...</option>
                   {CONFLICT_STYLES.filter(Boolean).map((s) => <option key={s} value={s}>{s}</option>)}
@@ -204,7 +230,8 @@ export default function ProfilesPage() {
                 {saving ? 'saving...' : saved ? 'saved!' : 'save my profile'}
               </button>
             </motion.div>
-          ) : (
+          )}
+          {activeTab === 'compare' && (
             <motion.div key="compare" initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 15 }}>
               {!partnerProfile ? (
                 <div className="glass" style={{ padding: 28, textAlign: 'center' }}>
@@ -218,6 +245,12 @@ export default function ProfilesPage() {
                 </div>
               ) : (
                 <>
+                  <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic', lineHeight: 1.4 }}>
+                      here's how your personalities line up — same types aren't better or worse, it's all about understanding each other
+                    </p>
+                  </div>
+
                   {/* Love Languages comparison */}
                   <div className="glass" style={sectionStyle}>
                     {sectionTitle('💕', 'love languages')}
@@ -248,7 +281,7 @@ export default function ProfilesPage() {
 
                   {/* Side by side cards */}
                   {[
-                    { emoji: '🧠', label: 'mbti', key: 'mbti' },
+                    { emoji: '🧠', label: 'mbti / 16 personalities', key: 'mbti' },
                     { emoji: '🔢', label: 'enneagram', key: 'enneagram' },
                     { emoji: '🔗', label: 'attachment style', key: 'attachment_style' },
                     { emoji: '⚔️', label: 'conflict style', key: 'conflict_style' },
@@ -302,6 +335,11 @@ export default function ProfilesPage() {
                   </div>
                 </>
               )}
+            </motion.div>
+          )}
+          {activeTab === 'goals' && (
+            <motion.div key="goals" initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 15 }}>
+              <VisionTab sessionId={sessionId} playerName={playerName} playerId={playerId} />
             </motion.div>
           )}
         </AnimatePresence>
