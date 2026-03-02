@@ -84,13 +84,26 @@ const movieGenres = [
   },
   {
     id: 'animated',
-    name: 'Animated',
+    name: 'Family Friendly',
     emoji: '🎨',
     titles: [
-      'Up', 'Coco', 'Spirited Away', 'Inside Out', 'Ratatouille',
-      'How to Train Your Dragon', 'The Lion King', 'Finding Nemo', 'Toy Story', 'Shrek',
-      'Moana', 'Encanto', 'Howl\'s Moving Castle', 'Princess Mononoke', 'Zootopia',
-      'Big Hero 6', 'Soul', 'Tangled', 'Frozen', 'The Incredibles',
+      'Up', 'Coco', 'Inside Out', 'Ratatouille', 'The Lion King',
+      'Finding Nemo', 'Toy Story', 'Shrek', 'Moana', 'Encanto',
+      'How to Train Your Dragon', 'Zootopia', 'Big Hero 6', 'Soul', 'Tangled',
+      'Frozen', 'The Incredibles', 'Lilo & Stitch', 'Paddington 2', 'The Mitchells vs. the Machines',
+    ],
+  },
+  {
+    id: 'anime',
+    name: 'Anime',
+    emoji: '⛩️',
+    titles: [
+      'Spirited Away', 'Your Name', 'A Silent Voice', 'Princess Mononoke',
+      'Howl\'s Moving Castle', 'Akira', 'Ghost in the Shell', 'Grave of the Fireflies',
+      'Weathering with You', 'The Boy and the Heron', 'Demon Slayer: Mugen Train',
+      'My Neighbor Totoro', 'Perfect Blue', 'Paprika', 'Suzume',
+      'Jujutsu Kaisen 0', 'Dragon Ball Super: Broly', 'One Piece Film: Red',
+      'Nausicaä of the Valley of the Wind', 'The Wind Rises',
     ],
   },
   {

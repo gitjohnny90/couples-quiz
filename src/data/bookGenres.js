@@ -105,6 +105,17 @@ const bookGenres = [
       'The Bell Jar', 'Their Eyes Were Watching God',
     ],
   },
+  {
+    id: 'manga',
+    name: 'Manga',
+    emoji: '⛩️',
+    titles: [
+      'One Piece', 'Naruto', 'Attack on Titan', 'Demon Slayer', 'My Hero Academia',
+      'Fullmetal Alchemist', 'Death Note', 'Dragon Ball', 'Jujutsu Kaisen', 'Chainsaw Man',
+      'One Punch Man', 'Spy x Family', 'Berserk', 'Vinland Saga', 'Tokyo Ghoul',
+      'Haikyuu!!', 'Slam Dunk', 'Fruits Basket', 'Sailor Moon', 'Nana',
+    ],
+  },
 ]
 
 export default bookGenres
