@@ -680,3 +680,108 @@ select option {
   border-top: 22px solid var(--text-primary);
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.15));
 }
+
+/* ═══ DEEP DIVE ═══ */
+
+/* Mood tag pills */
+.dd-mood-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: 0.75rem;
+  background: #FFF5E9;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-pencil);
+}
+
+/* Deck card button */
+.dd-deck-card {
+  width: 100%;
+  padding: 14px 16px;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  background: var(--bg-card);
+}
+.dd-deck-card:active {
+  background: var(--bg-card-hover);
+}
+
+/* Textarea with ruled-line notebook look */
+.dd-textarea-wrapper {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--border-pencil);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.dd-textarea-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 32px;
+  width: 1px;
+  height: 100%;
+  background: var(--margin-line);
+  opacity: 0.5;
+  z-index: 1;
+  pointer-events: none;
+}
+.dd-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px 12px 40px;
+  border: none;
+  outline: none;
+  resize: vertical;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.75rem;
+  color: var(--text-primary);
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 1.65rem,
+    var(--rule-line) 1.65rem,
+    var(--rule-line) 1.75rem
+  );
+  background-attachment: local;
+  background-position: 0 12px;
+}
+.dd-textarea::placeholder {
+  color: var(--text-light);
+  font-style: italic;
+}
+
+/* Journal entry cards */
+.dd-journal-entry {
+  padding: 10px 14px;
+  border-radius: 3px;
+  border-width: 1px;
+  border-style: solid;
+  position: relative;
+}
+
+/* Fire button */
+.dd-fire-btn {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border: 1px solid var(--border-pencil);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  font-family: var(--font-hand);
+  font-size: 0.8rem;
+  color: var(--text-light);
+  transition: all 0.2s;
+}
+.dd-fire-btn:active {
+  transform: scale(0.96);
+}
+.dd-fire-btn.fired {
+  background: #FFF0EC;
+  border-color: var(--accent-coral-light);
+  color: var(--accent-coral);
+}

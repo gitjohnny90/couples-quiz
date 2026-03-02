@@ -35,7 +35,7 @@ const tools = [
   },
   {
     name: 'Discord',
-    tag: 'Already Have It',
+    tag: 'Free & Easy',
     tagColor: '#7B68C4',
     emoji: '🎮',
     bullets: [
@@ -43,7 +43,7 @@ const tools = [
       'Works with: literally anything on your screen',
       'Voice/video chat built in, no extra extensions',
     ],
-    bestFor: 'People who already use Discord (you do!)',
+    bestFor: 'People who already use Discord',
     link: 'https://discord.com',
     linkLabel: 'discord.com',
     rotation: -0.3,

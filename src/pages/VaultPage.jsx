@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
+import deepDiveDecks from '../data/deepDiveDecks'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../components/Doodles'
 
@@ -13,6 +14,7 @@ export default function VaultPage() {
 
   const [session, setSession] = useState(null)
   const [completedPacks, setCompletedPacks] = useState({})
+  const [ddCompletedCount, setDdCompletedCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
 
@@ -41,6 +43,21 @@ export default function VaultPage() {
       completed[packId] = { count: responses.length, bothDone, matchCount, total: pack.questions.length }
     })
     setCompletedPacks(completed)
+
+    // Deep Dive completion count
+    const playerId = localStorage.getItem('playerId')
+    const { data: ddData } = await supabase.from('deep_dive_responses').select('*').eq('session_id', sessionId)
+    if (ddData) {
+      const ddDone = deepDiveDecks.filter((deck) =>
+        deck.questions.every((q) => {
+          const mine = ddData.find((r) => r.question_id === q.id && r.player_id === playerId)
+          const theirs = ddData.find((r) => r.question_id === q.id && r.player_id !== playerId)
+          return mine && theirs
+        })
+      ).length
+      setDdCompletedCount(ddDone)
+    }
+
     setLoading(false)
   }
 
@@ -195,6 +212,45 @@ export default function VaultPage() {
             )
           })}
         </div>
+
+        {/* Deep Dive section */}
+        <h2 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.4rem', marginTop: 28, marginBottom: 12, color: 'var(--text-secondary)' }}>
+          go deeper ~
+        </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="glass"
+          style={{ padding: 18, cursor: 'pointer', transform: 'rotate(0.3deg)' }}
+          onClick={() => navigate(`/deep-dive/${sessionId}`)}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ fontSize: 28, flexShrink: 0 }}>📖</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 600, marginBottom: 1, color: 'var(--text-primary)' }}>
+                Deep Dive
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
+                open-ended questions you both write answers to — then reveal together
+              </p>
+            </div>
+            <div style={{ flexShrink: 0, textAlign: 'right' }}>
+              {ddCompletedCount > 0 ? (
+                <div>
+                  <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent-sage)' }}>
+                    {ddCompletedCount}/{deepDiveDecks.length}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>decks</div>
+                </div>
+              ) : (
+                <div style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--text-light)' }}>
+                  new →
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
     </div>
   )

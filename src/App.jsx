@@ -13,6 +13,9 @@ import FunStuffPage from "./pages/FunStuffPage";
 import MoviesPage from "./pages/MoviesPage";
 import BooksPage from "./pages/BooksPage";
 import WatchGuidePage from "./pages/WatchGuidePage";
+import DeepDivePage from "./pages/DeepDivePage";
+import DeepDiveDeckPage from "./pages/DeepDiveDeckPage";
+import DeepDiveJournalPage from "./pages/DeepDiveJournalPage";
 
 // Guard: redirects to home if no name has been entered yet
 function RequireName({ children }) {
@@ -52,6 +55,13 @@ function BottomNav() {
              location.pathname.startsWith("/movies") ||
              location.pathname.startsWith("/books") ||
              location.pathname.startsWith("/watch-guide");
+    }
+    // "quizzes" tab should also highlight for /quiz, /results, /deep-dive, /deep-dive-journal
+    if (base === "/vault") {
+      return location.pathname.startsWith("/vault") ||
+             location.pathname.startsWith("/quiz") ||
+             location.pathname.startsWith("/results") ||
+             location.pathname.startsWith("/deep-dive");
     }
     return location.pathname.startsWith(base);
   };
@@ -122,6 +132,9 @@ export default function App() {
           <Route path="/movies/:sessionId" element={<RequireName><MoviesPage /></RequireName>} />
           <Route path="/watch-guide/:sessionId" element={<RequireName><WatchGuidePage /></RequireName>} />
           <Route path="/books/:sessionId" element={<RequireName><BooksPage /></RequireName>} />
+          <Route path="/deep-dive/:sessionId" element={<RequireName><DeepDivePage /></RequireName>} />
+          <Route path="/deep-dive/:sessionId/:deckId" element={<RequireName><DeepDiveDeckPage /></RequireName>} />
+          <Route path="/deep-dive-journal/:sessionId" element={<RequireName><DeepDiveJournalPage /></RequireName>} />
           <Route path="/vault/:sessionId" element={<RequireName><VaultPage /></RequireName>} />
           <Route path="/profiles/:sessionId" element={<RequireName><ProfilesPage /></RequireName>} />
         </Routes>
