@@ -155,6 +155,11 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
     saveData({ ...data, board })
   }
 
+  const handleBoardRemove = (slotIndex) => {
+    const board = (data.board || []).filter(b => b.slot !== slotIndex)
+    saveData({ ...data, board })
+  }
+
   const handleBoardCaption = (slotIndex, caption) => {
     const board = [...(data.board || [])]
     const idx = board.findIndex(b => b.slot === slotIndex)
@@ -274,7 +279,7 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
                     item={boardItem}
                     onImageUpload={(dataUrl) => handleBoardUpload(i, dataUrl)}
                     onCaptionChange={(caption) => handleBoardCaption(i, caption)}
-                    fileInputRef={el => fileInputRefs.current[i] = el}
+                    onRemove={() => handleBoardRemove(i)}
                   />
                 )
               })}
@@ -681,8 +686,11 @@ function ConstellationSVG({ goals }) {
   )
 }
 
-function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, fileInputRef }) {
+function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, onRemove }) {
   const hasPhoto = !!item?.dataUrl
+  const inputRef = useRef(null)
+
+  const openPicker = () => inputRef.current?.click()
 
   return (
     <div style={{
@@ -696,7 +704,7 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, file
     }}>
       {/* Push pin — always visible */}
       <div
-        onClick={() => !hasPhoto && fileInputRef?.click()}
+        onClick={() => !hasPhoto && openPicker()}
         style={{
           width: hasPhoto ? 14 : 13,
           height: hasPhoto ? 14 : 13,
@@ -716,7 +724,7 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, file
       {/* Empty slot — clickable area below pin */}
       {!hasPhoto && (
         <div
-          onClick={() => fileInputRef?.click()}
+          onClick={openPicker}
           style={{
             width: '100%', height: 50,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -739,7 +747,22 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, file
           padding: '6px 6px 20px',
           boxShadow: '2px 3px 8px rgba(0,0,0,0.18)',
           borderRadius: 1,
+          position: 'relative',
         }}>
+          {/* Remove button */}
+          <button
+            onClick={onRemove}
+            style={{
+              position: 'absolute', top: -6, right: -6,
+              width: 18, height: 18, borderRadius: '50%',
+              background: 'rgba(0,0,0,0.5)', border: 'none',
+              color: '#fff', fontSize: '0.55rem', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 11,
+            }}
+          >
+            ✕
+          </button>
           <img
             src={item.dataUrl}
             alt={item.caption || 'vision board photo'}
@@ -747,7 +770,7 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, file
               width: '100%', height: 'auto', display: 'block',
               cursor: 'pointer', borderRadius: 1,
             }}
-            onClick={() => fileInputRef?.click()}
+            onClick={openPicker}
           />
           <input
             type="text"
@@ -767,7 +790,7 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, file
 
       {/* Hidden file input */}
       <input
-        ref={fileInputRef}
+        ref={inputRef}
         type="file"
         accept="image/*"
         style={{ display: 'none' }}
