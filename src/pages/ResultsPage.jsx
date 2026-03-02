@@ -15,6 +15,7 @@ export default function ResultsPage() {
   const [responses, setResponses] = useState([])
   const [loading, setLoading] = useState(true)
   const [revealedQuestions, setRevealedQuestions] = useState(new Set())
+  const [expandedNotes, setExpandedNotes] = useState(new Set())
   const [copied, setCopied] = useState(false)
 
   const fetchResponses = async () => {
@@ -213,12 +214,65 @@ export default function ResultsPage() {
                     <div style={{ textAlign: 'center', fontFamily: 'var(--font-hand)', fontSize: '1.1rem' }}>
                       {matched ? (
                         <span style={{ color: 'var(--accent-sage)' }}>
-                          match! <DoodleHeart size={14} color="var(--accent-sage)" opacity={0.6} style={{ display: 'inline-block', verticalAlign: 'middle' }} />
+                          ✓ match! <DoodleHeart size={14} color="var(--accent-sage)" opacity={0.6} style={{ display: 'inline-block', verticalAlign: 'middle' }} />
                         </span>
                       ) : (
-                        <span style={{ color: 'var(--text-light)' }}>different ~</span>
+                        <span style={{ color: 'var(--text-light)' }}>✗ different ~</span>
                       )}
                     </div>
+
+                    {/* Research note for The Research Round */}
+                    {q.researchNote && (
+                      <div style={{ marginTop: 10 }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setExpandedNotes((prev) => {
+                              const next = new Set(prev)
+                              next.has(q.id) ? next.delete(q.id) : next.add(q.id)
+                              return next
+                            })
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontFamily: 'var(--font-body)',
+                            fontSize: '0.85rem',
+                            color: 'var(--accent-blue)',
+                            padding: '4px 0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            width: '100%',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          📚 {expandedNotes.has(q.id) ? 'hide' : 'why this matters'}
+                          <span style={{ fontSize: '0.7rem' }}>{expandedNotes.has(q.id) ? '▲' : '▼'}</span>
+                        </button>
+                        {expandedNotes.has(q.id) && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            transition={{ duration: 0.25 }}
+                            style={{
+                              marginTop: 8,
+                              padding: '10px 12px',
+                              background: '#F0F7F4',
+                              border: '1px solid #C5E0C4',
+                              borderRadius: 3,
+                              fontSize: '0.82rem',
+                              lineHeight: 1.5,
+                              color: 'var(--text-secondary)',
+                              fontFamily: 'var(--font-body)',
+                            }}
+                          >
+                            📚 {q.researchNote}
+                          </motion.div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </motion.div>

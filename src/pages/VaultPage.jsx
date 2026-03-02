@@ -67,7 +67,7 @@ export default function VaultPage() {
     )
   }
 
-  const cardRotations = [-0.7, 0.5, -0.3, 0.8, -0.5]
+  const cardRotations = [-0.7, 0.5, -0.3, 0.8, -0.5, 0.4]
 
   return (
     <div className="page" style={{ position: 'relative' }}>
