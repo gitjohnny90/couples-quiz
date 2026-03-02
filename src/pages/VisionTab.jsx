@@ -25,12 +25,12 @@ const STATUS_DISPLAY = {
 }
 
 const BOARD_SLOTS = [
-  { top: '4%', left: '4%', rotate: -3, width: '42%' },
-  { top: '2%', left: '54%', rotate: 2, width: '42%' },
-  { top: '35%', left: '7%', rotate: 1.5, width: '38%' },
-  { top: '33%', left: '53%', rotate: -2.5, width: '44%' },
-  { top: '65%', left: '3%', rotate: -1, width: '43%' },
-  { top: '67%', left: '55%', rotate: 3, width: '40%' },
+  { rotate: -5, marginTop: 8, width: 130, zIndex: 3, emptyPos: { top: '12%', left: '8%' } },
+  { rotate: 4, marginTop: 4, width: 140, zIndex: 1, emptyPos: { top: '55%', left: '25%' } },
+  { rotate: -3, marginTop: 16, width: 135, zIndex: 4, emptyPos: { top: '18%', left: '48%' } },
+  { rotate: 7, marginTop: 2, width: 145, zIndex: 2, emptyPos: { top: '60%', left: '65%' } },
+  { rotate: -6, marginTop: 10, width: 132, zIndex: 5, emptyPos: { top: '15%', left: '82%' } },
+  { rotate: 3, marginTop: 6, width: 138, zIndex: 1, emptyPos: { top: '52%', left: '90%' } },
 ]
 
 const PIN_COLORS = ['#E55', '#E8B84C', '#5B8FC7', '#6BAF6B', '#D47BA0', '#E88D7A']
@@ -197,16 +197,16 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
         </div>
 
         <div className="glass" style={{
-          padding: '24px 20px', textAlign: 'center',
+          padding: '16px 18px', textAlign: 'center',
           background: 'linear-gradient(135deg, #FFFDF7 0%, #FFF8E7 100%)',
         }}>
           <h2 style={{
-            fontFamily: 'var(--font-hand)', fontSize: '1.5rem', fontWeight: 700,
+            fontFamily: 'var(--font-hand)', fontSize: '1.3rem', fontWeight: 700,
             color: '#B8942F', marginBottom: 4,
           }}>
             our north star
           </h2>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 14 }}>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 10 }}>
             the thing you're building toward, together
           </p>
           <textarea
@@ -214,17 +214,119 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
             onChange={(e) => handleNorthStarChange(e.target.value)}
             placeholder="Close the distance. Build something real. Never stop laughing."
             maxLength={300}
-            rows={3}
+            rows={2}
             style={{
               width: '100%', border: 'none', outline: 'none', resize: 'none',
               background: 'transparent', textAlign: 'center',
-              fontFamily: 'var(--font-hand)', fontSize: '1.4rem', lineHeight: 1.5,
+              fontFamily: 'var(--font-hand)', fontSize: '1.2rem', lineHeight: 1.5,
               color: 'var(--text-primary)',
               textShadow: '0 0 20px rgba(212, 168, 67, 0.15)',
             }}
           />
           {saving && (
             <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginTop: 4 }}>saving...</p>
+          )}
+        </div>
+      </div>
+
+      {/* ===== VISION BOARD ===== */}
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{
+          fontFamily: 'var(--font-hand)', fontSize: '1.3rem', fontWeight: 700,
+          textAlign: 'center', marginBottom: 4, color: 'var(--text-primary)',
+        }}>
+          our vision board
+        </h2>
+        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 14 }}>
+          pin photos of your dreams — places, homes, pets, adventures, anything you're working toward
+        </p>
+
+        <div className="vision-board-cork" style={{
+          position: 'relative',
+          background: '#C4956A',
+          backgroundImage: 'radial-gradient(circle at 20% 30%, rgba(255,255,255,0.06) 0%, transparent 50%)',
+          borderRadius: 4,
+          padding: '14px 10px',
+          border: '3px solid #A07A52',
+          boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.15)',
+          overflowX: 'auto',
+          overflowY: 'visible',
+          WebkitOverflowScrolling: 'touch',
+          minHeight: 180,
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        }}>
+          {(data.board || []).some(b => b.dataUrl) ? (
+            /* Photos exist — horizontal flex with overlapping polaroids */
+            <div style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              minWidth: 'min-content',
+              padding: '6px 0',
+            }}>
+              {BOARD_SLOTS.map((slot, i) => {
+                const boardItem = (data.board || []).find(b => b.slot === i)
+                return (
+                  <CorkBoardSlot
+                    key={i}
+                    index={i}
+                    slot={slot}
+                    item={boardItem}
+                    onImageUpload={(dataUrl) => handleBoardUpload(i, dataUrl)}
+                    onCaptionChange={(caption) => handleBoardCaption(i, caption)}
+                    fileInputRef={el => fileInputRefs.current[i] = el}
+                  />
+                )
+              })}
+            </div>
+          ) : (
+            /* Empty board — tacks spread across with centered text */
+            <div style={{ position: 'relative', height: 160 }}>
+              {BOARD_SLOTS.map((slot, i) => (
+                <div
+                  key={i}
+                  onClick={() => fileInputRefs.current[i]?.click()}
+                  style={{
+                    position: 'absolute',
+                    top: slot.emptyPos.top,
+                    left: slot.emptyPos.left,
+                    width: 13, height: 13,
+                    borderRadius: '50%',
+                    background: `radial-gradient(circle at 40% 35%, ${PIN_COLORS[i]}, ${PIN_COLORS[i]}88)`,
+                    boxShadow: '0 2px 3px rgba(0,0,0,0.3)',
+                    cursor: 'pointer',
+                    transition: 'transform 0.15s',
+                    zIndex: 2,
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.3)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                />
+              ))}
+              {/* Hidden file inputs for empty state */}
+              {BOARD_SLOTS.map((_, i) => (
+                <input
+                  key={`empty-input-${i}`}
+                  ref={el => fileInputRefs.current[i] = el}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) compressAndUpload(file, (dataUrl) => handleBoardUpload(i, dataUrl))
+                    e.target.value = ''
+                  }}
+                />
+              ))}
+              <p style={{
+                position: 'absolute', top: '50%', left: '50%',
+                transform: 'translate(-50%, -50%)',
+                fontFamily: 'var(--font-hand)', fontSize: '0.9rem',
+                color: 'rgba(255,255,255,0.5)', fontStyle: 'italic',
+                whiteSpace: 'nowrap', zIndex: 1, pointerEvents: 'none',
+              }}>
+                tap a tack to pin a dream
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -460,50 +562,6 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
         </div>
       )}
 
-      {/* ===== CORK BOARD ===== */}
-      <div style={{ marginBottom: 24 }}>
-        <h2 style={{
-          fontFamily: 'var(--font-hand)', fontSize: '1.3rem', fontWeight: 700,
-          textAlign: 'center', marginBottom: 4, color: 'var(--text-primary)',
-        }}>
-          what we're building
-        </h2>
-        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 14 }}>
-          pin photos of your dreams — places, homes, pets, adventures, anything you're working toward
-        </p>
-
-        <div style={{
-          position: 'relative',
-          background: '#C4956A',
-          backgroundImage: `radial-gradient(circle at 20% 30%, rgba(255,255,255,0.06) 0%, transparent 50%)`,
-          borderRadius: 4,
-          padding: '16px',
-          border: '3px solid #A07A52',
-          boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.15)',
-        }}>
-          {/* 2x3 grid for cork board slots */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 12,
-          }}>
-            {BOARD_SLOTS.map((slot, i) => {
-              const boardItem = (data.board || []).find(b => b.slot === i)
-              return (
-                <CorkBoardSlot
-                  key={i}
-                  index={i}
-                  slot={slot}
-                  item={boardItem}
-                  onImageUpload={(dataUrl) => handleBoardUpload(i, dataUrl)}
-                  onCaptionChange={(caption) => handleBoardCaption(i, caption)}
-                  fileInputRef={el => fileInputRefs.current[i] = el}
-                />
-              )
-            })}
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
@@ -624,68 +682,69 @@ function ConstellationSVG({ goals }) {
 }
 
 function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, fileInputRef }) {
-  return (
-    <div style={{ transform: `rotate(${slot.rotate}deg)` }}>
-      {/* Push pin */}
-      <div style={{
-        width: 14, height: 14, borderRadius: '50%',
-        background: `radial-gradient(circle at 40% 35%, ${PIN_COLORS[index]}, ${PIN_COLORS[index]}88)`,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-        margin: '0 auto -7px', position: 'relative', zIndex: 2,
-      }} />
+  const hasPhoto = !!item?.dataUrl
 
-      {/* Polaroid frame */}
-      <div style={{
-        background: '#fff',
-        padding: '8px 8px 24px',
-        boxShadow: '2px 3px 8px rgba(0,0,0,0.15)',
-        borderRadius: 1,
-      }}>
-        {item?.dataUrl ? (
-          <>
-            <img
-              src={item.dataUrl}
-              alt={item.caption || 'vision board photo'}
-              style={{
-                width: '100%', height: 'auto', display: 'block',
-                cursor: 'pointer', borderRadius: 1,
-              }}
-              onClick={() => fileInputRef?.click()}
-            />
-            <input
-              type="text"
-              value={item.caption || ''}
-              onChange={(e) => onCaptionChange(e.target.value)}
-              placeholder="add a caption..."
-              maxLength={60}
-              style={{
-                width: '100%', border: 'none', outline: 'none',
-                fontFamily: 'var(--font-hand)', fontSize: '0.7rem',
-                textAlign: 'center', color: '#666',
-                marginTop: 4, background: 'transparent',
-              }}
-            />
-          </>
-        ) : (
-          <div
-            onClick={() => fileInputRef?.click()}
+  return (
+    <div style={{
+      position: 'relative',
+      transform: hasPhoto ? `rotate(${slot.rotate}deg)` : 'none',
+      marginTop: hasPhoto ? slot.marginTop : slot.emptyTop,
+      marginLeft: hasPhoto ? slot.marginLeft : index === 0 ? 12 : 30,
+      width: hasPhoto ? slot.width : 'auto',
+      flexShrink: 0,
+      zIndex: hasPhoto ? slot.zIndex + 5 : slot.zIndex,
+    }}>
+      {/* Push pin — always visible */}
+      <div
+        onClick={() => !hasPhoto && fileInputRef?.click()}
+        style={{
+          width: hasPhoto ? 14 : 13,
+          height: hasPhoto ? 14 : 13,
+          borderRadius: '50%',
+          background: `radial-gradient(circle at 40% 35%, ${PIN_COLORS[index]}, ${PIN_COLORS[index]}88)`,
+          boxShadow: `0 2px ${hasPhoto ? 4 : 3}px rgba(0,0,0,0.3)`,
+          margin: hasPhoto ? '0 auto -7px' : '0 auto',
+          position: 'relative',
+          zIndex: 10,
+          cursor: hasPhoto ? 'default' : 'pointer',
+          transition: 'transform 0.15s',
+        }}
+        onMouseEnter={e => { if (!hasPhoto) e.currentTarget.style.transform = 'scale(1.3)' }}
+        onMouseLeave={e => { if (!hasPhoto) e.currentTarget.style.transform = 'scale(1)' }}
+      />
+
+      {/* Polaroid frame — only when photo exists */}
+      {hasPhoto && (
+        <div style={{
+          background: '#fff',
+          padding: '6px 6px 20px',
+          boxShadow: '2px 3px 8px rgba(0,0,0,0.18)',
+          borderRadius: 1,
+        }}>
+          <img
+            src={item.dataUrl}
+            alt={item.caption || 'vision board photo'}
             style={{
-              width: '100%', aspectRatio: '4/3',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              background: '#F5F0EA', cursor: 'pointer', borderRadius: 1,
+              width: '100%', height: 'auto', display: 'block',
+              cursor: 'pointer', borderRadius: 1,
             }}
-          >
-            <span style={{ fontSize: '1.2rem', marginBottom: 4 }}>📌</span>
-            <span style={{
-              fontFamily: 'var(--font-hand)', fontSize: '0.7rem',
-              color: '#A09080',
-            }}>
-              pin a dream here ✨
-            </span>
-          </div>
-        )}
-      </div>
+            onClick={() => fileInputRef?.click()}
+          />
+          <input
+            type="text"
+            value={item.caption || ''}
+            onChange={(e) => onCaptionChange(e.target.value)}
+            placeholder="caption..."
+            maxLength={60}
+            style={{
+              width: '100%', border: 'none', outline: 'none',
+              fontFamily: 'var(--font-hand)', fontSize: '0.65rem',
+              textAlign: 'center', color: '#666',
+              marginTop: 3, background: 'transparent',
+            }}
+          />
+        </div>
+      )}
 
       {/* Hidden file input */}
       <input

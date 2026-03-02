@@ -421,6 +421,10 @@ select option {
   border-radius: 3px;
 }
 
+.vision-board-cork::-webkit-scrollbar {
+  display: none;
+}
+
 /* ===== SQUIGGLY DIVIDER ===== */
 .squiggle-divider {
   width: 100%;
