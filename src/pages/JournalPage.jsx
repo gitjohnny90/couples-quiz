@@ -4,6 +4,7 @@ import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
 import deepDiveDecks, { MOOD_TAGS, SERIES } from '../data/deepDiveDecks'
+import drawingPrompts, { DRAW_PACK_PREFIX } from '../data/drawingPrompts'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, DoodleHeart, SquigglyUnderline } from '../components/Doodles'
 
@@ -16,6 +17,7 @@ export default function JournalPage() {
   const [activeTab, setActiveTab] = useState('mc')
   const [mcResponses, setMcResponses] = useState([])
   const [ddResponses, setDdResponses] = useState([])
+  const [drawResponses, setDrawResponses] = useState([])
   const [loading, setLoading] = useState(true)
   const [expandedItem, setExpandedItem] = useState(null)
 
@@ -25,7 +27,11 @@ export default function JournalPage() {
         supabase.from('responses').select('*').eq('session_id', sessionId),
         supabase.from('deep_dive_responses').select('*').eq('session_id', sessionId),
       ])
-      if (mcRes.data) setMcResponses(mcRes.data)
+      if (mcRes.data) {
+        const allResponses = mcRes.data
+        setDrawResponses(allResponses.filter(r => r.pack_id?.startsWith(DRAW_PACK_PREFIX + 'dp')))
+        setMcResponses(allResponses.filter(r => !r.pack_id?.startsWith(DRAW_PACK_PREFIX)))
+      }
       if (ddRes.data) setDdResponses(ddRes.data)
       setLoading(false)
     }
@@ -60,8 +66,35 @@ export default function JournalPage() {
     )
   }
 
+  // ── Drawings helpers ──
+  const getCompletedDrawings = () => {
+    const byPack = {}
+    drawResponses.forEach(r => {
+      if (!byPack[r.pack_id]) byPack[r.pack_id] = []
+      byPack[r.pack_id].push(r)
+    })
+    return Object.entries(byPack)
+      .filter(([_, responses]) => responses.length >= 2)
+      .map(([packId, responses]) => {
+        const promptId = packId.replace(DRAW_PACK_PREFIX, '')
+        const promptData = drawingPrompts.find(p => p.id === promptId)
+        const p1 = responses.find(r => r.player_id === 'player1')
+        const p2 = responses.find(r => r.player_id === 'player2')
+        return {
+          packId,
+          promptId,
+          promptText: promptData?.text || p1?.answers?.promptText || '',
+          p1,
+          p2,
+          createdAt: p2?.created_at || p1?.created_at,
+        }
+      })
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  }
+
   const completedPacks = loading ? [] : getCompletedPacks()
   const completedDecks = loading ? [] : getCompletedDecks()
+  const completedDrawings = loading ? [] : getCompletedDrawings()
   const totalFires = ddResponses.filter((r) => r.is_fired).length
 
   // Stats
@@ -69,6 +102,7 @@ export default function JournalPage() {
   const mcMatches = completedPacks.reduce((s, p) => s + p.matchCount, 0)
   const mcQuestions = completedPacks.reduce((s, p) => s + p.pack.questions.length, 0)
   const ddTotal = completedDecks.length
+  const drawTotal = completedDrawings.length
 
   return (
     <div className="page" style={{ position: 'relative' }}>
@@ -88,7 +122,7 @@ export default function JournalPage() {
 
         {/* Tab switcher */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
-          {[['mc', 'multiple choice'], ['dd', 'deep dive']].map(([key, label]) => (
+          {[['mc', 'quizzes'], ['dd', 'deep dive'], ['drawings', 'drawings']].map(([key, label]) => (
             <button
               key={key}
               onClick={() => { setActiveTab(key); setExpandedItem(null) }}
@@ -384,6 +418,115 @@ export default function JournalPage() {
                                   </div>
                                 )
                               })}
+                            </motion.div>
+                          )}
+                        </motion.div>
+                      )
+                    })}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ══ DRAWINGS TAB ══ */}
+            {activeTab === 'drawings' && (
+              <motion.div key="drawings" initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 15 }}>
+
+                {/* Stats */}
+                {drawTotal > 0 && (
+                  <div className="sticky-note" style={{ padding: 16, textAlign: 'center', marginBottom: 20, transform: 'rotate(-0.5deg)', position: 'relative' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: 24 }}>
+                      <div>
+                        <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.8rem', fontWeight: 700, color: 'var(--accent-coral)', lineHeight: 1 }}>
+                          {drawTotal}
+                        </p>
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>drawings done</p>
+                      </div>
+                      <div>
+                        <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.8rem', fontWeight: 700, color: 'var(--accent-coral)', lineHeight: 1 }}>
+                          {drawingPrompts.length - drawTotal}
+                        </p>
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>left to draw</p>
+                      </div>
+                    </div>
+                    <div style={{ position: 'absolute', top: -6, right: 12 }}>
+                      <DoodleStar size={14} opacity={0.35} rotate={15} />
+                    </div>
+                  </div>
+                )}
+
+                {drawTotal === 0 ? (
+                  <div className="glass" style={{ padding: 28, textAlign: 'center', transform: 'rotate(0.3deg)' }}>
+                    <p style={{ fontSize: '1.5rem', marginBottom: 8 }}>🎨</p>
+                    <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem', color: 'var(--text-secondary)' }}>
+                      no drawings yet
+                    </p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginTop: 4, fontStyle: 'italic' }}>
+                      complete a drawing together to see your art here
+                    </p>
+                    <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => navigate(`/draw/${sessionId}`)}>
+                      start drawing →
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {completedDrawings.map((drawing, i) => {
+                      const isExpanded = expandedItem === drawing.packId
+                      return (
+                        <motion.div
+                          key={drawing.packId}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="glass"
+                          style={{ overflow: 'hidden', transform: `rotate(${i % 2 === 0 ? -0.3 : 0.3}deg)` }}
+                        >
+                          <button
+                            onClick={() => setExpandedItem(isExpanded ? null : drawing.packId)}
+                            style={{
+                              width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                              padding: '16px 18px', textAlign: 'left',
+                              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <span style={{ fontSize: '1.4rem' }}>🎨</span>
+                              <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                                {drawing.promptText}
+                              </h3>
+                            </div>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-light)', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)' }}>
+                              ▼
+                            </span>
+                          </button>
+
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              transition={{ duration: 0.25 }}
+                              style={{ padding: '0 18px 18px' }}
+                            >
+                              <div className="drawing-reveal-grid">
+                                <div className="drawing-reveal-card">
+                                  <p className="drawing-reveal-name" style={{ color: 'var(--accent-coral)' }}>
+                                    {drawing.p1?.player_name || 'player 1'}
+                                  </p>
+                                  <div style={{ position: 'relative' }}>
+                                    <img src={drawing.p1?.answers?.drawing} alt={`${drawing.p1?.player_name}'s drawing`} />
+                                    <div className="torn-edge-small" />
+                                  </div>
+                                </div>
+                                <div className="drawing-reveal-card">
+                                  <p className="drawing-reveal-name" style={{ color: 'var(--accent-blue)' }}>
+                                    {drawing.p2?.player_name || 'player 2'}
+                                  </p>
+                                  <div style={{ position: 'relative' }}>
+                                    <img src={drawing.p2?.answers?.drawing} alt={`${drawing.p2?.player_name}'s drawing`} />
+                                    <div className="torn-edge-small" />
+                                  </div>
+                                </div>
+                              </div>
                             </motion.div>
                           )}
                         </motion.div>

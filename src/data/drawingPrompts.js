@@ -18,4 +18,7 @@ export const drawingRoundMeta = {
   description: 'Same prompt, two artists, zero talent required',
 }
 
+export const DRAW_PACK_PREFIX = 'draw-'
+export const getDrawPackId = (promptId) => `${DRAW_PACK_PREFIX}${promptId}`
+
 export default drawingPrompts

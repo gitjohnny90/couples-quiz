@@ -202,7 +202,10 @@ export default function MoviesPage() {
           <h1 style={{ fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700, marginBottom: 2 }}>
             🎬 movies
           </h1>
-          <SquigglyUnderline width={90} color="#E88D7A" opacity={0.4} style={{ margin: '0 auto 6px' }} />
+          <SquigglyUnderline width={90} color="#E88D7A" opacity={0.4} style={{ margin: '0 auto 8px' }} />
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.4 }}>
+            build a shared watchlist, spin the genre wheel, or let us pick
+          </p>
           {totalWatched > 0 && (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               {totalWatched} watched together

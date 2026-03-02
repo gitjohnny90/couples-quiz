@@ -2,12 +2,12 @@ import { useContext, useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
-import { drawingRoundMeta } from '../data/drawingPrompts'
+import drawingPrompts, { drawingRoundMeta, getDrawPackId } from '../data/drawingPrompts'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline } from '../components/Doodles'
 
 export default function DrawResultsPage() {
-  const { sessionId } = useParams()
+  const { sessionId, promptId } = useParams()
   const navigate = useNavigate()
   const { playerName } = useContext(SessionContext)
 
@@ -16,12 +16,18 @@ export default function DrawResultsPage() {
   const [revealed, setRevealed] = useState(false)
   const [copied, setCopied] = useState(false)
 
+  // Use per-prompt pack_id if promptId present, else legacy fallback
+  const targetPackId = promptId ? getDrawPackId(promptId) : drawingRoundMeta.id
+
+  // Look up prompt text from static data when available
+  const promptFromData = promptId ? drawingPrompts.find(p => p.id === promptId) : null
+
   const fetchResponses = async () => {
     const { data, error } = await supabase
       .from('responses')
       .select('*')
       .eq('session_id', sessionId)
-      .eq('pack_id', drawingRoundMeta.id)
+      .eq('pack_id', targetPackId)
 
     if (!error && data) setResponses(data)
     setLoading(false)
@@ -32,7 +38,7 @@ export default function DrawResultsPage() {
 
     // Realtime: listen for partner's drawing submission
     const channel = supabase
-      .channel(`draw-${sessionId}`)
+      .channel(`draw-${sessionId}-${promptId || 'legacy'}`)
       .on(
         'postgres_changes',
         {
@@ -48,7 +54,7 @@ export default function DrawResultsPage() {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [sessionId])
+  }, [sessionId, promptId])
 
   const copyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)
@@ -118,13 +124,23 @@ export default function DrawResultsPage() {
           >
             check again
           </button>
+
+          {promptId && (
+            <button
+              className="btn btn-secondary"
+              style={{ marginTop: 8, marginLeft: 8 }}
+              onClick={() => navigate(`/draw/${sessionId}`)}
+            >
+              draw another →
+            </button>
+          )}
         </motion.div>
       </div>
     )
   }
 
   // Both done — reveal time!
-  const promptText = p1?.answers?.promptText || p2?.answers?.promptText || ''
+  const promptText = promptFromData?.text || p1?.answers?.promptText || p2?.answers?.promptText || ''
 
   return (
     <div className="page" style={{ position: 'relative' }}>
@@ -245,10 +261,19 @@ export default function DrawResultsPage() {
                 <button
                   className="btn btn-secondary"
                   style={{ flex: 1 }}
-                  onClick={() => navigate(`/vault/${sessionId}`)}
+                  onClick={() => navigate(`/fun/${sessionId}`)}
                 >
-                  back to quizzes
+                  ← back to fun stuff
                 </button>
+                {promptId && (
+                  <button
+                    className="btn btn-primary"
+                    style={{ flex: 1 }}
+                    onClick={() => navigate(`/draw/${sessionId}`)}
+                  >
+                    draw another →
+                  </button>
+                )}
               </div>
             </motion.div>
           </AnimatePresence>

@@ -158,8 +158,17 @@ export default function QuizPacksPage() {
           })}
         </div>
 
+        {/* Journal link */}
+        <button
+          className="btn btn-secondary"
+          style={{ width: '100%', marginTop: 24 }}
+          onClick={() => navigate(`/journal/${sessionId}`)}
+        >
+          📖 open journal
+        </button>
+
         {/* Back */}
-        <button className="btn btn-secondary" style={{ width: '100%', marginTop: 22 }} onClick={() => navigate(`/vault/${sessionId}`)}>
+        <button className="btn btn-secondary" style={{ width: '100%', marginTop: 10 }} onClick={() => navigate(`/vault/${sessionId}`)}>
           ← back to quizzes
         </button>
       </motion.div>

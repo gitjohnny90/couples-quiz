@@ -185,6 +185,25 @@ export default function VaultPage() {
             </div>
           </motion.div>
 
+          {/* Coming soon placeholder */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="sticky-note"
+            style={{ padding: 20, textAlign: 'center', marginTop: 8 }}
+          >
+            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.15rem', color: 'var(--text-secondary)' }}>
+              more quizzes coming soon...
+            </p>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginTop: 4 }}>
+              stay tuned ✨
+            </p>
+            <div style={{ position: 'absolute', top: -4, right: 10 }}>
+              <DoodleStar size={14} opacity={0.3} rotate={10} />
+            </div>
+          </motion.div>
+
         </div>
       </motion.div>
     </div>

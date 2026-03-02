@@ -2,7 +2,7 @@ import { useContext, useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
-import { drawingRoundMeta } from '../data/drawingPrompts'
+import drawingPrompts, { drawingRoundMeta, getDrawPackId } from '../data/drawingPrompts'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleStar, DoodleSpiral, SquigglyUnderline } from '../components/Doodles'
 
@@ -11,7 +11,7 @@ export default function FunStuffPage() {
   const navigate = useNavigate()
   const { setSessionId } = useContext(SessionContext)
 
-  const [drawStatus, setDrawStatus] = useState({ count: 0, bothDone: false })
+  const [drawStatus, setDrawStatus] = useState({ completedCount: 0, startedCount: 0, total: drawingPrompts.length })
   const [movieCount, setMovieCount] = useState(0)
   const [bookCount, setBookCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -22,13 +22,21 @@ export default function FunStuffPage() {
   }, [sessionId])
 
   const fetchData = async () => {
+    const allDrawPackIds = drawingPrompts.map(p => getDrawPackId(p.id))
     const [{ data: drawData }, { data: itemData }] = await Promise.all([
-      supabase.from('responses').select('*').eq('session_id', sessionId).eq('pack_id', drawingRoundMeta.id),
+      supabase.from('responses').select('pack_id, player_id').eq('session_id', sessionId).in('pack_id', allDrawPackIds),
       supabase.from('shared_items').select('type, id').eq('session_id', sessionId),
     ])
 
     if (drawData) {
-      setDrawStatus({ count: drawData.length, bothDone: drawData.length >= 2 })
+      const byPack = {}
+      drawData.forEach(r => {
+        if (!byPack[r.pack_id]) byPack[r.pack_id] = new Set()
+        byPack[r.pack_id].add(r.player_id)
+      })
+      const completedCount = Object.values(byPack).filter(players => players.size >= 2).length
+      const startedCount = Object.keys(byPack).length
+      setDrawStatus({ completedCount, startedCount, total: drawingPrompts.length })
     }
     if (itemData) {
       setMovieCount(itemData.filter((i) => i.type === 'movie').length)
@@ -55,12 +63,18 @@ export default function FunStuffPage() {
       title: drawingRoundMeta.title,
       description: drawingRoundMeta.description,
       rotation: 0.4,
-      borderColor: drawStatus.bothDone ? 'var(--accent-blue)' : undefined,
-      statusText: drawStatus.bothDone ? 'done! ✓' : drawStatus.count >= 1 ? 'waiting...' : 'draw →',
-      statusColor: drawStatus.bothDone ? 'var(--accent-blue)' : drawStatus.count >= 1 ? 'var(--accent-mustard)' : 'var(--text-light)',
-      onClick: () => drawStatus.bothDone
-        ? navigate(`/draw-results/${sessionId}`)
-        : navigate(`/draw/${sessionId}`),
+      borderColor: drawStatus.completedCount > 0 ? 'var(--accent-blue)' : undefined,
+      statusText: drawStatus.completedCount > 0
+        ? `${drawStatus.completedCount}/${drawStatus.total} done`
+        : drawStatus.startedCount > 0
+          ? 'in progress...'
+          : 'draw →',
+      statusColor: drawStatus.completedCount > 0
+        ? 'var(--accent-blue)'
+        : drawStatus.startedCount > 0
+          ? 'var(--accent-mustard)'
+          : 'var(--text-light)',
+      onClick: () => navigate(`/draw/${sessionId}`),
     },
     {
       emoji: '🎬',

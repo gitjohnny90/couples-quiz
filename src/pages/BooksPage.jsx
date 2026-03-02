@@ -203,7 +203,10 @@ export default function BooksPage() {
           <h1 style={{ fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700, marginBottom: 2 }}>
             📚 books
           </h1>
-          <SquigglyUnderline width={80} color="#7CAE7A" opacity={0.4} style={{ margin: '0 auto 6px' }} />
+          <SquigglyUnderline width={80} color="#7CAE7A" opacity={0.4} style={{ margin: '0 auto 8px' }} />
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.4 }}>
+            build a shared reading list, spin the genre wheel, or let us pick
+          </p>
           {totalRead > 0 && (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               {totalRead} read together

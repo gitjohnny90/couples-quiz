@@ -134,6 +134,7 @@ export default function App() {
           <Route path="/quiz/:sessionId/:packId" element={<RequireName><QuizPage /></RequireName>} />
           <Route path="/results/:sessionId/:packId" element={<RequireName><ResultsPage /></RequireName>} />
           <Route path="/draw/:sessionId" element={<RequireName><DrawPage /></RequireName>} />
+          <Route path="/draw-results/:sessionId/:promptId" element={<RequireName><DrawResultsPage /></RequireName>} />
           <Route path="/draw-results/:sessionId" element={<RequireName><DrawResultsPage /></RequireName>} />
           <Route path="/fun/:sessionId" element={<RequireName><FunStuffPage /></RequireName>} />
           <Route path="/movies/:sessionId" element={<RequireName><MoviesPage /></RequireName>} />
