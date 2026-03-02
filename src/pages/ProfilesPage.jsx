@@ -246,8 +246,11 @@ export default function ProfilesPage() {
               ) : (
                 <>
                   <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic', lineHeight: 1.4 }}>
-                      here's how your personalities line up — same types aren't better or worse, it's all about understanding each other
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic', lineHeight: 1.4, marginBottom: 6 }}>
+                      compatibility is fun to compare, but don't get too caught up in the score
+                    </p>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', lineHeight: 1.4 }}>
+                      differences and opposite traits can bring balance in a lifelong partnership — it's all about understanding each other
                     </p>
                   </div>
 
