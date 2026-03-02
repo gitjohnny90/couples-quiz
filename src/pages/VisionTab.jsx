@@ -358,32 +358,43 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
       </div>
 
       {/* ===== CONSTELLATION MAP ===== */}
-      {totalGoals > 0 && (
-        <div style={{ marginBottom: 24 }}>
-          <h2 style={{
-            fontFamily: 'var(--font-hand)', fontSize: '1.3rem', fontWeight: 700,
-            textAlign: 'center', marginBottom: 4, color: 'var(--text-primary)',
-          }}>
-            our sky
-          </h2>
-          <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 14 }}>
-            every dream you achieve becomes a star — watch your sky grow
-          </p>
-          <div className="glass" style={{
-            padding: 20, textAlign: 'center',
-            background: 'linear-gradient(180deg, #2C2C4A 0%, #1A1A2E 100%)',
-            border: '1.5px solid #3D3D5C',
-          }}>
-            <ConstellationSVG goals={data.goals} />
-            <p style={{
-              fontFamily: 'var(--font-hand)', fontSize: '1.1rem',
-              color: '#F0E6D3', marginTop: 10,
-            }}>
-              {achievedGoals.length} star{achievedGoals.length !== 1 ? 's' : ''} in our sky ✨
-            </p>
-          </div>
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{
+          fontFamily: 'var(--font-hand)', fontSize: '1.3rem', fontWeight: 700,
+          textAlign: 'center', marginBottom: 4, color: 'var(--text-primary)',
+        }}>
+          our sky
+        </h2>
+        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 14 }}>
+          every dream you achieve becomes a star — watch your sky grow
+        </p>
+        <div className="glass" style={{
+          padding: 20, textAlign: 'center',
+          background: 'linear-gradient(180deg, #2C2C4A 0%, #1A1A2E 100%)',
+          border: '1.5px solid #3D3D5C',
+        }}>
+          {totalGoals > 0 ? (
+            <>
+              <ConstellationSVG goals={data.goals} />
+              <p style={{
+                fontFamily: 'var(--font-hand)', fontSize: '1.1rem',
+                color: '#F0E6D3', marginTop: 10,
+              }}>
+                {achievedGoals.length} star{achievedGoals.length !== 1 ? 's' : ''} in our sky ✨
+              </p>
+            </>
+          ) : (
+            <div style={{ padding: '24px 10px' }}>
+              <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.3rem', color: '#F0E6D3', marginBottom: 8 }}>
+                your sky is empty — for now
+              </p>
+              <p style={{ fontSize: '0.85rem', color: '#A0A0C0', lineHeight: 1.5, maxWidth: 260, margin: '0 auto' }}>
+                add dreams in the categories above and mark them as achieved — each one becomes a glowing star up here
+              </p>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* ===== LOOK HOW FAR WE'VE COME ===== */}
       {achievedGoals.length > 0 && (
