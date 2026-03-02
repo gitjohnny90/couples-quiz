@@ -9,6 +9,7 @@ import VaultPage from "./pages/VaultPage";
 import ProfilesPage from "./pages/ProfilesPage";
 import DrawPage from "./pages/DrawPage";
 import DrawResultsPage from "./pages/DrawResultsPage";
+import FunStuffPage from "./pages/FunStuffPage";
 
 // Guard: redirects to home if no name has been entered yet
 function RequireName({ children }) {
@@ -32,14 +33,20 @@ function BottomNav() {
   if (!sessionId) return null;
 
   const tabs = [
-    { label: "home", path: "/", doodle: "~" },
-    { label: "quizzes", path: `/vault/${sessionId}`, doodle: "+" },
-    { label: "us", path: `/profiles/${sessionId}`, doodle: "&" },
+    { label: "home", path: "/" },
+    { label: "quizzes", path: `/vault/${sessionId}` },
+    { label: "fun stuff", path: `/fun/${sessionId}` },
+    { label: "us", path: `/profiles/${sessionId}` },
   ];
 
   const isActive = (tabPath) => {
     if (tabPath === "/") return location.pathname === "/";
     const base = "/" + tabPath.split("/")[1];
+    // "fun stuff" tab should also highlight for /draw and /draw-results pages
+    if (base === "/fun") {
+      return location.pathname.startsWith("/fun") ||
+             location.pathname.startsWith("/draw");
+    }
     return location.pathname.startsWith(base);
   };
 
@@ -105,6 +112,7 @@ export default function App() {
           <Route path="/results/:sessionId/:packId" element={<RequireName><ResultsPage /></RequireName>} />
           <Route path="/draw/:sessionId" element={<RequireName><DrawPage /></RequireName>} />
           <Route path="/draw-results/:sessionId" element={<RequireName><DrawResultsPage /></RequireName>} />
+          <Route path="/fun/:sessionId" element={<RequireName><FunStuffPage /></RequireName>} />
           <Route path="/vault/:sessionId" element={<RequireName><VaultPage /></RequireName>} />
           <Route path="/profiles/:sessionId" element={<RequireName><ProfilesPage /></RequireName>} />
         </Routes>
