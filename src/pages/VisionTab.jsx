@@ -342,9 +342,25 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
         }}>
           our dreams
         </h2>
-        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 14 }}>
-          tap a category to add dreams and track your progress together
+        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 4 }}>
+          add dreams to any category and tap the emoji to track your progress
         </p>
+        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 10 }}>
+          achieved dreams become stars — collect enough and they form a constellation that tells the story of your journey together
+        </p>
+        <div style={{
+          display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 14,
+          flexWrap: 'wrap',
+        }}>
+          {STATUS_CYCLE.map((s) => (
+            <span key={s} style={{
+              fontSize: '0.75rem', color: 'var(--text-light)',
+              fontFamily: 'var(--font-hand)',
+            }}>
+              {STATUS_DISPLAY[s].emoji} {STATUS_DISPLAY[s].label}
+            </span>
+          ))}
+        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {CATEGORIES.map((cat, i) => {
