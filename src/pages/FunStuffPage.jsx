@@ -14,6 +14,7 @@ export default function FunStuffPage() {
   const [drawStatus, setDrawStatus] = useState({ completedCount: 0, startedCount: 0, total: drawingPrompts.length })
   const [movieCount, setMovieCount] = useState(0)
   const [bookCount, setBookCount] = useState(0)
+  const [loveNoteStatus, setLoveNoteStatus] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -23,9 +24,10 @@ export default function FunStuffPage() {
 
   const fetchData = async () => {
     const allDrawPackIds = drawingPrompts.map(p => getDrawPackId(p.id))
-    const [{ data: drawData }, { data: itemData }] = await Promise.all([
+    const [{ data: drawData }, { data: itemData }, { data: loveNoteData }] = await Promise.all([
       supabase.from('responses').select('pack_id, player_id').eq('session_id', sessionId).in('pack_id', allDrawPackIds),
       supabase.from('shared_items').select('type, id').eq('session_id', sessionId),
+      supabase.from('love_notes').select('round').eq('session_id', sessionId),
     ])
 
     if (drawData) {
@@ -41,6 +43,10 @@ export default function FunStuffPage() {
     if (itemData) {
       setMovieCount(itemData.filter((i) => i.type === 'movie').length)
       setBookCount(itemData.filter((i) => i.type === 'book').length)
+    }
+    if (loveNoteData && loveNoteData.length > 0) {
+      const maxRound = Math.max(...loveNoteData.map(n => n.round))
+      setLoveNoteStatus(maxRound > 1 ? `round ${maxRound}` : 'in progress')
     }
     setLoading(false)
   }
@@ -104,6 +110,15 @@ export default function FunStuffPage() {
       statusText: 'play →',
       statusColor: 'var(--text-light)',
       onClick: () => navigate(`/tictactoe/${sessionId}`),
+    },
+    {
+      emoji: '💌',
+      title: 'Love Note Hunt',
+      description: "hide love notes on a grid — then hunt for each other's",
+      rotation: 0.5,
+      statusText: loveNoteStatus || 'play →',
+      statusColor: loveNoteStatus ? 'var(--accent-coral)' : 'var(--text-light)',
+      onClick: () => navigate(`/love-notes/${sessionId}`),
     },
   ]
 
