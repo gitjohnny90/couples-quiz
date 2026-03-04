@@ -6,8 +6,8 @@ import deepDiveDecks, { MOOD_TAGS } from '../data/deepDiveDecks'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline, DoodleHeart } from '../components/Doodles'
 
-// Phases: answer → waiting → reveal, per question. After all 3: summary.
-const PHASE = { ANSWER: 'answer', WAITING: 'waiting', REVEAL: 'reveal', SUMMARY: 'summary' }
+// Answer all questions → submit → wait for partner → reveal all together
+const PHASE = { ANSWERING: 'answering', WAITING: 'waiting', RESULTS: 'results' }
 
 export default function DeepDiveDeckPage() {
   const { sessionId, deckId } = useParams()
@@ -18,12 +18,13 @@ export default function DeepDiveDeckPage() {
   const deck = deepDiveDecks.find((d) => d.id === deckId)
 
   const [currentQ, setCurrentQ] = useState(0)
-  const [phase, setPhase] = useState(PHASE.ANSWER)
-  const [answer, setAnswer] = useState('')
+  const [phase, setPhase] = useState(PHASE.ANSWERING)
+  const [answers, setAnswers] = useState({}) // { questionId: "answer text" }
   const [submitting, setSubmitting] = useState(false)
-  const [responses, setResponses] = useState([]) // all responses for this deck
+  const [responses, setResponses] = useState([]) // all DB responses for this deck
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [error, setError] = useState('')
   const textareaRef = useRef(null)
 
   // Fetch existing responses for this deck
@@ -38,31 +39,28 @@ export default function DeepDiveDeckPage() {
     return []
   }
 
-  // Determine phase + question index from existing responses
+  // Check if a player has answered ALL questions in this deck
+  const hasFinishedAll = (data, pid) => {
+    if (!deck) return false
+    return deck.questions.every((q) =>
+      data.some((r) => r.question_id === q.id && r.player_id === pid)
+    )
+  }
+
+  // Determine phase from existing responses on load/resume
   const resumeFromResponses = (data) => {
     if (!deck) return
-    for (let i = 0; i < deck.questions.length; i++) {
-      const q = deck.questions[i]
-      const mine = data.find((r) => r.question_id === q.id && r.player_id === playerId)
-      const theirs = data.find((r) => r.question_id === q.id && r.player_id !== playerId)
+    const iFinished = hasFinishedAll(data, playerId)
+    const partnerFinished = data.some((r) => r.player_id !== playerId) && hasFinishedAll(data, data.find((r) => r.player_id !== playerId)?.player_id)
 
-      if (!mine) {
-        // I haven't answered this one yet
-        setCurrentQ(i)
-        setPhase(PHASE.ANSWER)
-        setAnswer('')
-        return
-      }
-      if (mine && !theirs) {
-        // I answered but partner hasn't
-        setCurrentQ(i)
-        setPhase(PHASE.WAITING)
-        return
-      }
-      // Both answered — this one is revealed, check next
+    if (iFinished && partnerFinished) {
+      setPhase(PHASE.RESULTS)
+    } else if (iFinished) {
+      setPhase(PHASE.WAITING)
+    } else {
+      setPhase(PHASE.ANSWERING)
+      setCurrentQ(0)
     }
-    // All questions answered by both → summary
-    setPhase(PHASE.SUMMARY)
   }
 
   // Initial load
@@ -85,79 +83,90 @@ export default function DeepDiveDeckPage() {
         table: 'deep_dive_responses',
         filter: `session_id=eq.${sessionId}`,
       }, (payload) => {
-        // Only care about this deck
         if (payload.new && payload.new.deck_id === deckId) {
-          // Refetch all responses for this deck
-          fetchResponses().then((data) => {
-            // If we're in waiting phase, check if partner answered
-            setResponses(data)
-          })
+          fetchResponses()
         }
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [sessionId, deckId])
 
-  // When responses update, re-evaluate phase (handles realtime partner answers)
+  // When responses update while waiting, check if partner finished all
   useEffect(() => {
-    if (loading || !deck) return
-    const q = deck.questions[currentQ]
-    if (!q) return
-    const mine = responses.find((r) => r.question_id === q.id && r.player_id === playerId)
-    const theirs = responses.find((r) => r.question_id === q.id && r.player_id !== playerId)
-
-    if (phase === PHASE.WAITING && mine && theirs) {
-      setPhase(PHASE.REVEAL)
+    if (loading || !deck || phase !== PHASE.WAITING) return
+    const partnerResponses = responses.filter((r) => r.player_id !== playerId)
+    const partnerDone = deck.questions.every((q) =>
+      partnerResponses.some((r) => r.question_id === q.id)
+    )
+    if (partnerDone) {
+      setPhase(PHASE.RESULTS)
     }
-  }, [responses, currentQ, phase, loading])
+  }, [responses, phase, loading])
 
-  // Submit answer
-  const handleSubmit = async () => {
-    if (!answer.trim() || submitting) return
+  // Poll for partner's answers while waiting (fallback if realtime doesn't fire)
+  useEffect(() => {
+    if (phase !== PHASE.WAITING || !deck) return
+    const interval = setInterval(async () => {
+      const data = await fetchResponses()
+      const partnerDone = deck.questions.every((q) =>
+        data.some((r) => r.question_id === q.id && r.player_id !== playerId)
+      )
+      if (partnerDone) {
+        setPhase(PHASE.RESULTS)
+      }
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [phase])
+
+  // Submit all answers at once
+  const handleSubmitAll = async () => {
+    if (submitting) return
     setSubmitting(true)
-    const q = deck.questions[currentQ]
-    const { error } = await supabase.from('deep_dive_responses').upsert(
-      {
+    setError('')
+    try {
+      const rows = deck.questions.map((q) => ({
         session_id: sessionId,
         deck_id: deckId,
         question_id: q.id,
         player_id: playerId,
         player_name: playerName,
-        answer: answer.trim(),
-      },
-      { onConflict: 'session_id,deck_id,question_id,player_id' }
-    )
-    if (!error) {
+        answer: answers[q.id].trim(),
+      }))
+      const { error: upsertError } = await supabase
+        .from('deep_dive_responses')
+        .upsert(rows, { onConflict: 'session_id,deck_id,question_id,player_id' })
+      if (upsertError) {
+        setError('something went wrong saving your answers — try again!')
+        setSubmitting(false)
+        return
+      }
       const data = await fetchResponses()
-      const theirs = data.find((r) => r.question_id === q.id && r.player_id !== playerId)
-      if (theirs) {
-        setPhase(PHASE.REVEAL)
+      const partnerDone = deck.questions.every((q) =>
+        data.some((r) => r.question_id === q.id && r.player_id !== playerId)
+      )
+      if (partnerDone) {
+        setPhase(PHASE.RESULTS)
       } else {
         setPhase(PHASE.WAITING)
       }
+    } catch (e) {
+      setError('couldn\'t connect — check your internet and try again!')
     }
     setSubmitting(false)
   }
 
-  // Move to next question after reveal
+  // Navigation within ANSWERING phase
   const handleNext = () => {
-    const nextIdx = currentQ + 1
-    if (nextIdx >= deck.questions.length) {
-      setPhase(PHASE.SUMMARY)
+    const isLast = currentQ >= deck.questions.length - 1
+    if (isLast) {
+      handleSubmitAll()
     } else {
-      const q = deck.questions[nextIdx]
-      const mine = responses.find((r) => r.question_id === q.id && r.player_id === playerId)
-      const theirs = responses.find((r) => r.question_id === q.id && r.player_id !== playerId)
-      setCurrentQ(nextIdx)
-      setAnswer('')
-      if (!mine) {
-        setPhase(PHASE.ANSWER)
-      } else if (!theirs) {
-        setPhase(PHASE.WAITING)
-      } else {
-        setPhase(PHASE.REVEAL)
-      }
+      setCurrentQ(currentQ + 1)
     }
+  }
+
+  const handleBack = () => {
+    if (currentQ > 0) setCurrentQ(currentQ - 1)
   }
 
   // Fire reaction
@@ -173,6 +182,13 @@ export default function DeepDiveDeckPage() {
     navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  // Helper to get response pairs for a question
+  const getResponsePair = (q) => {
+    const mine = responses.find((r) => r.question_id === q.id && r.player_id === playerId)
+    const theirs = responses.find((r) => r.question_id === q.id && r.player_id !== playerId)
+    return { mine, theirs }
   }
 
   if (!deck) {
@@ -206,16 +222,11 @@ export default function DeepDiveDeckPage() {
   const question = deck.questions[currentQ]
   const moodTag = question ? MOOD_TAGS[question.moodTag] : null
   const progressPercent = ((currentQ + 1) / deck.questions.length) * 100
+  const currentAnswer = question ? (answers[question.id] || '') : ''
+  const isLastQ = currentQ >= deck.questions.length - 1
 
-  // Helper to get response pairs for a question
-  const getResponsePair = (q) => {
-    const mine = responses.find((r) => r.question_id === q.id && r.player_id === playerId)
-    const theirs = responses.find((r) => r.question_id === q.id && r.player_id !== playerId)
-    return { mine, theirs }
-  }
-
-  // ── SUMMARY PHASE ──
-  if (phase === PHASE.SUMMARY) {
+  // ── RESULTS PHASE ──
+  if (phase === PHASE.RESULTS) {
     const totalFires = responses.filter((r) => r.is_fired).length
     return (
       <div className="page" style={{ position: 'relative' }}>
@@ -287,7 +298,7 @@ export default function DeepDiveDeckPage() {
     )
   }
 
-  // ── PER-QUESTION PHASES ──
+  // ── ANSWERING + WAITING PHASES ──
   return (
     <div className="page" style={{ position: 'relative' }}>
       <PageDoodles seed={deck.id.length + currentQ} />
@@ -300,18 +311,20 @@ export default function DeepDiveDeckPage() {
           </h1>
         </div>
 
-        {/* Progress */}
-        <div style={{ marginBottom: 18 }}>
-          <p style={{ color: 'var(--text-secondary)', textAlign: 'center', fontFamily: 'var(--font-hand)', fontSize: '1.1rem', marginBottom: 6 }}>
-            {currentQ + 1} of {deck.questions.length}
-          </p>
-          <div className="progress-bar-track">
-            <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
+        {/* Progress (only during answering) */}
+        {phase === PHASE.ANSWERING && (
+          <div style={{ marginBottom: 18 }}>
+            <p style={{ color: 'var(--text-secondary)', textAlign: 'center', fontFamily: 'var(--font-hand)', fontSize: '1.1rem', marginBottom: 6 }}>
+              {currentQ + 1} of {deck.questions.length}
+            </p>
+            <div className="progress-bar-track">
+              <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Mood tag pill */}
-        {moodTag && (
+        {/* Mood tag pill (only during answering) */}
+        {phase === PHASE.ANSWERING && moodTag && (
           <div style={{ textAlign: 'center', marginBottom: 14 }}>
             <span className="dd-mood-pill">
               {moodTag.emoji} {moodTag.label}
@@ -320,8 +333,8 @@ export default function DeepDiveDeckPage() {
         )}
 
         <AnimatePresence mode="wait">
-          {/* ── ANSWER PHASE ── */}
-          {phase === PHASE.ANSWER && (
+          {/* ── ANSWERING PHASE ── */}
+          {phase === PHASE.ANSWERING && (
             <motion.div
               key={`answer-${currentQ}`}
               initial={{ opacity: 0, y: 10 }}
@@ -339,25 +352,42 @@ export default function DeepDiveDeckPage() {
                     ref={textareaRef}
                     className="dd-textarea"
                     placeholder="write your answer here..."
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
+                    value={currentAnswer}
+                    onChange={(e) => setAnswers({ ...answers, [question.id]: e.target.value })}
                     rows={5}
                     maxLength={1000}
                   />
                 </div>
 
+                {error && (
+                  <p style={{ color: 'var(--accent-coral)', fontSize: '0.85rem', marginTop: 8, textAlign: 'center', fontStyle: 'italic' }}>
+                    {error}
+                  </p>
+                )}
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
                   <span style={{ fontSize: '0.78rem', color: 'var(--text-light)' }}>
-                    {answer.length}/1000
+                    {currentAnswer.length}/1000
                   </span>
-                  <button
-                    className="btn btn-primary"
-                    onClick={handleSubmit}
-                    disabled={!answer.trim() || submitting}
-                    style={{ minWidth: 100 }}
-                  >
-                    {submitting ? 'saving...' : 'submit'}
-                  </button>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {currentQ > 0 && (
+                      <button
+                        className="btn btn-secondary"
+                        onClick={handleBack}
+                        style={{ minWidth: 70 }}
+                      >
+                        ← back
+                      </button>
+                    )}
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleNext}
+                      disabled={!currentAnswer.trim() || submitting}
+                      style={{ minWidth: 100 }}
+                    >
+                      {submitting ? 'saving...' : isLastQ ? 'submit all' : 'next →'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -366,17 +396,13 @@ export default function DeepDiveDeckPage() {
           {/* ── WAITING PHASE ── */}
           {phase === PHASE.WAITING && (
             <motion.div
-              key={`waiting-${currentQ}`}
+              key="waiting"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.25 }}
             >
               <div className="glass" style={{ padding: '28px 20px', textAlign: 'center', transform: 'rotate(-0.3deg)' }}>
-                <p style={{ fontSize: '1.05rem', fontWeight: 500, lineHeight: 1.6, marginBottom: 18, color: 'var(--text-primary)' }}>
-                  {question.text}
-                </p>
-
                 <div style={{ margin: '10px 0 18px' }}>
                   <motion.div
                     animate={{ scale: [1, 1.08, 1] }}
@@ -389,7 +415,7 @@ export default function DeepDiveDeckPage() {
                     waiting for your person...
                   </p>
                   <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', fontStyle: 'italic', marginTop: 6 }}>
-                    your answer is locked in — they need to answer too!
+                    your answers are locked in — they need to finish the deck too!
                   </p>
                 </div>
 
@@ -408,43 +434,13 @@ export default function DeepDiveDeckPage() {
                   style={{ width: '100%', marginTop: 10 }}
                   onClick={async () => {
                     const data = await fetchResponses()
-                    // Manually re-check if partner has answered
-                    const q = deck.questions[currentQ]
-                    const theirs = data.find((r) => r.question_id === q.id && r.player_id !== playerId)
-                    if (theirs) setPhase(PHASE.REVEAL)
+                    const partnerDone = deck.questions.every((q) =>
+                      data.some((r) => r.question_id === q.id && r.player_id !== playerId)
+                    )
+                    if (partnerDone) setPhase(PHASE.RESULTS)
                   }}
                 >
                   check again
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ── REVEAL PHASE ── */}
-          {phase === PHASE.REVEAL && (
-            <motion.div
-              key={`reveal-${currentQ}`}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="glass" style={{ padding: '22px 18px', transform: 'rotate(-0.2deg)' }}>
-                <p style={{ fontSize: '1.05rem', fontWeight: 500, lineHeight: 1.6, marginBottom: 18, color: 'var(--text-primary)' }}>
-                  {question.text}
-                </p>
-
-                {(() => {
-                  const { mine, theirs } = getResponsePair(question)
-                  return <JournalEntryPair mine={mine} theirs={theirs} onFire={handleFire} />
-                })()}
-
-                <button
-                  className="btn btn-primary"
-                  style={{ width: '100%', marginTop: 18 }}
-                  onClick={handleNext}
-                >
-                  {currentQ < deck.questions.length - 1 ? 'next question →' : 'see summary'}
                 </button>
               </div>
             </motion.div>
@@ -468,7 +464,6 @@ export default function DeepDiveDeckPage() {
 function JournalEntryPair({ mine, theirs, onFire }) {
   if (!mine || !theirs) return null
 
-  // Show mine on left (coral), theirs on right (blue)
   const entries = [
     { response: mine, bg: '#FFF5E9', border: 'var(--accent-coral-light)', nameColor: 'var(--accent-coral)', label: mine.player_name },
     { response: theirs, bg: '#EDF3F8', border: '#B8CFDF', nameColor: 'var(--accent-blue)', label: theirs.player_name },

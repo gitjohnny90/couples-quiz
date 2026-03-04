@@ -24,6 +24,13 @@ export default function VaultPage() {
     fetchData()
   }, [sessionId])
 
+  // Polling fallback — check for partner joining & quiz progress updates
+  useEffect(() => {
+    if (session?.player2_name) return
+    const interval = setInterval(fetchData, 5000)
+    return () => clearInterval(interval)
+  }, [sessionId, session?.player2_name])
+
   const fetchData = async () => {
     const { data: sessionData } = await supabase.from('sessions').select('*').eq('id', sessionId).single()
     setSession(sessionData)

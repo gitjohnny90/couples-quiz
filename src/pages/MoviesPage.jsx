@@ -79,7 +79,9 @@ export default function MoviesPage() {
       .channel(`shared-items-movies-${sessionId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'shared_items', filter: `session_id=eq.${sessionId}` }, () => fetchData())
       .subscribe()
-    return () => { supabase.removeChannel(channel) }
+    // Polling fallback — realtime can be unreliable
+    const interval = setInterval(fetchData, 5000)
+    return () => { supabase.removeChannel(channel); clearInterval(interval) }
   }, [sessionId])
 
   const fetchData = async () => {

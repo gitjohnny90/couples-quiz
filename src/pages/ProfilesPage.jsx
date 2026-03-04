@@ -43,6 +43,13 @@ export default function ProfilesPage() {
 
   useEffect(() => { fetchProfiles() }, [sessionId])
 
+  // Polling fallback — no realtime here, poll until partner profile appears
+  useEffect(() => {
+    if (partnerProfile) return
+    const interval = setInterval(fetchProfiles, 5000)
+    return () => clearInterval(interval)
+  }, [sessionId, partnerProfile])
+
   const fetchProfiles = async () => {
     const { data: session } = await supabase.from('sessions').select('*').eq('id', sessionId).single()
     if (session) setPartnerName(playerId === 'player1' ? session.player2_name : session.player1_name || '')

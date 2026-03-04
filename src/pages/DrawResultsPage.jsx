@@ -56,6 +56,13 @@ export default function DrawResultsPage() {
     }
   }, [sessionId, promptId])
 
+  // Polling fallback — realtime can be unreliable
+  useEffect(() => {
+    if (responses.length >= 2) return
+    const interval = setInterval(fetchResponses, 5000)
+    return () => clearInterval(interval)
+  }, [sessionId, promptId, responses.length])
+
   const copyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)
     setCopied(true)

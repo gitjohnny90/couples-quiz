@@ -35,6 +35,13 @@ export default function ResultsPage() {
     return () => { supabase.removeChannel(channel) }
   }, [sessionId, packId])
 
+  // Polling fallback — realtime can be unreliable
+  useEffect(() => {
+    if (responses.length >= 2) return
+    const interval = setInterval(fetchResponses, 5000)
+    return () => clearInterval(interval)
+  }, [sessionId, packId, responses.length])
+
   const toggleReveal = (qId) => {
     setRevealedQuestions((prev) => {
       const next = new Set(prev)

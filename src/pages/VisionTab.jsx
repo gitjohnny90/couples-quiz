@@ -78,7 +78,9 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
         }
       })
       .subscribe()
-    return () => { supabase.removeChannel(channel) }
+    // Polling fallback — realtime can be unreliable
+    const interval = setInterval(fetchData, 5000)
+    return () => { supabase.removeChannel(channel); clearInterval(interval) }
   }, [sessionId])
 
   // Save helper
