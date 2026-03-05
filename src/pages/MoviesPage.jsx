@@ -253,7 +253,7 @@ export default function MoviesPage() {
                   {movieGenres.map((g) => <option key={g.id} value={g.name}>{g.emoji} {g.name}</option>)}
                 </select>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button className="btn btn-primary" style={{ flex: 1 }} onClick={addItem}>add</button>
+                  <button className="btn btn-primary" style={{ flex: 1 }} onClick={addItem} disabled={!newTitle.trim()}>add</button>
                   <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => { setShowAdd(false); setNewTitle(''); setNewGenre('') }}>cancel</button>
                 </div>
               </motion.div>

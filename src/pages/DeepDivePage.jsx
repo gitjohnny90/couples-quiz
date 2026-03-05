@@ -69,6 +69,14 @@ export default function DeepDivePage() {
     setRandomCard(pick)
   }
 
+  // Close random card on Escape
+  useEffect(() => {
+    if (!randomCard) return
+    const handleEscape = (e) => { if (e.key === 'Escape') setRandomCard(null) }
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [randomCard])
+
   // Stats
   const completedDecks = deepDiveDecks.filter((d) => getDeckStatus(d).label === 'done').length
   const totalDecks = deepDiveDecks.length
@@ -138,10 +146,23 @@ export default function DeepDivePage() {
                 className="glass"
                 style={{
                   padding: '28px 22px', maxWidth: 360, width: '100%',
-                  transform: 'rotate(-0.5deg)',
+                  transform: 'rotate(-0.5deg)', position: 'relative',
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
+                {/* Close button */}
+                <button
+                  onClick={() => setRandomCard(null)}
+                  style={{
+                    position: 'absolute', top: 10, right: 12,
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    fontSize: '1.2rem', color: 'var(--text-light)', padding: '4px 6px',
+                    lineHeight: 1,
+                  }}
+                  aria-label="Close"
+                >
+                  ✕
+                </button>
                 {randomCard.empty ? (
                   <>
                     <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.3rem', textAlign: 'center', color: 'var(--accent-coral)' }}>
