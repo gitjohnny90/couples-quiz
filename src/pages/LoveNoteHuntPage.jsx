@@ -81,7 +81,7 @@ export default function LoveNoteHuntPage() {
       .eq('session_id', sessionId)
       .eq('pack_id', `love-notes-guesses-r${latestRound}`)
       .eq('player_id', playerId)
-      .single()
+      .maybeSingle()
 
     const savedGuesses = guessData?.answers?.guesses || []
     const savedHits = guessData?.answers?.hits || []
