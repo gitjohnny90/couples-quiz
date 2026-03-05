@@ -136,9 +136,10 @@ export default function SpinningWheel({ items = [], onResult, disabled = false }
                   fontFamily="'Patrick Hand', cursive"
                   fontSize={n > 15 ? '8' : n > 10 ? '9.5' : '11'}
                   fontWeight="600"
+                  textAnchor={flipped ? 'start' : 'end'}
                   style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
                 >
-                  <textPath href={`#slice-path-${i}`} startOffset={flipped ? '5%' : '18%'}>
+                  <textPath href={`#slice-path-${i}`} startOffset={flipped ? '5%' : '95%'}>
                     {truncateText(item, n > 15 ? 18 : n > 10 ? 22 : 26)}
                   </textPath>
                 </text>
