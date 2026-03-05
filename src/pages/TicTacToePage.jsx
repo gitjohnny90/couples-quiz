@@ -2,12 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import PageDoodles, { SquigglyUnderline } from '../components/Doodles'
-
-const WINNING_COMBOS = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8],
-  [0, 3, 6], [1, 4, 7], [2, 5, 8],
-  [0, 4, 8], [2, 4, 6],
-]
+import { checkWinner } from '../utils/gameLogic'
 
 const HEART_PATH = 'M16 28 C12 24, 2 18, 3 11 C4 6, 9 4, 13 7 C14.5 8.5, 15.5 9, 16 10 C16.5 9, 17.5 8.5, 19 7 C23 4, 28 6, 29 11 C30 18, 20 24, 16 28Z'
 
@@ -31,19 +26,6 @@ export default function TicTacToePage() {
   const [currentPlayer, setCurrentPlayer] = useState('p1')
   const [winner, setWinner] = useState(null)
   const [winningCells, setWinningCells] = useState([])
-
-  const checkWinner = (newBoard) => {
-    for (const combo of WINNING_COMBOS) {
-      const [a, b, c] = combo
-      if (newBoard[a] && newBoard[a] === newBoard[b] && newBoard[a] === newBoard[c]) {
-        return { winner: newBoard[a], cells: combo }
-      }
-    }
-    if (newBoard.every(cell => cell !== null)) {
-      return { winner: 'draw', cells: [] }
-    }
-    return null
-  }
 
   const handleCellClick = (index) => {
     if (board[index] || winner) return

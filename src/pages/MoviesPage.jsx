@@ -7,26 +7,10 @@ import SpinningWheel from '../components/SpinningWheel'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline, DoodleHeart } from '../components/Doodles'
 
-const VETO_KEY = 'movie_vetoes'
+import { createVetoSystem } from '../utils/vetoSystem'
+
 const MAX_VETOES = 2
-
-function getVetoInfo() {
-  try {
-    const raw = localStorage.getItem(VETO_KEY)
-    if (!raw) return { count: 0, weekStart: Date.now() }
-    const data = JSON.parse(raw)
-    const weekMs = 7 * 24 * 60 * 60 * 1000
-    if (Date.now() - data.weekStart > weekMs) return { count: 0, weekStart: Date.now() }
-    return data
-  } catch { return { count: 0, weekStart: Date.now() } }
-}
-
-function saveVeto() {
-  const info = getVetoInfo()
-  const updated = { count: info.count + 1, weekStart: info.weekStart || Date.now() }
-  localStorage.setItem(VETO_KEY, JSON.stringify(updated))
-  return updated
-}
+const { getVetoInfo, saveVeto } = createVetoSystem('movie_vetoes')
 
 function StarRating({ rating, onRate, size = 22 }) {
   return (

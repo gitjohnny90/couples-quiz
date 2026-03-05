@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import deepDiveDecks, { MOOD_TAGS } from '../data/deepDiveDecks'
+import { hasFinishedAll as _hasFinishedAll } from '../utils/quizScoring'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline, DoodleHeart } from '../components/Doodles'
 
@@ -39,13 +40,7 @@ export default function DeepDiveDeckPage() {
     return []
   }
 
-  // Check if a player has answered ALL questions in this deck
-  const hasFinishedAll = (data, pid) => {
-    if (!deck) return false
-    return deck.questions.every((q) =>
-      data.some((r) => r.question_id === q.id && r.player_id === pid)
-    )
-  }
+  const hasFinishedAll = (data, pid) => _hasFinishedAll(data, deck?.questions, pid)
 
   // Determine phase from existing responses on load/resume
   const resumeFromResponses = (data) => {

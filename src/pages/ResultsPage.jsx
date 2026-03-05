@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
+import { calculateMatchScore } from '../utils/quizScoring'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline, DoodleCloud } from '../components/Doodles'
 
@@ -125,8 +126,7 @@ export default function ResultsPage() {
   const p2 = responses.find((r) => r.player_id === 'player2')
   const p1A = p1?.answers || {}
   const p2A = p2?.answers || {}
-  let matchCount = 0
-  pack.questions.forEach((q) => { if (p1A[q.id] === p2A[q.id]) matchCount++ })
+  const matchCount = calculateMatchScore(responses, pack.questions)
 
   const cardRotations = [0.4, -0.6, 0.3, -0.4, 0.7]
 

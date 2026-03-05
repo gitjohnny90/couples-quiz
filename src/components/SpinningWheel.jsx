@@ -7,19 +7,19 @@ const COLORS = [
   '#8DAD6B', '#AD8D6B',
 ]
 
-function polarToCartesian(cx, cy, r, angleDeg) {
+export function polarToCartesian(cx, cy, r, angleDeg) {
   const rad = (angleDeg - 90) * Math.PI / 180
   return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) }
 }
 
-function describeArc(cx, cy, r, startAngle, endAngle) {
+export function describeArc(cx, cy, r, startAngle, endAngle) {
   const start = polarToCartesian(cx, cy, r, endAngle)
   const end = polarToCartesian(cx, cy, r, startAngle)
   const largeArc = endAngle - startAngle > 180 ? 1 : 0
   return `M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 0 ${end.x} ${end.y} Z`
 }
 
-function truncateText(text, maxLen) {
+export function truncateText(text, maxLen) {
   if (text.length <= maxLen) return text
   return text.slice(0, maxLen - 1) + '\u2026'
 }
