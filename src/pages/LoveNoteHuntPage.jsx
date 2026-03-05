@@ -246,17 +246,15 @@ export default function LoveNoteHuntPage() {
       answers: { guesses: newGuesses, hits: newHits },
     }, { onConflict: 'session_id,pack_id,player_id' })
 
-    // Auto-transition to reveal after all found
-    if (newHits.length >= NOTES_REQUIRED) {
-      setTimeout(() => {
-        setRevealedNote(null)
-        setPhase(PHASE.REVEAL)
-      }, 2000)
-    }
+    // Note: when all found, the popup button says "see all notes"
+    // and dismissNote handles the transition to reveal
   }
 
   const dismissNote = () => {
     setRevealedNote(null)
+    if (hits.length >= NOTES_REQUIRED) {
+      setPhase(PHASE.REVEAL)
+    }
   }
 
   // --- PLAY AGAIN ---
