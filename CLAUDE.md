@@ -32,8 +32,8 @@ No test runner or linter is configured.
 
 All routes defined in `App.jsx`. Four nav tabs map to route groups:
 - **home** → `/` (HomePage — session creation/name entry)
-- **quizzes** → `/vault/:id`, `/quiz/:id/:packId`, `/results/:id/:packId`, `/deep-dive/:id`, `/quiz-packs/:id`
-- **fun stuff** → `/fun/:id`, `/draw/:id`, `/movies/:id`, `/books/:id`, `/tictactoe/:id`, `/watch-guide/:id`
+- **quizzes** → `/vault/:id`, `/quiz/:id/:packId`, `/results/:id/:packId`, `/deep-dive/:id`, `/deep-dive/:id/:deckId`, `/quiz-packs/:id`
+- **fun stuff** → `/fun/:id`, `/draw/:id`, `/movies/:id`, `/books/:id`, `/tictactoe/:id`, `/love-notes/:id`, `/watch-guide/:id`
 - **us** → `/profiles/:id` (personality profiles + vision board via tab param), `/journal/:id`
 
 ### Data Flow
@@ -51,6 +51,8 @@ All routes defined in `App.jsx`. Four nav tabs map to route groups:
 | `profiles` | Personality test data | `session_id`, `player_id`, `profile_data` (JSONB) |
 | `deep_dive_responses` | Open-ended answers | `session_id`, `deck_id`, `question_id`, `answer` |
 | `shared_items` | Movie/book lists | `session_id`, `type`, `title`, `status`, ratings |
+| `love_note_games` | Love Note Hunt game state | `session_id`, `player_id`, `notes` (JSONB), `note_cells` (JSONB) |
+| `love_note_guesses` | Love Note Hunt guesses | `game_id`, `player_id`, `cell_index` |
 
 All tables use `player_id` as `'player1'` or `'player2'` (not auth-based).
 
@@ -69,11 +71,19 @@ The visual theme is a hand-drawn notebook:
 
 `src/components/Doodles.jsx` exports SVG components (DoodleHeart, DoodleStar, DoodleArrow, DoodleFlower, etc.) plus a `PageDoodles` default export that scatters decorative doodles in page margins. All doodle SVGs use `pointer-events: none` and `position: absolute`.
 
+### Components
+
+- `src/components/Doodles.jsx` — decorative SVG doodles (see Doodles section above)
+- `src/components/DrawingCanvas.jsx` — reusable canvas with color picker, eraser, undo/clear. Uses pointer events and `globalCompositeOperation` for erasing. Exports drawing as PNG data URL via `onDrawingChange` callback.
+
 ## Key Patterns
 
 - **Supabase queries**: `useEffect` with `supabase.from(table).select()` / `.upsert()` / `.insert()`
 - **Realtime**: `supabase.channel(name).on('postgres_changes', ...).subscribe()` — always unsubscribe in cleanup
 - **No component library**: all UI is custom JSX with inline styles
+- **Error handling**: Most pages use an `error` state variable with user-visible feedback (inline `<p>` or banner). Some use `setTimeout` for auto-dismiss after 3 seconds.
+- **Dynamic page titles**: `useDocumentTitle()` hook in `App.jsx` sets `document.title` based on the current route.
+- **Accessibility**: Bottom nav uses `aria-label`, `aria-current`; quiz options use `aria-pressed`; Love Note Hunt grid uses `role="gridcell"` with keyboard support.
 - **localStorage keys**: `sessionId`, `playerName`, `playerId`, plus feature-specific keys like movie vetoes
 
 ## Environment Variables
