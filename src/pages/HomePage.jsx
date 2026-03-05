@@ -9,19 +9,21 @@ export default function HomePage() {
   const { setSessionId, setPlayerName } = useContext(SessionContext);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleCreate = async () => {
     if (!name.trim()) return;
     setLoading(true);
+    setError("");
     try {
-      const { data: session, error } = await supabase
+      const { data: session, error: createError } = await supabase
         .from("sessions")
         .insert({ player1_name: name.trim() })
         .select()
         .single();
 
-      if (error) throw error;
+      if (createError) throw createError;
 
       setSessionId(session.id);
       setPlayerName(name.trim());
@@ -29,6 +31,7 @@ export default function HomePage() {
       navigate(`/vault/${session.id}`);
     } catch (err) {
       console.error("Failed to create session:", err);
+      setError("couldn't create session — check your connection");
     } finally {
       setLoading(false);
     }
@@ -132,6 +135,11 @@ export default function HomePage() {
           >
             {loading ? "creating..." : "start a quiz session"}
           </button>
+          {error && (
+            <p style={{ color: 'var(--accent-coral)', fontSize: '0.85rem', marginTop: 10, textAlign: 'center', fontStyle: 'italic' }}>
+              {error}
+            </p>
+          )}
         </div>
 
         {/* Bottom note */}

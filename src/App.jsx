@@ -34,18 +34,43 @@ export const SessionContext = createContext({
   setPlayerName: () => {},
 });
 
+function useDocumentTitle() {
+  const location = useLocation();
+  React.useEffect(() => {
+    const path = location.pathname;
+    let title = 'The Us Quiz';
+    if (path.startsWith('/vault')) title = 'Quizzes — The Us Quiz';
+    else if (path.startsWith('/quiz-packs')) title = 'Quiz Packs — The Us Quiz';
+    else if (path.startsWith('/quiz/')) title = 'Quiz — The Us Quiz';
+    else if (path.startsWith('/results')) title = 'Results — The Us Quiz';
+    else if (path.startsWith('/deep-dive')) title = 'Deep Dive — The Us Quiz';
+    else if (path.startsWith('/fun')) title = 'Fun Stuff — The Us Quiz';
+    else if (path.startsWith('/draw')) title = 'Draw — The Us Quiz';
+    else if (path.startsWith('/movies')) title = 'Movies — The Us Quiz';
+    else if (path.startsWith('/books')) title = 'Books — The Us Quiz';
+    else if (path.startsWith('/tictactoe')) title = 'Tic-Tac-Toe — The Us Quiz';
+    else if (path.startsWith('/love-notes')) title = 'Love Note Hunt — The Us Quiz';
+    else if (path.startsWith('/profiles')) title = 'About Us — The Us Quiz';
+    else if (path.startsWith('/journal')) title = 'Journal — The Us Quiz';
+    else if (path.startsWith('/join')) title = 'Join — The Us Quiz';
+    document.title = title;
+  }, [location.pathname]);
+}
+
 function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { sessionId } = React.useContext(SessionContext);
 
+  useDocumentTitle();
+
   if (!sessionId) return null;
 
   const tabs = [
-    { label: "home", path: "/" },
-    { label: "quizzes", path: `/vault/${sessionId}` },
-    { label: "fun stuff", path: `/fun/${sessionId}` },
-    { label: "us", path: `/profiles/${sessionId}` },
+    { label: "home", icon: "\u{1F3E0}", path: "/" },
+    { label: "quizzes", icon: "\u{1F4DD}", path: `/vault/${sessionId}` },
+    { label: "fun stuff", icon: "\u{1F389}", path: `/fun/${sessionId}` },
+    { label: "us", icon: "\u{1F495}", path: `/profiles/${sessionId}` },
   ];
 
   const isActive = (tabPath) => {
@@ -78,13 +103,15 @@ function BottomNav() {
   };
 
   return (
-    <nav className="bottom-nav">
+    <nav className="bottom-nav" aria-label="Main navigation">
       {tabs.map((tab) => (
         <button
           key={tab.label}
           className={`nav-item${isActive(tab.path) ? " active" : ""}`}
           onClick={() => navigate(tab.path)}
+          aria-current={isActive(tab.path) ? "page" : undefined}
         >
+          <span style={{ fontSize: '1.1rem' }}>{tab.icon}</span>
           <span>{tab.label}</span>
         </button>
       ))}

@@ -301,7 +301,7 @@ export default function DeepDiveDeckPage() {
   // ── ANSWERING + WAITING PHASES ──
   return (
     <div className="page" style={{ position: 'relative' }}>
-      <PageDoodles seed={deck.id.length + currentQ} />
+      <PageDoodles seed={deck.id.length} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1, width: '100%' }}>
 
         {/* Deck header */}
@@ -451,7 +451,11 @@ export default function DeepDiveDeckPage() {
         <button
           className="btn btn-secondary"
           style={{ width: '100%', marginTop: 14 }}
-          onClick={() => navigate(`/deep-dive/${sessionId}`)}
+          onClick={() => {
+            const hasUnsaved = Object.values(answers).some(a => a && a.trim())
+            if (hasUnsaved && !window.confirm('You have unsaved answers — leave anyway?')) return
+            navigate(`/deep-dive/${sessionId}`)
+          }}
         >
           ← back to decks
         </button>
@@ -485,7 +489,7 @@ function JournalEntryPair({ mine, theirs, onFire }) {
             className={`dd-fire-btn ${response.is_fired ? 'fired' : ''}`}
             onClick={() => onFire(response.id, response.is_fired)}
           >
-            🔥 {response.is_fired ? 'this one hit' : 'this one hit'}
+            🔥 {response.is_fired ? 'this one hit ✓' : 'mark this one'}
           </button>
         </div>
       ))}

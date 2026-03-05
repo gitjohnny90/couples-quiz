@@ -38,6 +38,7 @@ export default function ProfilesPage() {
   const [partnerName, setPartnerName] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [activeTab, setActiveTab] = useState('edit')
   const [loading, setLoading] = useState(true)
 
@@ -65,11 +66,18 @@ export default function ProfilesPage() {
 
   const saveProfile = async () => {
     setSaving(true)
-    const { error } = await supabase.from('profiles').upsert(
-      { session_id: sessionId, player_id: playerId, player_name: playerName, profile_data: myProfile },
-      { onConflict: 'session_id,player_id' }
-    )
-    if (!error) { setSaved(true); setTimeout(() => setSaved(false), 2000) }
+    setSaveError('')
+    try {
+      const { error } = await supabase.from('profiles').upsert(
+        { session_id: sessionId, player_id: playerId, player_name: playerName, profile_data: myProfile },
+        { onConflict: 'session_id,player_id' }
+      )
+      if (error) throw error
+      setSaved(true); setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      setSaveError("couldn't save — try again")
+      setTimeout(() => setSaveError(''), 3000)
+    }
     setSaving(false)
   }
 
@@ -236,6 +244,11 @@ export default function ProfilesPage() {
               <button className="btn btn-primary" style={{ width: '100%', marginTop: 6 }} onClick={saveProfile} disabled={saving}>
                 {saving ? 'saving...' : saved ? 'saved!' : 'save my profile'}
               </button>
+              {saveError && (
+                <p style={{ color: 'var(--accent-coral)', fontSize: '0.85rem', marginTop: 8, textAlign: 'center', fontStyle: 'italic' }}>
+                  {saveError}
+                </p>
+              )}
             </motion.div>
           )}
           {activeTab === 'compare' && (

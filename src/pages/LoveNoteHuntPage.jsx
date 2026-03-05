@@ -295,8 +295,11 @@ export default function LoveNoteHuntPage() {
         : (!isGuessed && !revealedNote)
 
       cells.push(
-        <motion.div
+        <motion.button
           key={i}
+          role="gridcell"
+          aria-label={`Cell ${Math.floor(i / 6) + 1}, ${(i % 6) + 1}${isHit ? ' — found!' : isMiss ? ' — miss' : ''}`}
+          tabIndex={canTap ? 0 : -1}
           style={{
             aspectRatio: '1',
             border: '1px solid rgba(107, 141, 173, 0.3)',
@@ -305,6 +308,8 @@ export default function LoveNoteHuntPage() {
             alignItems: 'center',
             justifyContent: 'center',
             cursor: canTap ? 'pointer' : 'default',
+            padding: 0,
+            font: 'inherit',
             background: isActive
               ? 'rgba(232, 141, 122, 0.15)'
               : isHit
@@ -376,7 +381,7 @@ export default function LoveNoteHuntPage() {
               />
             </motion.svg>
           )}
-        </motion.div>
+        </motion.button>
       )
     }
 

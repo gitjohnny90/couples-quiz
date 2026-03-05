@@ -11,10 +11,13 @@ const CANVAS_W = 600
 const CANVAS_H = 450
 const LINE_WIDTH = 3.5
 
+const ERASER_WIDTH = LINE_WIDTH * 3
+
 export default function DrawingCanvas({ onDrawingChange, disabled }) {
   const canvasRef = useRef(null)
   const [isDrawing, setIsDrawing] = useState(false)
   const [color, setColor] = useState(COLORS[0].value)
+  const [isEraser, setIsEraser] = useState(false)
   const [strokes, setStrokes] = useState([])
   const currentStroke = useRef([])
 
@@ -27,8 +30,9 @@ export default function DrawingCanvas({ onDrawingChange, disabled }) {
 
     strokeList.forEach((stroke) => {
       if (stroke.points.length < 2) return
+      ctx.globalCompositeOperation = stroke.isEraser ? 'destination-out' : 'source-over'
       ctx.beginPath()
-      ctx.strokeStyle = stroke.color
+      ctx.strokeStyle = stroke.isEraser ? 'rgba(0,0,0,1)' : stroke.color
       ctx.lineWidth = stroke.width
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
@@ -47,6 +51,7 @@ export default function DrawingCanvas({ onDrawingChange, disabled }) {
       ctx.lineTo(last.x, last.y)
       ctx.stroke()
     })
+    ctx.globalCompositeOperation = 'source-over'
   }, [])
 
   // Get canvas-relative coordinates from pointer event
@@ -71,10 +76,19 @@ export default function DrawingCanvas({ onDrawingChange, disabled }) {
 
     // Draw a dot for single taps
     const ctx = canvas.getContext('2d')
-    ctx.beginPath()
-    ctx.fillStyle = color
-    ctx.arc(pos.x, pos.y, LINE_WIDTH / 2, 0, Math.PI * 2)
-    ctx.fill()
+    if (isEraser) {
+      ctx.globalCompositeOperation = 'destination-out'
+      ctx.beginPath()
+      ctx.fillStyle = 'rgba(0,0,0,1)'
+      ctx.arc(pos.x, pos.y, ERASER_WIDTH / 2, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.globalCompositeOperation = 'source-over'
+    } else {
+      ctx.beginPath()
+      ctx.fillStyle = color
+      ctx.arc(pos.x, pos.y, LINE_WIDTH / 2, 0, Math.PI * 2)
+      ctx.fill()
+    }
   }
 
   const handlePointerMove = (e) => {
@@ -91,9 +105,16 @@ export default function DrawingCanvas({ onDrawingChange, disabled }) {
     if (pts.length < 2) return
 
     // Draw just the latest segment for performance
+    if (isEraser) {
+      ctx.globalCompositeOperation = 'destination-out'
+      ctx.strokeStyle = 'rgba(0,0,0,1)'
+      ctx.lineWidth = ERASER_WIDTH
+    } else {
+      ctx.globalCompositeOperation = 'source-over'
+      ctx.strokeStyle = color
+      ctx.lineWidth = LINE_WIDTH
+    }
     ctx.beginPath()
-    ctx.strokeStyle = color
-    ctx.lineWidth = LINE_WIDTH
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
 
@@ -113,6 +134,7 @@ export default function DrawingCanvas({ onDrawingChange, disabled }) {
       ctx.quadraticCurveTo(curr.x, curr.y, midX, midY)
     }
     ctx.stroke()
+    ctx.globalCompositeOperation = 'source-over'
   }
 
   const handlePointerUp = (e) => {
@@ -122,8 +144,9 @@ export default function DrawingCanvas({ onDrawingChange, disabled }) {
 
     if (currentStroke.current.length > 0) {
       const newStroke = {
-        color,
-        width: LINE_WIDTH,
+        color: isEraser ? 'rgba(0,0,0,1)' : color,
+        width: isEraser ? ERASER_WIDTH : LINE_WIDTH,
+        isEraser,
         points: [...currentStroke.current],
       }
       const newStrokes = [...strokes, newStroke]
@@ -199,12 +222,34 @@ export default function DrawingCanvas({ onDrawingChange, disabled }) {
             {COLORS.map((c) => (
               <button
                 key={c.name}
-                className={`color-dot${color === c.value ? ' active' : ''}`}
+                className={`color-dot${color === c.value && !isEraser ? ' active' : ''}`}
                 style={{ background: c.value }}
-                onClick={() => setColor(c.value)}
+                onClick={() => { setColor(c.value); setIsEraser(false) }}
                 aria-label={c.name}
               />
             ))}
+            <button
+              className={`color-dot${isEraser ? ' active' : ''}`}
+              style={{
+                background: '#FFF8F0',
+                border: '2px solid #B8A08A',
+                position: 'relative',
+              }}
+              onClick={() => setIsEraser(!isEraser)}
+              aria-label="eraser"
+              title="eraser"
+            >
+              <span style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) rotate(-45deg)',
+                width: '60%',
+                height: 2,
+                background: '#B8A08A',
+                borderRadius: 1,
+              }} />
+            </button>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button

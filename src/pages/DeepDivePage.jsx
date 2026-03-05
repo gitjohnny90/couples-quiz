@@ -200,10 +200,7 @@ export default function DeepDivePage() {
                     <button
                       className="btn btn-secondary"
                       style={{ width: '100%', marginTop: 8 }}
-                      onClick={() => {
-                        setRandomCard(null)
-                        pullRandomCard()
-                      }}
+                      onClick={pullRandomCard}
                     >
                       🎲 different one
                     </button>

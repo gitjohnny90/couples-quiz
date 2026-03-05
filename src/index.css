@@ -83,12 +83,6 @@ body {
   z-index: 1;
 }
 
-/* Slight random-feeling rotation on cards via nth-child */
-.glass:nth-child(odd) { transform: rotate(-0.4deg); }
-.glass:nth-child(even) { transform: rotate(0.6deg); }
-.glass:nth-child(3n) { transform: rotate(-0.8deg); }
-.glass:nth-child(3n+1) { transform: rotate(0.3deg); }
-
 /* ===== BUTTONS ===== */
 .btn {
   display: inline-flex;
@@ -172,6 +166,12 @@ body {
   padding: 24px 20px 110px 68px; /* Extra left padding for margin line */
   width: 100%;
   position: relative;
+}
+
+@media (max-width: 380px) {
+  .page {
+    padding-left: 48px;
+  }
 }
 
 /* ===== BOTTOM NAV — Notebook tabs ===== */
@@ -375,8 +375,18 @@ input[type="range"] {
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent-coral);
+  border: 2px solid #C47363;
+  cursor: pointer;
+  box-shadow: 1px 1px 3px rgba(61, 44, 44, 0.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--accent-coral);
   border: 2px solid #C47363;

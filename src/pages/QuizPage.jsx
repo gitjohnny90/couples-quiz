@@ -85,7 +85,7 @@ export default function QuizPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
-      <PageDoodles seed={3 + currentQ} />
+      <PageDoodles seed={3} />
 
       <motion.div
         initial={{ opacity: 0, y: 15 }}
@@ -103,7 +103,7 @@ export default function QuizPage() {
 
         {/* Crayon progress bar */}
         <div style={{ marginBottom: 20 }}>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: 6, textAlign: "center", fontFamily: "var(--font-hand)", fontSize: "1.1rem" }}>
+          <p style={{ color: "var(--text-secondary)", marginBottom: 6, textAlign: "center", fontFamily: "var(--font-hand)", fontSize: "1.1rem" }}>
             {currentQ + 1} of {questions.length}
           </p>
           <div className="progress-bar-track">
@@ -153,6 +153,7 @@ export default function QuizPage() {
                     className={`option-btn${answers[currentQuestion.id] === index ? " selected" : ""}`}
                     onClick={() => handleSelectOption(index)}
                     disabled={submitted}
+                    aria-pressed={answers[currentQuestion.id] === index}
                     style={{ transform: `rotate(${optionRotations[index] || 0}deg)` }}
                   >
                     {option}

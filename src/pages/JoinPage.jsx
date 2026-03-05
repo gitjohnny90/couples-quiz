@@ -11,11 +11,13 @@ export default function JoinPage() {
   const navigate = useNavigate();
 
   const [player1Name, setPlayer1Name] = useState("");
+  const [player2Name, setPlayer2Name] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [alreadyJoined, setAlreadyJoined] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -28,7 +30,7 @@ export default function JoinPage() {
 
         if (error || !data) { setNotFound(true); return; }
         setPlayer1Name(data.player1_name);
-        if (data.player2_name) setAlreadyJoined(true);
+        if (data.player2_name) { setAlreadyJoined(true); setPlayer2Name(data.player2_name); }
       } catch (err) {
         setNotFound(true);
       } finally {
@@ -41,18 +43,20 @@ export default function JoinPage() {
   const handleJoin = async () => {
     if (!name.trim()) return;
     setJoining(true);
+    setError("");
     try {
-      const { error } = await supabase
+      const { error: joinError } = await supabase
         .from("sessions")
         .update({ player2_name: name.trim() })
         .eq("id", sessionId);
-      if (error) throw error;
+      if (joinError) throw joinError;
       setSessionId(sessionId);
       setPlayerName(name.trim());
       localStorage.setItem("playerId", "player2");
       navigate(`/vault/${sessionId}`);
     } catch (err) {
       console.error("oops, couldn't join:", err);
+      setError("couldn't join — check your connection and try again");
     } finally {
       setJoining(false);
     }
@@ -96,7 +100,7 @@ export default function JoinPage() {
           <p style={{ color: "var(--text-secondary)", marginBottom: 24 }}>this notebook already has two people writing in it</p>
           <button className="btn btn-primary" onClick={() => {
             setSessionId(sessionId);
-            setPlayerName("Player 2");
+            setPlayerName(player2Name || "Player 2");
             localStorage.setItem("playerId", "player2");
             navigate(`/vault/${sessionId}`);
           }}>
@@ -147,6 +151,11 @@ export default function JoinPage() {
           <button className="btn btn-primary" onClick={handleJoin} disabled={joining || !name.trim()} style={{ width: "100%" }}>
             {joining ? "joining..." : "let's do this"}
           </button>
+          {error && (
+            <p style={{ color: 'var(--accent-coral)', fontSize: '0.85rem', marginTop: 10, textAlign: 'center', fontStyle: 'italic' }}>
+              {error}
+            </p>
+          )}
         </div>
       </motion.div>
     </div>

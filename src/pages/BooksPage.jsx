@@ -35,8 +35,10 @@ function StarRating({ rating, onRate, size = 22 }) {
         <button
           key={star}
           onClick={(e) => { e.stopPropagation(); onRate(star) }}
+          aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
           style={{
-            background: 'none', border: 'none', cursor: 'pointer', padding: 2,
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: '6px 4px', minWidth: 36, minHeight: 36,
             fontSize: size, color: star <= rating ? '#D4A843' : '#D4C4B0',
             transition: 'transform 0.1s',
           }}
@@ -60,6 +62,7 @@ export default function BooksPage() {
   const [showAdd, setShowAdd] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newGenre, setNewGenre] = useState('')
+  const [error, setError] = useState('')
 
   // Pick For Us state
   const [currentPick, setCurrentPick] = useState(null)
@@ -94,49 +97,61 @@ export default function BooksPage() {
     setLoading(false)
   }
 
+  const showError = (msg) => { setError(msg); setTimeout(() => setError(''), 3000) }
+
   const addItem = async () => {
     if (!newTitle.trim()) return
-    await supabase.from('shared_items').insert({
-      session_id: sessionId,
-      type: 'book',
-      title: newTitle.trim(),
-      genre: newGenre || null,
-      added_by: playerId,
-      source: 'manual',
-    })
-    setNewTitle('')
-    setNewGenre('')
-    setShowAdd(false)
-    fetchData()
+    try {
+      await supabase.from('shared_items').insert({
+        session_id: sessionId,
+        type: 'book',
+        title: newTitle.trim(),
+        genre: newGenre || null,
+        added_by: playerId,
+        source: 'manual',
+      })
+      setNewTitle('')
+      setNewGenre('')
+      setShowAdd(false)
+      fetchData()
+    } catch (err) { showError('something went wrong — try again') }
   }
 
   const addFromWheel = async (title) => {
-    const genre = bookGenres.find((g) => g.id === selectedGenre)
-    await supabase.from('shared_items').insert({
-      session_id: sessionId,
-      type: 'book',
-      title: title,
-      genre: genre?.name || null,
-      added_by: playerId,
-      source: 'wheel',
-    })
-    fetchData()
+    try {
+      const genre = bookGenres.find((g) => g.id === selectedGenre)
+      await supabase.from('shared_items').insert({
+        session_id: sessionId,
+        type: 'book',
+        title: title,
+        genre: genre?.name || null,
+        added_by: playerId,
+        source: 'wheel',
+      })
+      fetchData()
+    } catch (err) { showError('something went wrong — try again') }
   }
 
   const updateStatus = async (item, newStatus) => {
-    await supabase.from('shared_items').update({ status: newStatus }).eq('id', item.id)
-    fetchData()
+    try {
+      await supabase.from('shared_items').update({ status: newStatus }).eq('id', item.id)
+      fetchData()
+    } catch (err) { showError('something went wrong — try again') }
   }
 
   const rateItem = async (item, rating) => {
-    const field = playerId === 'player1' ? 'player1_rating' : 'player2_rating'
-    await supabase.from('shared_items').update({ [field]: rating }).eq('id', item.id)
-    fetchData()
+    try {
+      const field = playerId === 'player1' ? 'player1_rating' : 'player2_rating'
+      await supabase.from('shared_items').update({ [field]: rating }).eq('id', item.id)
+      fetchData()
+    } catch (err) { showError('something went wrong — try again') }
   }
 
   const deleteItem = async (item) => {
-    await supabase.from('shared_items').delete().eq('id', item.id)
-    fetchData()
+    try {
+      await supabase.from('shared_items').delete().eq('id', item.id)
+      fetchData()
+    } catch (err) { showError('something went wrong — try again') }
   }
 
   // Categorize items
@@ -199,6 +214,13 @@ export default function BooksPage() {
     <div className="page" style={{ position: 'relative' }}>
       <PageDoodles seed={25} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
+
+        {/* Error banner */}
+        {error && (
+          <p style={{ color: 'var(--accent-coral)', fontSize: '0.85rem', textAlign: 'center', fontStyle: 'italic', marginBottom: 8 }}>
+            {error}
+          </p>
+        )}
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 14 }}>
