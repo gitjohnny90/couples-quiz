@@ -35,13 +35,23 @@ export default function LoveNoteHuntPage() {
 
   // Waiting state
   const [copied, setCopied] = useState(false)
+  const [partnerName, setPartnerName] = useState(null)
 
   const textareaRef = useRef(null)
 
   useEffect(() => {
     if (sessionId) setSessionId(sessionId)
     resumeGame()
+    fetchPartnerName()
   }, [sessionId])
+
+  const fetchPartnerName = async () => {
+    const { data } = await supabase.from('sessions').select('player1_name, player2_name').eq('id', sessionId).single()
+    if (!data) return
+    const myKey = playerId === 'player1' ? 'player1_name' : 'player2_name'
+    const partnerKey = playerId === 'player1' ? 'player2_name' : 'player1_name'
+    if (data[partnerKey]) setPartnerName(data[partnerKey])
+  }
 
   // Resume from existing DB state
   const resumeGame = async () => {
@@ -679,7 +689,7 @@ export default function LoveNoteHuntPage() {
                     style={{ fontSize: '0.9rem' }}
                     onClick={dismissNote}
                   >
-                    keep searching
+                    {hits.length >= NOTES_REQUIRED ? 'see all notes' : 'keep searching'}
                   </button>
                 </motion.div>
               </motion.div>
@@ -763,7 +773,7 @@ export default function LoveNoteHuntPage() {
           >
             <div className="sticky-note" style={{ padding: 14, display: 'inline-block' }}>
               <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
-                with love 💕
+                with love{partnerName ? `, ${partnerName}` : ''} 💕
               </p>
               <DoodleStar size={12} opacity={0.3} rotate={15} style={{ position: 'absolute', top: -4, right: -4 }} />
             </div>
