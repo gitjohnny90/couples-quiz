@@ -29,12 +29,23 @@ export default function SpinningWheel({ items = [], onResult, disabled = false }
   const [rotation, setRotation] = useState(0)
   const [result, setResult] = useState(null)
   const wheelRef = useRef(null)
+  const resultRef = useRef(null)
 
   const n = items.length
   if (n === 0) return null
 
   const segmentAngle = 360 / n
   const cx = 160, cy = 160, r = 150
+
+  // Auto-scroll to result card when it appears
+  useEffect(() => {
+    if (result && !spinning && resultRef.current) {
+      const timer = setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [result, spinning])
 
   const spin = () => {
     if (spinning || disabled) return
@@ -85,17 +96,31 @@ export default function SpinningWheel({ items = [], onResult, disabled = false }
           <circle cx={cx} cy={cy} r={r + 4} fill="none" stroke="var(--text-primary)" strokeWidth="2.5"
             strokeDasharray="4 2" opacity={0.6} />
 
+          {/* Invisible paths for text to flow along (one per segment) */}
+          <defs>
+            {items.map((item, i) => {
+              const midAngle = i * segmentAngle + segmentAngle / 2
+              const inner = polarToCartesian(cx, cy, r * 0.18, midAngle)
+              const outer = polarToCartesian(cx, cy, r * 0.92, midAngle)
+              // Flip path direction for slices on the left half so text isn't upside-down
+              const flipped = midAngle > 180
+              return (
+                <path key={i} id={`slice-path-${i}`}
+                  d={flipped
+                    ? `M ${outer.x} ${outer.y} L ${inner.x} ${inner.y}`
+                    : `M ${inner.x} ${inner.y} L ${outer.x} ${outer.y}`
+                  } />
+              )
+            })}
+          </defs>
+
           {/* Segments */}
           {items.map((item, i) => {
             const startAngle = i * segmentAngle
             const endAngle = startAngle + segmentAngle
             const midAngle = startAngle + segmentAngle / 2
             const color = COLORS[i % COLORS.length]
-
-            // Text position — along the radius
-            const textR = r * 0.62
-            const textPos = polarToCartesian(cx, cy, textR, midAngle)
-            const textRotation = midAngle
+            const flipped = midAngle > 180
 
             return (
               <g key={i}>
@@ -107,18 +132,15 @@ export default function SpinningWheel({ items = [], onResult, disabled = false }
                   opacity={0.85}
                 />
                 <text
-                  x={textPos.x}
-                  y={textPos.y}
-                  transform={`rotate(${textRotation}, ${textPos.x}, ${textPos.y})`}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
                   fill="#fff"
                   fontFamily="'Patrick Hand', cursive"
                   fontSize={n > 15 ? '8' : n > 10 ? '9.5' : '11'}
                   fontWeight="600"
                   style={{ textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}
                 >
-                  {truncateText(item, n > 15 ? 16 : 20)}
+                  <textPath href={`#slice-path-${i}`} startOffset={flipped ? '5%' : '18%'}>
+                    {truncateText(item, n > 15 ? 18 : n > 10 ? 22 : 26)}
+                  </textPath>
                 </text>
               </g>
             )
@@ -148,6 +170,7 @@ export default function SpinningWheel({ items = [], onResult, disabled = false }
       {/* Result display */}
       {result && !spinning && (
         <motion.div
+          ref={resultRef}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', damping: 12 }}
