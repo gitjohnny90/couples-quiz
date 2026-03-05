@@ -75,6 +75,7 @@ The visual theme is a hand-drawn notebook:
 
 - `src/components/Doodles.jsx` — decorative SVG doodles (see Doodles section above)
 - `src/components/DrawingCanvas.jsx` — reusable canvas with color picker, eraser, undo/clear. Uses pointer events and `globalCompositeOperation` for erasing. Exports drawing as PNG data URL via `onDrawingChange` callback.
+- `src/components/SpinningWheel.jsx` — SVG genre wheel used by Movies and Books pages. Titles rendered via `<textPath>` along each slice's midline (flipped for bottom half so text is never upside-down). CSS transition spin animation with cubic-bezier easing; auto-scrolls to result card after landing.
 
 ## Key Patterns
 
