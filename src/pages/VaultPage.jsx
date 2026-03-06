@@ -32,7 +32,20 @@ export default function VaultPage() {
   }, [sessionId, session?.player2_name])
 
   const fetchData = async () => {
-    const { data: sessionData } = await supabase.from('sessions').select('*').eq('id', sessionId).single()
+    let { data: sessionData } = await supabase.from('sessions').select('*').eq('id', sessionId).single()
+
+    // Backfill invite code for legacy sessions that don't have one
+    if (sessionData && !sessionData.invite_code) {
+      const code = `LOVE-${Math.floor(1000 + Math.random() * 9000)}`
+      const { data: updated } = await supabase
+        .from('sessions')
+        .update({ invite_code: code })
+        .eq('id', sessionId)
+        .select()
+        .single()
+      if (updated) sessionData = updated
+    }
+
     setSession(sessionData)
 
     // Multiple choice completion count
