@@ -37,8 +37,8 @@ No test runner or linter is configured.
 All routes defined in `App.jsx`. `/auth` and `/reset-password` are public; all others require authentication. Four nav tabs map to route groups:
 - **home** → `/` (HomePage — session creation/join via invite code)
 - **quizzes** → `/vault/:id`, `/quiz/:id/:packId`, `/results/:id/:packId`, `/deep-dive/:id`, `/deep-dive/:id/:deckId`, `/quiz-packs/:id`
-- **fun stuff** → `/fun/:id`, `/draw/:id`, `/movies/:id`, `/books/:id`, `/tictactoe/:id`, `/love-notes/:id`, `/watch-guide/:id`
-- **us** → `/profiles/:id` (hub page with links to sub-pages), `/personality/:id` (edit/compare personality tests), `/vision/:id` (north star + vision board tab, dreams + sky + milestones tab), `/journal/:id`
+- **fun stuff** → `/fun/:id`, `/draw/:id`, `/movies/:id`, `/tictactoe/:id`, `/love-notes/:id`, `/watch-guide/:id`
+- **us** → `/profiles/:id` (hub page with links to sub-pages), `/personality/:id` (edit/compare personality tests), `/vision/:id` (north star + vision board tab, dreams + sky + milestones tab), `/journal/:id` (four tabs: quizzes, deep dive, drawings, books), `/study/:id` (Study Together — shared reading + reflections)
 
 ### Data Flow
 
@@ -55,12 +55,12 @@ All routes defined in `App.jsx`. `/auth` and `/reset-password` are public; all o
 | `responses` | Quiz answers, drawings, & tic-tac-toe game state | `session_id`, `pack_id`, `player_id`, `answers` (JSONB) |
 | `profiles` | Personality test data | `session_id`, `player_id`, `profile_data` (JSONB) |
 | `deep_dive_responses` | Open-ended answers | `session_id`, `deck_id`, `question_id`, `answer` |
-| `shared_items` | Movie/book lists | `session_id`, `type`, `title`, `status`, ratings |
+| `shared_items` | Movie lists | `session_id`, `type`, `title`, `status`, ratings |
 | `love_note_games` | Love Note Hunt game state | `session_id`, `player_id`, `notes` (JSONB), `note_cells` (JSONB) |
 | `love_note_guesses` | Love Note Hunt guesses | `game_id`, `player_id`, `cell_index` |
 | `reactions` | Emoji reactions to answers | `session_id`, `player_id`, `target_type`, `target_id`, `reaction` |
 
-All tables use `player_id` as `'player1'` or `'player2'` (tic-tac-toe uses `'game'` for shared state). Auth user IDs stored in `sessions` and `user_sessions`.
+All tables use `player_id` as `'player1'` or `'player2'` (tic-tac-toe uses `'game'`, study-together and vision use `'shared'` for shared state). Auth user IDs stored in `sessions` and `user_sessions`.
 
 ## Styling
 
@@ -81,7 +81,7 @@ The visual theme is a hand-drawn notebook:
 
 - `src/components/Doodles.jsx` — decorative SVG doodles (see Doodles section above)
 - `src/components/DrawingCanvas.jsx` — reusable canvas with color picker, eraser, undo/clear. Uses pointer events and `globalCompositeOperation` for erasing. Exports drawing as PNG data URL via `onDrawingChange` callback.
-- `src/components/SpinningWheel.jsx` — SVG genre wheel used by Movies and Books pages. Titles rendered via `<textPath>` along each slice's midline (flipped for bottom half so text is never upside-down). CSS transition spin animation with cubic-bezier easing; auto-scrolls to result card after landing.
+- `src/components/SpinningWheel.jsx` — SVG genre wheel used by Movies page. Titles rendered via `<textPath>` along each slice's midline (flipped for bottom half so text is never upside-down). CSS transition spin animation with cubic-bezier easing; auto-scrolls to result card after landing.
 - `src/components/ReactionPopup.jsx` — floating emoji picker (❤️ 😂 🔥) that appears on long-press. Uses framer-motion spring animations, fixed-position backdrop, smart positioning above/below the target. Highlights your current selection (coral border) and shows a blue dot on partner's pick.
 - `src/components/ReactionBadge.jsx` — bare emoji(s) positioned at the bottom-right edge of an answer/drawing box, hanging halfway off the corner (`position: absolute; bottom: -10; right: -6`). Parent must have `position: relative; overflow: visible`. Pop animation (spring: stiffness 500, damping 12) only fires for real-time arrivals, not pre-existing reactions on page load (800ms mount delay via ref). Shows one or two emojis (yours + partner's) with slight overlap when both exist.
 - `src/components/ReactionPicker.jsx` — re-export barrel for ReactionPopup, ReactionBadge, and useLongPress.
@@ -97,6 +97,7 @@ The visual theme is a hand-drawn notebook:
 - **Realtime**: `supabase.channel(name).on('postgres_changes', ...).subscribe()` — always unsubscribe in cleanup
 - **Reactions**: `useReactions(sessionId, targetType)` hook in `src/utils/reactions.js` manages fetch, toggle, and realtime subscription for emoji reactions. Target types: `'quiz'`, `'drawing'`, `'love_note'`, `'deep_dive'`. Each individual answer/drawing is its own reaction target — long-press on a specific answer box opens `ReactionPopup`, and `ReactionBadge` displays at that answer's bottom-right edge. TargetId formats: `${packId}:${questionId}:player1` (quiz), `${packId}:player1` (drawing). Toggle behavior: same emoji = remove, different emoji = switch, none = create.
 - **Tic-Tac-Toe**: Multiplayer via Supabase — game state stored in `responses` table with `pack_id: 'tictactoe'` and `player_id: 'game'`. Each player can only place their own color heart (`player1` = coral, `player2` = blue) and must wait for partner's turn. Uses realtime subscription + 3s polling fallback for sync.
+- **Study Together**: `src/pages/StudyTogetherPage.jsx` — three shelves (Personal Growth 🌳, Marriage & Couples 💕, Faith & Christian 🕊️). Books stored in `responses` table with `pack_id: 'study-together'`, `player_id: 'shared'`, JSONB `answers.books` array. Four status stages: want → reading → finished → reflected. Each partner writes guided reflections (4 prompts + freeform) when a book is finished; status auto-sets to `reflected` when both partners have saved reflections. Reflections color-coded by player (coral/blue). Finished books also appear in the Journal's "books" tab (`JournalPage.jsx`).
 - **No component library**: all UI is custom JSX with inline styles
 - **Error handling**: Most pages use an `error` state variable with user-visible feedback (inline `<p>` or banner). Some use `setTimeout` for auto-dismiss after 3 seconds.
 - **Dynamic page titles**: `useDocumentTitle()` hook in `App.jsx` sets `document.title` based on the current route.
