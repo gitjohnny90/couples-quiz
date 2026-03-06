@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
+import { AuthContext } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleFlower } from '../components/Doodles'
@@ -31,6 +32,7 @@ export default function ProfilesPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
   const { playerName, playerId } = useContext(SessionContext)
+  const { signOut } = useContext(AuthContext)
 
   const [myProfile, setMyProfile] = useState({ ...defaultProfile })
   const [partnerProfile, setPartnerProfile] = useState(null)
@@ -365,6 +367,34 @@ export default function ProfilesPage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Sign out */}
+        <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 8 }}>
+          <button
+            onClick={async () => {
+              await signOut()
+              navigate('/auth')
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-hand)',
+              fontSize: '1rem',
+              color: 'var(--text-light)',
+              padding: '8px 16px',
+              textDecoration: 'underline',
+              textDecorationStyle: 'wavy',
+              textDecorationColor: 'var(--border-pencil)',
+              textUnderlineOffset: 4,
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-coral)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-light)'}
+          >
+            sign out
+          </button>
+        </div>
       </motion.div>
     </div>
   )
