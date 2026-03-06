@@ -33,6 +33,13 @@ export default function ProfilesPage() {
       rotation: -0.5,
       onClick: () => navigate(`/vision/${sessionId}`),
     },
+    {
+      emoji: '📚',
+      title: 'Study Together',
+      description: 'read, grow, and reflect on books together',
+      rotation: 0.5,
+      onClick: () => navigate(`/study/${sessionId}`),
+    },
   ]
 
   return (

@@ -15,7 +15,6 @@ export default function FunStuffPage() {
 
   const [drawStatus, setDrawStatus] = useState({ completedCount: 0, startedCount: 0, total: drawingPrompts.length })
   const [movieCount, setMovieCount] = useState(0)
-  const [bookCount, setBookCount] = useState(0)
   const [loveNoteStatus, setLoveNoteStatus] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -44,7 +43,6 @@ export default function FunStuffPage() {
     }
     if (itemData) {
       setMovieCount(itemData.filter((i) => i.type === 'movie').length)
-      setBookCount(itemData.filter((i) => i.type === 'book').length)
     }
     if (loveNoteData && loveNoteData.length > 0) {
       const maxRound = Math.max(...loveNoteData.map(n => n.round))
@@ -93,16 +91,6 @@ export default function FunStuffPage() {
       statusText: movieCount > 0 ? `${movieCount} saved` : 'explore →',
       statusColor: movieCount > 0 ? 'var(--accent-coral)' : 'var(--text-light)',
       onClick: () => navigate(`/movies/${sessionId}`),
-    },
-    {
-      emoji: '📚',
-      title: 'Books',
-      description: 'shared reading list, genre wheel, and pick for us',
-      rotation: 0.3,
-      borderColor: bookCount > 0 ? 'var(--accent-sage)' : undefined,
-      statusText: bookCount > 0 ? `${bookCount} saved` : 'explore →',
-      statusColor: bookCount > 0 ? 'var(--accent-sage)' : 'var(--text-light)',
-      onClick: () => navigate(`/books/${sessionId}`),
     },
     {
       emoji: '💕',

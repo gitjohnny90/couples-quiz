@@ -12,6 +12,62 @@ import useLongPress from '../hooks/useLongPress'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, DoodleHeart, SquigglyUnderline } from '../components/Doodles'
 
+const BOOK_SHELVES = [
+  { key: 'growth', label: 'Personal Growth', emoji: '🌳', color: '#8DAE8B' },
+  { key: 'couples', label: 'Marriage & Couples', emoji: '💕', color: '#E88D7A' },
+  { key: 'faith', label: 'Faith & Christian', emoji: '🕊️', color: '#7EB8D8' },
+]
+
+const BOOK_GUIDED_PROMPTS = [
+  { key: 'takeaway', label: 'biggest takeaway' },
+  { key: 'changedUs', label: 'changed how you think about us' },
+  { key: 'tryApply', label: 'one thing to try or apply' },
+  { key: 'surprised', label: 'something that surprised you' },
+]
+
+const BOOK_PLAYER_COLORS = { player1: '#E88D7A', player2: '#7EB8D8' }
+
+function JournalBookReflection({ reflection, color, label }) {
+  const savedDate = new Date(reflection.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0 }} />
+        <span style={{ fontFamily: 'var(--font-hand)', fontSize: '0.9rem', fontWeight: 600, color }}>
+          {label}
+        </span>
+        <span style={{ fontFamily: 'var(--font-hand)', fontSize: '0.7rem', color: 'var(--text-light)' }}>
+          — {savedDate}
+        </span>
+      </div>
+      {BOOK_GUIDED_PROMPTS.map((prompt) => {
+        const val = reflection.guided?.[prompt.key]
+        if (!val) return null
+        return (
+          <div key={prompt.key} style={{ marginBottom: 8 }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.72rem', color: 'var(--text-light)', display: 'block', marginBottom: 2 }}>
+              {prompt.label}
+            </span>
+            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.88rem', color, lineHeight: 1.4, margin: 0, whiteSpace: 'pre-wrap' }}>
+              {val}
+            </p>
+          </div>
+        )
+      })}
+      {reflection.freeform && (
+        <div style={{ marginTop: 6 }}>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.72rem', color: 'var(--text-light)', display: 'block', marginBottom: 2 }}>
+            other thoughts
+          </span>
+          <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.88rem', color, lineHeight: 1.4, margin: 0, whiteSpace: 'pre-wrap' }}>
+            {reflection.freeform}
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function JournalPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
@@ -32,6 +88,8 @@ export default function JournalPage() {
   const [mcResponses, setMcResponses] = useState([])
   const [ddResponses, setDdResponses] = useState([])
   const [drawResponses, setDrawResponses] = useState([])
+  const [bookEntries, setBookEntries] = useState([])
+  const [partnerName, setPartnerName] = useState(null)
   const [loading, setLoading] = useState(true)
   const [expandedItem, setExpandedItem] = useState(null)
 
@@ -44,13 +102,31 @@ export default function JournalPage() {
       if (mcRes.data) {
         const allResponses = mcRes.data
         setDrawResponses(allResponses.filter(r => r.pack_id?.startsWith(DRAW_PACK_PREFIX + 'dp')))
-        setMcResponses(allResponses.filter(r => !r.pack_id?.startsWith(DRAW_PACK_PREFIX)))
+        setMcResponses(allResponses.filter(r => !r.pack_id?.startsWith(DRAW_PACK_PREFIX) && r.pack_id !== 'study-together'))
+        const studyRow = allResponses.find(r => r.pack_id === 'study-together' && r.player_id === 'shared')
+        setBookEntries(studyRow?.answers?.books?.filter(b => b.status === 'finished' || b.status === 'reflected') || [])
       }
       if (ddRes.data) setDdResponses(ddRes.data)
       setLoading(false)
     }
     fetchAll()
   }, [sessionId])
+
+  // Fetch partner name for book reflections
+  useEffect(() => {
+    if (!sessionId || !playerId) return
+    const fetchPartner = async () => {
+      const { data: session } = await supabase
+        .from('sessions')
+        .select('player1_name, player2_name')
+        .eq('id', sessionId)
+        .maybeSingle()
+      if (session) {
+        setPartnerName(playerId === 'player1' ? session.player2_name : session.player1_name)
+      }
+    }
+    fetchPartner()
+  }, [sessionId, playerId])
 
   // ── Multiple Choice helpers ──
   const getCompletedPacks = () => {
@@ -117,6 +193,7 @@ export default function JournalPage() {
   const mcQuestions = completedPacks.reduce((s, p) => s + p.pack.questions.length, 0)
   const ddTotal = completedDecks.length
   const drawTotal = completedDrawings.length
+  const bookTotal = bookEntries.length
 
   return (
     <div className="page" style={{ position: 'relative' }}>
@@ -136,7 +213,7 @@ export default function JournalPage() {
 
         {/* Tab switcher */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
-          {[['mc', 'quizzes'], ['dd', 'deep dive'], ['drawings', 'drawings']].map(([key, label]) => (
+          {[['mc', 'quizzes'], ['dd', 'deep dive'], ['drawings', 'drawings'], ['books', 'books']].map(([key, label]) => (
             <button
               key={key}
               onClick={() => { setActiveTab(key); setExpandedItem(null) }}
@@ -145,7 +222,7 @@ export default function JournalPage() {
                 border: `1.5px solid ${activeTab === key ? 'var(--border-pencil-dark)' : 'var(--border-pencil)'}`,
                 borderBottom: activeTab === key ? '2px solid var(--bg-paper)' : '1.5px solid var(--border-pencil)',
                 fontFamily: 'var(--font-hand)', fontWeight: activeTab === key ? 700 : 500,
-                fontSize: '1.05rem', cursor: 'pointer',
+                fontSize: '0.95rem', cursor: 'pointer',
                 background: activeTab === key ? 'var(--bg-paper)' : 'var(--bg-card)',
                 color: activeTab === key ? 'var(--accent-coral)' : 'var(--text-secondary)',
                 transition: 'all 0.15s', position: 'relative', zIndex: activeTab === key ? 2 : 1,
@@ -615,6 +692,132 @@ export default function JournalPage() {
                                   <div className="torn-edge-small" />
                                 </div>
                               </div>
+                            </motion.div>
+                          )}
+                        </motion.div>
+                      )
+                    })}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ══ BOOKS TAB ══ */}
+            {activeTab === 'books' && (
+              <motion.div key="books" initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 15 }}>
+
+                {/* Stats */}
+                {bookTotal > 0 && (
+                  <div className="sticky-note" style={{ padding: 16, textAlign: 'center', marginBottom: 20, transform: 'rotate(-0.5deg)', position: 'relative' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: 24 }}>
+                      <div>
+                        <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.8rem', fontWeight: 700, color: 'var(--accent-coral)', lineHeight: 1 }}>
+                          {bookTotal}
+                        </p>
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>books finished</p>
+                      </div>
+                      <div>
+                        <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.8rem', fontWeight: 700, color: 'var(--accent-coral)', lineHeight: 1 }}>
+                          {bookEntries.filter(b => b.status === 'reflected').length}
+                        </p>
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>both reflected</p>
+                      </div>
+                    </div>
+                    <div style={{ position: 'absolute', top: -6, right: 12 }}>
+                      <DoodleStar size={14} opacity={0.35} rotate={15} />
+                    </div>
+                  </div>
+                )}
+
+                {bookTotal === 0 ? (
+                  <div className="glass" style={{ padding: 28, textAlign: 'center', transform: 'rotate(0.3deg)' }}>
+                    <p style={{ fontSize: '1.5rem', marginBottom: 8 }}>📚</p>
+                    <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem', color: 'var(--text-secondary)' }}>
+                      no finished books yet
+                    </p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginTop: 4, fontStyle: 'italic' }}>
+                      complete a book in Study Together to see reflections here
+                    </p>
+                    <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => navigate(`/study/${sessionId}`)}>
+                      study together →
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {bookEntries.map((book, i) => {
+                      const isExpanded = expandedItem === book.id
+                      const shelf = BOOK_SHELVES.find(s => s.key === book.shelf)
+                      const myReflection = book.reflections?.[playerId]
+                      const partnerReflection = book.reflections?.[partnerId]
+
+                      return (
+                        <motion.div
+                          key={book.id}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="glass"
+                          style={{ overflow: 'hidden', transform: `rotate(${i % 2 === 0 ? -0.3 : 0.3}deg)`, borderLeft: `3px solid ${shelf?.color || 'var(--border-pencil)'}` }}
+                        >
+                          <button
+                            onClick={() => setExpandedItem(isExpanded ? null : book.id)}
+                            style={{
+                              width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                              padding: '16px 18px', textAlign: 'left',
+                              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <span style={{ fontSize: '1.3rem' }}>{shelf?.emoji || '📖'}</span>
+                              <div>
+                                <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                                  {book.title}
+                                </h3>
+                                <p style={{ fontSize: '0.78rem', color: shelf?.color || 'var(--text-light)', fontFamily: 'var(--font-hand)' }}>
+                                  {shelf?.label || book.shelf} · {book.status === 'reflected' ? 'both reflected ✨' : 'finished'}
+                                </p>
+                              </div>
+                            </div>
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-light)', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)' }}>
+                              ▼
+                            </span>
+                          </button>
+
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              transition={{ duration: 0.25 }}
+                              style={{ padding: '0 18px 18px' }}
+                            >
+                              {/* My reflections */}
+                              {myReflection?.savedAt ? (
+                                <JournalBookReflection
+                                  reflection={myReflection}
+                                  color={BOOK_PLAYER_COLORS[playerId]}
+                                  label={`${playerName || 'you'}`}
+                                />
+                              ) : (
+                                <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.85rem', color: 'var(--text-light)', fontStyle: 'italic', padding: '6px 0' }}>
+                                  you haven't reflected yet
+                                </p>
+                              )}
+
+                              {/* Divider */}
+                              <div style={{ borderTop: '1px dashed var(--rule-line)', margin: '12px 0' }} />
+
+                              {/* Partner's reflections */}
+                              {partnerReflection?.savedAt ? (
+                                <JournalBookReflection
+                                  reflection={partnerReflection}
+                                  color={BOOK_PLAYER_COLORS[partnerId]}
+                                  label={`${partnerName || 'your partner'}`}
+                                />
+                              ) : (
+                                <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.85rem', color: 'var(--text-light)', fontStyle: 'italic', padding: '6px 0' }}>
+                                  {partnerName || 'your partner'} hasn't reflected yet
+                                </p>
+                              )}
                             </motion.div>
                           )}
                         </motion.div>

@@ -17,7 +17,7 @@ import DrawPage from "./pages/DrawPage";
 import DrawResultsPage from "./pages/DrawResultsPage";
 import FunStuffPage from "./pages/FunStuffPage";
 import MoviesPage from "./pages/MoviesPage";
-import BooksPage from "./pages/BooksPage";
+import StudyTogetherPage from "./pages/StudyTogetherPage";
 import WatchGuidePage from "./pages/WatchGuidePage";
 import DeepDivePage from "./pages/DeepDivePage";
 import DeepDiveDeckPage from "./pages/DeepDiveDeckPage";
@@ -168,7 +168,7 @@ export default function App() {
           <Route path="/fun/:sessionId" element={<RequireAuth><FunStuffPage /></RequireAuth>} />
           <Route path="/movies/:sessionId" element={<RequireAuth><MoviesPage /></RequireAuth>} />
           <Route path="/watch-guide/:sessionId" element={<RequireAuth><WatchGuidePage /></RequireAuth>} />
-          <Route path="/books/:sessionId" element={<RequireAuth><BooksPage /></RequireAuth>} />
+          <Route path="/study/:sessionId" element={<RequireAuth><StudyTogetherPage /></RequireAuth>} />
           <Route path="/tictactoe/:sessionId" element={<RequireAuth><TicTacToePage /></RequireAuth>} />
           <Route path="/love-notes/:sessionId" element={<RequireAuth><LoveNoteHuntPage /></RequireAuth>} />
           <Route path="/deep-dive/:sessionId" element={<RequireAuth><DeepDivePage /></RequireAuth>} />
