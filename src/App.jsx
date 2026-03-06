@@ -22,6 +22,7 @@ import JournalPage from "./pages/JournalPage";
 import QuizPacksPage from "./pages/QuizPacksPage";
 import TicTacToePage from "./pages/TicTacToePage";
 import LoveNoteHuntPage from "./pages/LoveNoteHuntPage";
+import MissYouHeart from "./components/MissYouHeart";
 
 // Guard: redirects to /auth if not logged in
 function RequireAuth({ children }) {
@@ -171,6 +172,7 @@ export default function App() {
           <Route path="/profiles/:sessionId" element={<RequireAuth><ProfilesPage /></RequireAuth>} />
         </Routes>
         <BottomNav />
+        <MissYouHeart />
       </div>
     </SessionContext.Provider>
   );

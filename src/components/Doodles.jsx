@@ -140,11 +140,6 @@ export default function PageDoodles({ seed = 0 }) {
 
   return (
     <>
-      {/* Top-right corner doodles */}
-      <div className="doodle" style={{ top: 8, right: 12 }}>
-        <DoodleHeart size={18 + v(0) * 8} rotate={-8 + v(1) * 16} opacity={0.3 + v(2) * 0.15} />
-      </div>
-
       {/* Top-left margin area */}
       <div className="doodle" style={{ top: 60 + v(3) * 40, left: 12 }}>
         <DoodleStar size={14 + v(4) * 6} color="#D4A843" rotate={v(5) * 30} opacity={0.25 + v(6) * 0.15} />
