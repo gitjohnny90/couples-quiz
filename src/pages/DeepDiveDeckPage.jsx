@@ -1,11 +1,13 @@
-import { useContext, useState, useEffect, useRef } from 'react'
+import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import deepDiveDecks, { MOOD_TAGS } from '../data/deepDiveDecks'
 import { determineDeepDivePhase } from '../utils/quizScoring'
 import { useReactions } from '../utils/reactions'
-import ReactionPicker from '../components/ReactionPicker'
+import ReactionPopup from '../components/ReactionPopup'
+import ReactionBadge from '../components/ReactionBadge'
+import useLongPress from '../hooks/useLongPress'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline, DoodleHeart } from '../components/Doodles'
 
@@ -18,6 +20,13 @@ export default function DeepDiveDeckPage() {
   const navigate = useNavigate()
   const partnerId = playerId === 'player1' ? 'player2' : 'player1'
   const { reactionMap, handleReact } = useReactions(sessionId, 'deep_dive')
+
+  const [activeReaction, setActiveReaction] = useState(null)
+  const pressedCardRef = useRef(null)
+  const onLongPressCard = useCallback(() => {
+    if (pressedCardRef.current) setActiveReaction(pressedCardRef.current)
+  }, [])
+  const longPress = useLongPress(onLongPressCard)
 
   const deck = deepDiveDecks.find((d) => d.id === deckId)
 
@@ -257,11 +266,22 @@ export default function DeepDiveDeckPage() {
                   <p style={{ fontSize: '0.95rem', fontWeight: 500, marginBottom: 14, lineHeight: 1.5 }}>
                     {q.text}
                   </p>
-                  <JournalEntryPair mine={mine} theirs={theirs} reactionMap={reactionMap} playerId={playerId} partnerId={partnerId} onReact={handleReact} />
+                  <JournalEntryPair mine={mine} theirs={theirs} reactionMap={reactionMap} playerId={playerId} partnerId={partnerId} longPress={longPress} pressedCardRef={pressedCardRef} />
                 </motion.div>
               )
             })}
           </div>
+
+          {/* Hold to react hint */}
+          <p style={{
+            textAlign: 'center',
+            fontFamily: 'var(--font-hand)',
+            fontSize: '0.9rem',
+            color: 'var(--text-light)',
+            marginTop: 14,
+          }}>
+            hold any answer to react ~
+          </p>
 
           {/* Nav buttons */}
           <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
@@ -273,6 +293,20 @@ export default function DeepDiveDeckPage() {
             </button>
           </div>
         </motion.div>
+
+        {/* Reaction popup */}
+        {activeReaction && (
+          <ReactionPopup
+            targetRect={activeReaction.rect}
+            myReaction={reactionMap[activeReaction.targetId]?.[playerId] || null}
+            partnerReaction={reactionMap[activeReaction.targetId]?.[partnerId] || null}
+            onReact={async (emoji) => {
+              await handleReact(playerId, activeReaction.targetId, emoji)
+              setActiveReaction(null)
+            }}
+            onClose={() => setActiveReaction(null)}
+          />
+        )}
       </div>
     )
   }
@@ -444,7 +478,7 @@ export default function DeepDiveDeckPage() {
 }
 
 // ── Journal Entry Pair component ──
-function JournalEntryPair({ mine, theirs, reactionMap, playerId, partnerId, onReact }) {
+function JournalEntryPair({ mine, theirs, reactionMap, playerId, partnerId, longPress, pressedCardRef }) {
   if (!mine || !theirs) return null
 
   const entries = [
@@ -455,7 +489,20 @@ function JournalEntryPair({ mine, theirs, reactionMap, playerId, partnerId, onRe
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {entries.map(({ response, bg, border, nameColor, label }) => (
-        <div key={response.id} style={{ position: 'relative' }}>
+        <div
+          key={response.id}
+          style={{ position: 'relative', touchAction: 'none' }}
+          onPointerDown={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect()
+            pressedCardRef.current = { targetId: response.id, rect }
+            longPress.onPointerDown(e)
+          }}
+          onPointerUp={longPress.onPointerUp}
+          onPointerMove={longPress.onPointerMove}
+          onPointerCancel={longPress.onPointerCancel}
+          onContextMenu={longPress.onContextMenu}
+          onClick={longPress.onClick}
+        >
           <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', color: nameColor, marginBottom: 4 }}>
             {label}
           </p>
@@ -464,11 +511,9 @@ function JournalEntryPair({ mine, theirs, reactionMap, playerId, partnerId, onRe
               {response.answer}
             </p>
           </div>
-          <ReactionPicker
+          <ReactionBadge
             myReaction={reactionMap?.[response.id]?.[playerId] || null}
             partnerReaction={reactionMap?.[response.id]?.[partnerId] || null}
-            onReact={(emoji) => onReact(playerId, response.id, emoji)}
-            size="sm"
           />
         </div>
       ))}

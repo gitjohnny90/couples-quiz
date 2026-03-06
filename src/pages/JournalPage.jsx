@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
@@ -6,7 +6,9 @@ import quizPacks from '../data/quizPacks'
 import deepDiveDecks, { MOOD_TAGS, SERIES } from '../data/deepDiveDecks'
 import drawingPrompts, { DRAW_PACK_PREFIX } from '../data/drawingPrompts'
 import { useReactions } from '../utils/reactions'
-import ReactionPicker from '../components/ReactionPicker'
+import ReactionPopup from '../components/ReactionPopup'
+import ReactionBadge from '../components/ReactionBadge'
+import useLongPress from '../hooks/useLongPress'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, DoodleHeart, SquigglyUnderline } from '../components/Doodles'
 
@@ -18,6 +20,13 @@ export default function JournalPage() {
   const { reactionMap: quizReactions, handleReact: handleQuizReact } = useReactions(sessionId, 'quiz')
   const { reactionMap: ddReactions, handleReact: handleDdReact } = useReactions(sessionId, 'deep_dive')
   const { reactionMap: drawReactions, handleReact: handleDrawReact } = useReactions(sessionId, 'drawing')
+
+  const [activeReaction, setActiveReaction] = useState(null)
+  const pressedCardRef = useRef(null)
+  const onLongPressCard = useCallback(() => {
+    if (pressedCardRef.current) setActiveReaction(pressedCardRef.current)
+  }, [])
+  const longPress = useLongPress(onLongPressCard)
 
   const [activeTab, setActiveTab] = useState('mc')
   const [mcResponses, setMcResponses] = useState([])
@@ -247,7 +256,20 @@ export default function JournalPage() {
                                 const matched = p1Answer === p2Answer
 
                                 return (
-                                  <div key={q.id} style={{ marginTop: qi === 0 ? 0 : 16, paddingTop: qi === 0 ? 0 : 16, borderTop: qi === 0 ? 'none' : '1px dashed var(--border-pencil)' }}>
+                                  <div
+                                    key={q.id}
+                                    style={{ marginTop: qi === 0 ? 0 : 16, paddingTop: qi === 0 ? 0 : 16, borderTop: qi === 0 ? 'none' : '1px dashed var(--border-pencil)', touchAction: 'none' }}
+                                    onPointerDown={(e) => {
+                                      const rect = e.currentTarget.getBoundingClientRect()
+                                      pressedCardRef.current = { targetId: `${pack.id}:${q.id}`, rect, type: 'quiz' }
+                                      longPress.onPointerDown(e)
+                                    }}
+                                    onPointerUp={longPress.onPointerUp}
+                                    onPointerMove={longPress.onPointerMove}
+                                    onPointerCancel={longPress.onPointerCancel}
+                                    onContextMenu={longPress.onContextMenu}
+                                    onClick={longPress.onClick}
+                                  >
                                     <p style={{ fontSize: '0.92rem', fontWeight: 500, lineHeight: 1.5, marginBottom: 12, color: 'var(--text-primary)' }}>
                                       {q.text}
                                     </p>
@@ -278,11 +300,9 @@ export default function JournalPage() {
                                         <span style={{ color: 'var(--text-light)' }}>✗ different ~</span>
                                       )}
                                     </div>
-                                    <ReactionPicker
+                                    <ReactionBadge
                                       myReaction={quizReactions[`${pack.id}:${q.id}`]?.[playerId] || null}
                                       partnerReaction={quizReactions[`${pack.id}:${q.id}`]?.[partnerId] || null}
-                                      onReact={(emoji) => handleQuizReact(playerId, `${pack.id}:${q.id}`, emoji)}
-                                      size="sm"
                                     />
                                   </div>
                                 )
@@ -412,7 +432,20 @@ export default function JournalPage() {
                                       { response: mine, bg: '#FFF5E9', border: 'var(--accent-coral-light)', nameColor: 'var(--accent-coral)' },
                                       { response: theirs, bg: '#EDF3F8', border: '#B8CFDF', nameColor: 'var(--accent-blue)' },
                                     ].map(({ response, bg, border, nameColor }) => response ? (
-                                      <div key={response.id} style={{ marginBottom: 8 }}>
+                                      <div
+                                        key={response.id}
+                                        style={{ marginBottom: 8, touchAction: 'none' }}
+                                        onPointerDown={(e) => {
+                                          const rect = e.currentTarget.getBoundingClientRect()
+                                          pressedCardRef.current = { targetId: response.id, rect, type: 'deep_dive' }
+                                          longPress.onPointerDown(e)
+                                        }}
+                                        onPointerUp={longPress.onPointerUp}
+                                        onPointerMove={longPress.onPointerMove}
+                                        onPointerCancel={longPress.onPointerCancel}
+                                        onContextMenu={longPress.onContextMenu}
+                                        onClick={longPress.onClick}
+                                      >
                                         <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.92rem', color: nameColor, marginBottom: 3 }}>
                                           {response.player_name}
                                         </p>
@@ -421,11 +454,9 @@ export default function JournalPage() {
                                             {response.answer}
                                           </p>
                                         </div>
-                                        <ReactionPicker
+                                        <ReactionBadge
                                           myReaction={ddReactions[response.id]?.[playerId] || null}
                                           partnerReaction={ddReactions[response.id]?.[partnerId] || null}
-                                          onReact={(emoji) => handleDdReact(playerId, response.id, emoji)}
-                                          size="sm"
                                         />
                                       </div>
                                     ) : null)}
@@ -521,7 +552,20 @@ export default function JournalPage() {
                               transition={{ duration: 0.25 }}
                               style={{ padding: '0 18px 18px' }}
                             >
-                              <div className="drawing-reveal-grid">
+                              <div
+                                className="drawing-reveal-grid"
+                                style={{ touchAction: 'none' }}
+                                onPointerDown={(e) => {
+                                  const rect = e.currentTarget.getBoundingClientRect()
+                                  pressedCardRef.current = { targetId: drawing.packId, rect, type: 'drawing' }
+                                  longPress.onPointerDown(e)
+                                }}
+                                onPointerUp={longPress.onPointerUp}
+                                onPointerMove={longPress.onPointerMove}
+                                onPointerCancel={longPress.onPointerCancel}
+                                onContextMenu={longPress.onContextMenu}
+                                onClick={longPress.onClick}
+                              >
                                 <div className="drawing-reveal-card">
                                   <p className="drawing-reveal-name" style={{ color: 'var(--accent-coral)' }}>
                                     {drawing.p1?.player_name || 'player 1'}
@@ -541,11 +585,9 @@ export default function JournalPage() {
                                   </div>
                                 </div>
                               </div>
-                              <ReactionPicker
+                              <ReactionBadge
                                 myReaction={drawReactions[drawing.packId]?.[playerId] || null}
                                 partnerReaction={drawReactions[drawing.packId]?.[partnerId] || null}
-                                onReact={(emoji) => handleDrawReact(playerId, drawing.packId, emoji)}
-                                size="sm"
                               />
                             </motion.div>
                           )}
@@ -568,6 +610,31 @@ export default function JournalPage() {
           ← back to quizzes
         </button>
       </motion.div>
+
+      {/* Reaction popup — shared across all tabs */}
+      {activeReaction && (
+        <ReactionPopup
+          targetRect={activeReaction.rect}
+          myReaction={
+            activeReaction.type === 'quiz' ? (quizReactions[activeReaction.targetId]?.[playerId] || null)
+            : activeReaction.type === 'deep_dive' ? (ddReactions[activeReaction.targetId]?.[playerId] || null)
+            : (drawReactions[activeReaction.targetId]?.[playerId] || null)
+          }
+          partnerReaction={
+            activeReaction.type === 'quiz' ? (quizReactions[activeReaction.targetId]?.[partnerId] || null)
+            : activeReaction.type === 'deep_dive' ? (ddReactions[activeReaction.targetId]?.[partnerId] || null)
+            : (drawReactions[activeReaction.targetId]?.[partnerId] || null)
+          }
+          onReact={async (emoji) => {
+            const handler = activeReaction.type === 'quiz' ? handleQuizReact
+              : activeReaction.type === 'deep_dive' ? handleDdReact
+              : handleDrawReact
+            await handler(playerId, activeReaction.targetId, emoji)
+            setActiveReaction(null)
+          }}
+          onClose={() => setActiveReaction(null)}
+        />
+      )}
     </div>
   )
 }

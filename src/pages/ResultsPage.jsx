@@ -1,11 +1,13 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
 import { calculateMatchScore } from '../utils/quizScoring'
 import { useReactions } from '../utils/reactions'
-import ReactionPicker from '../components/ReactionPicker'
+import ReactionPopup from '../components/ReactionPopup'
+import ReactionBadge from '../components/ReactionBadge'
+import useLongPress from '../hooks/useLongPress'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline, DoodleCloud } from '../components/Doodles'
 
@@ -22,6 +24,18 @@ export default function ResultsPage() {
   const [revealedQuestions, setRevealedQuestions] = useState(new Set())
   const [expandedNotes, setExpandedNotes] = useState(new Set())
   const [copied, setCopied] = useState(false)
+  const [activeReaction, setActiveReaction] = useState(null) // { targetId, rect }
+
+  // Track which card is being pressed for long-press
+  const pressedCardRef = useRef(null)
+
+  const onLongPressCard = useCallback(() => {
+    if (pressedCardRef.current) {
+      setActiveReaction(pressedCardRef.current)
+    }
+  }, [])
+
+  const longPress = useLongPress(onLongPressCard)
 
   const fetchResponses = async () => {
     const { data, error } = await supabase
@@ -170,6 +184,17 @@ export default function ResultsPage() {
           unfold all answers
         </button>
 
+        {/* Long-press hint */}
+        <p style={{
+          textAlign: 'center',
+          fontFamily: 'var(--font-hand)',
+          fontSize: '0.9rem',
+          color: 'var(--text-light)',
+          marginBottom: 10,
+        }}>
+          hold any answer to react ~
+        </p>
+
         {/* Question cards — folded notes */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {pack.questions.map((q, i) => {
@@ -177,6 +202,28 @@ export default function ResultsPage() {
             const matched = p1A[q.id] === p2A[q.id]
             const p1Text = p1A[q.id] !== undefined ? q.options[p1A[q.id]] : 'no answer'
             const p2Text = p2A[q.id] !== undefined ? q.options[p2A[q.id]] : 'no answer'
+            const targetId = `${packId}:${q.id}`
+
+            // Long-press handlers — only active when card is revealed
+            const cardLongPress = revealed ? {
+              onPointerDown: (e) => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                pressedCardRef.current = { targetId, rect }
+                longPress.onPointerDown(e)
+              },
+              onPointerUp: longPress.onPointerUp,
+              onPointerMove: longPress.onPointerMove,
+              onPointerCancel: longPress.onPointerCancel,
+              onContextMenu: longPress.onContextMenu,
+              onClick: (e) => {
+                longPress.onClick(e)
+                if (!e.defaultPrevented) {
+                  toggleReveal(q.id)
+                }
+              },
+            } : {
+              onClick: () => toggleReveal(q.id),
+            }
 
             return (
               <motion.div
@@ -185,8 +232,8 @@ export default function ResultsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06 }}
                 className={`glass reveal-card ${revealed ? (matched ? 'matched' : 'unmatched') : ''}`}
-                onClick={() => toggleReveal(q.id)}
-                style={{ transform: `rotate(${cardRotations[i] || 0}deg)` }}
+                style={{ transform: `rotate(${cardRotations[i] || 0}deg)`, touchAction: revealed ? 'none' : undefined }}
+                {...cardLongPress}
               >
                 <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: '0.95rem', marginBottom: revealed ? 14 : 4 }}>
                   {q.text}
@@ -232,12 +279,10 @@ export default function ResultsPage() {
                       )}
                     </div>
 
-                    {/* Reactions */}
-                    <ReactionPicker
-                      myReaction={reactionMap[`${packId}:${q.id}`]?.[playerId] || null}
-                      partnerReaction={reactionMap[`${packId}:${q.id}`]?.[partnerId] || null}
-                      onReact={(emoji) => handleReact(playerId, `${packId}:${q.id}`, emoji)}
-                      size="sm"
+                    {/* Reaction badge — shows existing reactions */}
+                    <ReactionBadge
+                      myReaction={reactionMap[targetId]?.[playerId] || null}
+                      partnerReaction={reactionMap[targetId]?.[partnerId] || null}
                     />
 
                     {/* Research note for The Research Round */}
@@ -303,6 +348,20 @@ export default function ResultsPage() {
           ← back to quizzes
         </button>
       </motion.div>
+
+      {/* Reaction popup — one instance for the whole page */}
+      {activeReaction && (
+        <ReactionPopup
+          targetRect={activeReaction.rect}
+          myReaction={reactionMap[activeReaction.targetId]?.[playerId] || null}
+          partnerReaction={reactionMap[activeReaction.targetId]?.[partnerId] || null}
+          onReact={async (emoji) => {
+            await handleReact(playerId, activeReaction.targetId, emoji)
+            setActiveReaction(null)
+          }}
+          onClose={() => setActiveReaction(null)}
+        />
+      )}
     </div>
   )
 }

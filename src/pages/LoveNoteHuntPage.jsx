@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useRef } from 'react'
+import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
@@ -7,7 +7,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../components/Doodles'
 import { determineLoveNotePhase } from '../utils/gameLogic'
 import { useReactions } from '../utils/reactions'
-import ReactionPicker from '../components/ReactionPicker'
+import ReactionPopup from '../components/ReactionPopup'
+import ReactionBadge from '../components/ReactionBadge'
+import useLongPress from '../hooks/useLongPress'
 
 const PHASE = { SETUP: 'setup', WAITING: 'waiting', HUNTING: 'hunting', REVEAL: 'reveal' }
 const GRID_SIZE = 6
@@ -21,6 +23,13 @@ export default function LoveNoteHuntPage() {
 
   const partnerId = playerId === 'player1' ? 'player2' : 'player1'
   const { reactionMap, handleReact } = useReactions(sessionId, 'love_note')
+
+  const [activeReaction, setActiveReaction] = useState(null)
+  const pressedCardRef = useRef(null)
+  const onLongPressCard = useCallback(() => {
+    if (pressedCardRef.current) setActiveReaction(pressedCardRef.current)
+  }, [])
+  const longPress = useLongPress(onLongPressCard)
 
   const [phase, setPhase] = useState(PHASE.SETUP)
   const [round, setRound] = useState(1)
@@ -738,7 +747,18 @@ export default function LoveNoteHuntPage() {
                   textAlign: 'center',
                   transform: `rotate(${i === 0 ? -0.8 : i === 1 ? 0.5 : -0.3}deg)`,
                   position: 'relative',
+                  touchAction: 'none',
                 }}
+                onPointerDown={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  pressedCardRef.current = { targetId: `${i}:${round}`, rect }
+                  longPress.onPointerDown(e)
+                }}
+                onPointerUp={longPress.onPointerUp}
+                onPointerMove={longPress.onPointerMove}
+                onPointerCancel={longPress.onPointerCancel}
+                onContextMenu={longPress.onContextMenu}
+                onClick={longPress.onClick}
               >
                 <p style={{
                   fontFamily: 'var(--font-hand)',
@@ -748,10 +768,9 @@ export default function LoveNoteHuntPage() {
                 }}>
                   "{note.message}"
                 </p>
-                <ReactionPicker
+                <ReactionBadge
                   myReaction={reactionMap[`${i}:${round}`]?.[playerId] || null}
                   partnerReaction={reactionMap[`${i}:${round}`]?.[partnerId] || null}
-                  onReact={(emoji) => handleReact(playerId, `${i}:${round}`, emoji)}
                 />
                 <DoodleHeart
                   size={10}
@@ -778,6 +797,17 @@ export default function LoveNoteHuntPage() {
             </div>
           </motion.div>
 
+          {/* Hold to react hint */}
+          <p style={{
+            textAlign: 'center',
+            fontFamily: 'var(--font-hand)',
+            fontSize: '0.9rem',
+            color: 'var(--text-light)',
+            marginTop: 12,
+          }}>
+            hold any note to react ~
+          </p>
+
           {/* Action buttons */}
           <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
             <button
@@ -796,6 +826,20 @@ export default function LoveNoteHuntPage() {
             </button>
           </div>
         </motion.div>
+
+        {/* Reaction popup */}
+        {activeReaction && (
+          <ReactionPopup
+            targetRect={activeReaction.rect}
+            myReaction={reactionMap[activeReaction.targetId]?.[playerId] || null}
+            partnerReaction={reactionMap[activeReaction.targetId]?.[partnerId] || null}
+            onReact={async (emoji) => {
+              await handleReact(playerId, activeReaction.targetId, emoji)
+              setActiveReaction(null)
+            }}
+            onClose={() => setActiveReaction(null)}
+          />
+        )}
       </div>
     )
   }

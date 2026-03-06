@@ -1,10 +1,12 @@
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import drawingPrompts, { drawingRoundMeta, getDrawPackId } from '../data/drawingPrompts'
 import { useReactions } from '../utils/reactions'
-import ReactionPicker from '../components/ReactionPicker'
+import ReactionPopup from '../components/ReactionPopup'
+import ReactionBadge from '../components/ReactionBadge'
+import useLongPress from '../hooks/useLongPress'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline } from '../components/Doodles'
 
@@ -18,6 +20,7 @@ export default function DrawResultsPage() {
   const [loading, setLoading] = useState(true)
   const [revealed, setRevealed] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [activeReaction, setActiveReaction] = useState(null)
 
   // Use per-prompt pack_id if promptId present, else legacy fallback
   const targetPackId = promptId ? getDrawPackId(promptId) : drawingRoundMeta.id
@@ -25,6 +28,13 @@ export default function DrawResultsPage() {
 
   // Look up prompt text from static data when available
   const promptFromData = promptId ? drawingPrompts.find(p => p.id === promptId) : null
+
+  // Long-press for reaction popup
+  const pressedCardRef = useRef(null)
+  const onLongPressCard = useCallback(() => {
+    if (pressedCardRef.current) setActiveReaction(pressedCardRef.current)
+  }, [])
+  const longPress = useLongPress(onLongPressCard)
 
   const fetchResponses = async () => {
     const { data, error } = await supabase
@@ -211,8 +221,21 @@ export default function DrawResultsPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, ease: 'easeOut' }}
             >
-              {/* Side-by-side drawings */}
-              <div className="drawing-reveal-grid">
+              {/* Side-by-side drawings — long-press to react */}
+              <div
+                className="drawing-reveal-grid"
+                style={{ touchAction: 'none' }}
+                onPointerDown={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  pressedCardRef.current = { targetId: targetPackId, rect }
+                  longPress.onPointerDown(e)
+                }}
+                onPointerUp={longPress.onPointerUp}
+                onPointerMove={longPress.onPointerMove}
+                onPointerCancel={longPress.onPointerCancel}
+                onContextMenu={longPress.onContextMenu}
+                onClick={longPress.onClick}
+              >
                 {/* Player 1 */}
                 <motion.div
                   className="drawing-reveal-card"
@@ -252,20 +275,19 @@ export default function DrawResultsPage() {
                 </motion.div>
               </div>
 
-              {/* Reactions */}
+              {/* Reaction badge + hint */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
                 style={{ textAlign: 'center', marginTop: 20 }}
               >
-                <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--text-light)', marginBottom: 4 }}>
-                  react to the masterpieces
+                <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.9rem', color: 'var(--text-light)', marginBottom: 4 }}>
+                  hold the drawings to react ~
                 </p>
-                <ReactionPicker
+                <ReactionBadge
                   myReaction={reactionMap[targetPackId]?.[playerId] || null}
                   partnerReaction={reactionMap[targetPackId]?.[partnerId] || null}
-                  onReact={(emoji) => handleReact(playerId, targetPackId, emoji)}
                 />
               </motion.div>
 
@@ -292,6 +314,20 @@ export default function DrawResultsPage() {
           </AnimatePresence>
         )}
       </motion.div>
+
+      {/* Reaction popup */}
+      {activeReaction && (
+        <ReactionPopup
+          targetRect={activeReaction.rect}
+          myReaction={reactionMap[activeReaction.targetId]?.[playerId] || null}
+          partnerReaction={reactionMap[activeReaction.targetId]?.[partnerId] || null}
+          onReact={async (emoji) => {
+            await handleReact(playerId, activeReaction.targetId, emoji)
+            setActiveReaction(null)
+          }}
+          onClose={() => setActiveReaction(null)}
+        />
+      )}
     </div>
   )
 }
