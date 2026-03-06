@@ -564,7 +564,7 @@ export default function JournalPage() {
                               <div className="drawing-reveal-grid">
                                 <div
                                   className="drawing-reveal-card"
-                                  style={{ touchAction: 'none' }}
+                                  style={{ touchAction: 'none', position: 'relative', overflow: 'visible' }}
                                   onPointerDown={(e) => {
                                     const rect = e.currentTarget.getBoundingClientRect()
                                     pressedCardRef.current = { targetId: `${drawing.packId}:player1`, rect, type: 'drawing' }
@@ -581,16 +581,16 @@ export default function JournalPage() {
                                   </p>
                                   <div style={{ position: 'relative', overflow: 'visible' }}>
                                     <img src={drawing.p1?.answers?.drawing} alt={`${drawing.p1?.player_name}'s drawing`} />
-                                    <div className="torn-edge-small" />
                                     <ReactionBadge
                                       myReaction={drawReactions[`${drawing.packId}:player1`]?.[playerId] || null}
                                       partnerReaction={drawReactions[`${drawing.packId}:player1`]?.[partnerId] || null}
                                     />
                                   </div>
+                                  <div className="torn-edge-small" />
                                 </div>
                                 <div
                                   className="drawing-reveal-card"
-                                  style={{ touchAction: 'none' }}
+                                  style={{ touchAction: 'none', position: 'relative', overflow: 'visible' }}
                                   onPointerDown={(e) => {
                                     const rect = e.currentTarget.getBoundingClientRect()
                                     pressedCardRef.current = { targetId: `${drawing.packId}:player2`, rect, type: 'drawing' }
@@ -607,12 +607,12 @@ export default function JournalPage() {
                                   </p>
                                   <div style={{ position: 'relative', overflow: 'visible' }}>
                                     <img src={drawing.p2?.answers?.drawing} alt={`${drawing.p2?.player_name}'s drawing`} />
-                                    <div className="torn-edge-small" />
                                     <ReactionBadge
                                       myReaction={drawReactions[`${drawing.packId}:player2`]?.[playerId] || null}
                                       partnerReaction={drawReactions[`${drawing.packId}:player2`]?.[partnerId] || null}
                                     />
                                   </div>
+                                  <div className="torn-edge-small" />
                                 </div>
                               </div>
                             </motion.div>

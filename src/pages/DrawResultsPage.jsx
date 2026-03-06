@@ -229,7 +229,7 @@ export default function DrawResultsPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 }}
-                  style={{ touchAction: 'none' }}
+                  style={{ touchAction: 'none', position: 'relative', overflow: 'visible' }}
                   onPointerDown={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     pressedCardRef.current = { targetId: `${targetPackId}:player1`, rect }
@@ -249,12 +249,12 @@ export default function DrawResultsPage() {
                       src={p1?.answers?.drawing}
                       alt={`${p1?.player_name}'s drawing`}
                     />
-                    <div className="torn-edge-small" />
                     <ReactionBadge
                       myReaction={reactionMap[`${targetPackId}:player1`]?.[playerId] || null}
                       partnerReaction={reactionMap[`${targetPackId}:player1`]?.[partnerId] || null}
                     />
                   </div>
+                  <div className="torn-edge-small" />
                 </motion.div>
 
                 {/* Player 2 */}
@@ -263,7 +263,7 @@ export default function DrawResultsPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  style={{ touchAction: 'none' }}
+                  style={{ touchAction: 'none', position: 'relative', overflow: 'visible' }}
                   onPointerDown={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     pressedCardRef.current = { targetId: `${targetPackId}:player2`, rect }
@@ -283,12 +283,12 @@ export default function DrawResultsPage() {
                       src={p2?.answers?.drawing}
                       alt={`${p2?.player_name}'s drawing`}
                     />
-                    <div className="torn-edge-small" />
                     <ReactionBadge
                       myReaction={reactionMap[`${targetPackId}:player2`]?.[playerId] || null}
                       partnerReaction={reactionMap[`${targetPackId}:player2`]?.[partnerId] || null}
                     />
                   </div>
+                  <div className="torn-edge-small" />
                 </motion.div>
               </div>
 
