@@ -202,11 +202,13 @@ export default function ResultsPage() {
             const matched = p1A[q.id] === p2A[q.id]
             const p1Text = p1A[q.id] !== undefined ? q.options[p1A[q.id]] : 'no answer'
             const p2Text = p2A[q.id] !== undefined ? q.options[p2A[q.id]] : 'no answer'
-            const targetId = `${packId}:${q.id}`
+            const p1TargetId = `${packId}:${q.id}:player1`
+            const p2TargetId = `${packId}:${q.id}:player2`
 
-            // Long-press handlers — only active when card is revealed
-            const cardLongPress = revealed ? {
+            // Long-press helper for individual answer boxes
+            const answerLongPress = (targetId) => revealed ? {
               onPointerDown: (e) => {
+                e.stopPropagation()
                 const rect = e.currentTarget.getBoundingClientRect()
                 pressedCardRef.current = { targetId, rect }
                 longPress.onPointerDown(e)
@@ -215,15 +217,8 @@ export default function ResultsPage() {
               onPointerMove: longPress.onPointerMove,
               onPointerCancel: longPress.onPointerCancel,
               onContextMenu: longPress.onContextMenu,
-              onClick: (e) => {
-                longPress.onClick(e)
-                if (!e.defaultPrevented) {
-                  toggleReveal(q.id)
-                }
-              },
-            } : {
-              onClick: () => toggleReveal(q.id),
-            }
+              onClick: longPress.onClick,
+            } : {}
 
             return (
               <motion.div
@@ -232,8 +227,8 @@ export default function ResultsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06 }}
                 className={`glass reveal-card ${revealed ? (matched ? 'matched' : 'unmatched') : ''}`}
-                style={{ transform: `rotate(${cardRotations[i] || 0}deg)`, touchAction: revealed ? 'none' : undefined }}
-                {...cardLongPress}
+                style={{ transform: `rotate(${cardRotations[i] || 0}deg)` }}
+                onClick={() => toggleReveal(q.id)}
               >
                 <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: '0.95rem', marginBottom: revealed ? 14 : 4 }}>
                   {q.text}
@@ -246,7 +241,7 @@ export default function ResultsPage() {
                 ) : (
                   <div>
                     <div style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'none' }} {...answerLongPress(p1TargetId)}>
                         <p style={{ color: 'var(--accent-coral)', fontFamily: 'var(--font-hand)', fontSize: '0.95rem', marginBottom: 4 }}>
                           {p1?.player_name || 'Player 1'}
                         </p>
@@ -256,8 +251,12 @@ export default function ResultsPage() {
                         }}>
                           {p1Text}
                         </div>
+                        <ReactionBadge
+                          myReaction={reactionMap[p1TargetId]?.[playerId] || null}
+                          partnerReaction={reactionMap[p1TargetId]?.[partnerId] || null}
+                        />
                       </div>
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'none' }} {...answerLongPress(p2TargetId)}>
                         <p style={{ color: 'var(--accent-blue)', fontFamily: 'var(--font-hand)', fontSize: '0.95rem', marginBottom: 4 }}>
                           {p2?.player_name || 'Player 2'}
                         </p>
@@ -267,6 +266,10 @@ export default function ResultsPage() {
                         }}>
                           {p2Text}
                         </div>
+                        <ReactionBadge
+                          myReaction={reactionMap[p2TargetId]?.[playerId] || null}
+                          partnerReaction={reactionMap[p2TargetId]?.[partnerId] || null}
+                        />
                       </div>
                     </div>
                     <div style={{ textAlign: 'center', fontFamily: 'var(--font-hand)', fontSize: '1.1rem' }}>
@@ -278,12 +281,6 @@ export default function ResultsPage() {
                         <span style={{ color: 'var(--text-light)' }}>✗ different ~</span>
                       )}
                     </div>
-
-                    {/* Reaction badge — shows existing reactions */}
-                    <ReactionBadge
-                      myReaction={reactionMap[targetId]?.[playerId] || null}
-                      partnerReaction={reactionMap[targetId]?.[partnerId] || null}
-                    />
 
                     {/* Research note for The Research Round */}
                     {q.researchNote && (

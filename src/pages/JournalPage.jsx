@@ -254,41 +254,54 @@ export default function JournalPage() {
                                 const p1Text = p1Answer !== undefined ? q.options[p1Answer] : 'no answer'
                                 const p2Text = p2Answer !== undefined ? q.options[p2Answer] : 'no answer'
                                 const matched = p1Answer === p2Answer
+                                const p1TargetId = `${pack.id}:${q.id}:player1`
+                                const p2TargetId = `${pack.id}:${q.id}:player2`
+                                const answerLP = (targetId) => ({
+                                  onPointerDown: (e) => {
+                                    e.stopPropagation()
+                                    const rect = e.currentTarget.getBoundingClientRect()
+                                    pressedCardRef.current = { targetId, rect, type: 'quiz' }
+                                    longPress.onPointerDown(e)
+                                  },
+                                  onPointerUp: longPress.onPointerUp,
+                                  onPointerMove: longPress.onPointerMove,
+                                  onPointerCancel: longPress.onPointerCancel,
+                                  onContextMenu: longPress.onContextMenu,
+                                  onClick: longPress.onClick,
+                                })
 
                                 return (
                                   <div
                                     key={q.id}
-                                    style={{ marginTop: qi === 0 ? 0 : 16, paddingTop: qi === 0 ? 0 : 16, borderTop: qi === 0 ? 'none' : '1px dashed var(--border-pencil)', touchAction: 'none' }}
-                                    onPointerDown={(e) => {
-                                      const rect = e.currentTarget.getBoundingClientRect()
-                                      pressedCardRef.current = { targetId: `${pack.id}:${q.id}`, rect, type: 'quiz' }
-                                      longPress.onPointerDown(e)
-                                    }}
-                                    onPointerUp={longPress.onPointerUp}
-                                    onPointerMove={longPress.onPointerMove}
-                                    onPointerCancel={longPress.onPointerCancel}
-                                    onContextMenu={longPress.onContextMenu}
-                                    onClick={longPress.onClick}
+                                    style={{ marginTop: qi === 0 ? 0 : 16, paddingTop: qi === 0 ? 0 : 16, borderTop: qi === 0 ? 'none' : '1px dashed var(--border-pencil)' }}
                                   >
                                     <p style={{ fontSize: '0.92rem', fontWeight: 500, lineHeight: 1.5, marginBottom: 12, color: 'var(--text-primary)' }}>
                                       {q.text}
                                     </p>
                                     <div style={{ display: 'flex', gap: 10, marginBottom: 6 }}>
-                                      <div style={{ flex: 1 }}>
+                                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'none' }} {...answerLP(p1TargetId)}>
                                         <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.92rem', color: 'var(--accent-coral)', marginBottom: 3 }}>
                                           {p1?.player_name || 'Player 1'}
                                         </p>
                                         <div style={{ background: '#FFF5E9', border: '1px solid var(--accent-coral-light)', borderRadius: 3, padding: '8px 10px', fontSize: '0.85rem' }}>
                                           {p1Text}
                                         </div>
+                                        <ReactionBadge
+                                          myReaction={quizReactions[p1TargetId]?.[playerId] || null}
+                                          partnerReaction={quizReactions[p1TargetId]?.[partnerId] || null}
+                                        />
                                       </div>
-                                      <div style={{ flex: 1 }}>
+                                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'none' }} {...answerLP(p2TargetId)}>
                                         <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.92rem', color: 'var(--accent-blue)', marginBottom: 3 }}>
                                           {p2?.player_name || 'Player 2'}
                                         </p>
                                         <div style={{ background: '#EDF3F8', border: '1px solid #B8CFDF', borderRadius: 3, padding: '8px 10px', fontSize: '0.85rem' }}>
                                           {p2Text}
                                         </div>
+                                        <ReactionBadge
+                                          myReaction={quizReactions[p2TargetId]?.[playerId] || null}
+                                          partnerReaction={quizReactions[p2TargetId]?.[partnerId] || null}
+                                        />
                                       </div>
                                     </div>
                                     <div style={{ textAlign: 'center', fontFamily: 'var(--font-hand)', fontSize: '1rem' }}>
@@ -300,10 +313,6 @@ export default function JournalPage() {
                                         <span style={{ color: 'var(--text-light)' }}>✗ different ~</span>
                                       )}
                                     </div>
-                                    <ReactionBadge
-                                      myReaction={quizReactions[`${pack.id}:${q.id}`]?.[playerId] || null}
-                                      partnerReaction={quizReactions[`${pack.id}:${q.id}`]?.[partnerId] || null}
-                                    />
                                   </div>
                                 )
                               })}
@@ -434,7 +443,7 @@ export default function JournalPage() {
                                     ].map(({ response, bg, border, nameColor }) => response ? (
                                       <div
                                         key={response.id}
-                                        style={{ marginBottom: 8, touchAction: 'none' }}
+                                        style={{ marginBottom: 8, touchAction: 'none', position: 'relative', overflow: 'visible' }}
                                         onPointerDown={(e) => {
                                           const rect = e.currentTarget.getBoundingClientRect()
                                           pressedCardRef.current = { targetId: response.id, rect, type: 'deep_dive' }
@@ -552,43 +561,60 @@ export default function JournalPage() {
                               transition={{ duration: 0.25 }}
                               style={{ padding: '0 18px 18px' }}
                             >
-                              <div
-                                className="drawing-reveal-grid"
-                                style={{ touchAction: 'none' }}
-                                onPointerDown={(e) => {
-                                  const rect = e.currentTarget.getBoundingClientRect()
-                                  pressedCardRef.current = { targetId: drawing.packId, rect, type: 'drawing' }
-                                  longPress.onPointerDown(e)
-                                }}
-                                onPointerUp={longPress.onPointerUp}
-                                onPointerMove={longPress.onPointerMove}
-                                onPointerCancel={longPress.onPointerCancel}
-                                onContextMenu={longPress.onContextMenu}
-                                onClick={longPress.onClick}
-                              >
-                                <div className="drawing-reveal-card">
+                              <div className="drawing-reveal-grid">
+                                <div
+                                  className="drawing-reveal-card"
+                                  style={{ touchAction: 'none' }}
+                                  onPointerDown={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect()
+                                    pressedCardRef.current = { targetId: `${drawing.packId}:player1`, rect, type: 'drawing' }
+                                    longPress.onPointerDown(e)
+                                  }}
+                                  onPointerUp={longPress.onPointerUp}
+                                  onPointerMove={longPress.onPointerMove}
+                                  onPointerCancel={longPress.onPointerCancel}
+                                  onContextMenu={longPress.onContextMenu}
+                                  onClick={longPress.onClick}
+                                >
                                   <p className="drawing-reveal-name" style={{ color: 'var(--accent-coral)' }}>
                                     {drawing.p1?.player_name || 'player 1'}
                                   </p>
-                                  <div style={{ position: 'relative' }}>
+                                  <div style={{ position: 'relative', overflow: 'visible' }}>
                                     <img src={drawing.p1?.answers?.drawing} alt={`${drawing.p1?.player_name}'s drawing`} />
                                     <div className="torn-edge-small" />
+                                    <ReactionBadge
+                                      myReaction={drawReactions[`${drawing.packId}:player1`]?.[playerId] || null}
+                                      partnerReaction={drawReactions[`${drawing.packId}:player1`]?.[partnerId] || null}
+                                    />
                                   </div>
                                 </div>
-                                <div className="drawing-reveal-card">
+                                <div
+                                  className="drawing-reveal-card"
+                                  style={{ touchAction: 'none' }}
+                                  onPointerDown={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect()
+                                    pressedCardRef.current = { targetId: `${drawing.packId}:player2`, rect, type: 'drawing' }
+                                    longPress.onPointerDown(e)
+                                  }}
+                                  onPointerUp={longPress.onPointerUp}
+                                  onPointerMove={longPress.onPointerMove}
+                                  onPointerCancel={longPress.onPointerCancel}
+                                  onContextMenu={longPress.onContextMenu}
+                                  onClick={longPress.onClick}
+                                >
                                   <p className="drawing-reveal-name" style={{ color: 'var(--accent-blue)' }}>
                                     {drawing.p2?.player_name || 'player 2'}
                                   </p>
-                                  <div style={{ position: 'relative' }}>
+                                  <div style={{ position: 'relative', overflow: 'visible' }}>
                                     <img src={drawing.p2?.answers?.drawing} alt={`${drawing.p2?.player_name}'s drawing`} />
                                     <div className="torn-edge-small" />
+                                    <ReactionBadge
+                                      myReaction={drawReactions[`${drawing.packId}:player2`]?.[playerId] || null}
+                                      partnerReaction={drawReactions[`${drawing.packId}:player2`]?.[partnerId] || null}
+                                    />
                                   </div>
                                 </div>
                               </div>
-                              <ReactionBadge
-                                myReaction={drawReactions[drawing.packId]?.[playerId] || null}
-                                partnerReaction={drawReactions[drawing.packId]?.[partnerId] || null}
-                              />
                             </motion.div>
                           )}
                         </motion.div>

@@ -221,37 +221,39 @@ export default function DrawResultsPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.4, ease: 'easeOut' }}
             >
-              {/* Side-by-side drawings — long-press to react */}
-              <div
-                className="drawing-reveal-grid"
-                style={{ touchAction: 'none' }}
-                onPointerDown={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect()
-                  pressedCardRef.current = { targetId: targetPackId, rect }
-                  longPress.onPointerDown(e)
-                }}
-                onPointerUp={longPress.onPointerUp}
-                onPointerMove={longPress.onPointerMove}
-                onPointerCancel={longPress.onPointerCancel}
-                onContextMenu={longPress.onContextMenu}
-                onClick={longPress.onClick}
-              >
+              {/* Side-by-side drawings — long-press each to react */}
+              <div className="drawing-reveal-grid">
                 {/* Player 1 */}
                 <motion.div
                   className="drawing-reveal-card"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 }}
+                  style={{ touchAction: 'none' }}
+                  onPointerDown={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    pressedCardRef.current = { targetId: `${targetPackId}:player1`, rect }
+                    longPress.onPointerDown(e)
+                  }}
+                  onPointerUp={longPress.onPointerUp}
+                  onPointerMove={longPress.onPointerMove}
+                  onPointerCancel={longPress.onPointerCancel}
+                  onContextMenu={longPress.onContextMenu}
+                  onClick={longPress.onClick}
                 >
                   <p className="drawing-reveal-name" style={{ color: 'var(--accent-coral)' }}>
                     {p1?.player_name || 'player 1'}
                   </p>
-                  <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'relative', overflow: 'visible' }}>
                     <img
                       src={p1?.answers?.drawing}
                       alt={`${p1?.player_name}'s drawing`}
                     />
                     <div className="torn-edge-small" />
+                    <ReactionBadge
+                      myReaction={reactionMap[`${targetPackId}:player1`]?.[playerId] || null}
+                      partnerReaction={reactionMap[`${targetPackId}:player1`]?.[partnerId] || null}
+                    />
                   </div>
                 </motion.div>
 
@@ -261,34 +263,45 @@ export default function DrawResultsPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
+                  style={{ touchAction: 'none' }}
+                  onPointerDown={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    pressedCardRef.current = { targetId: `${targetPackId}:player2`, rect }
+                    longPress.onPointerDown(e)
+                  }}
+                  onPointerUp={longPress.onPointerUp}
+                  onPointerMove={longPress.onPointerMove}
+                  onPointerCancel={longPress.onPointerCancel}
+                  onContextMenu={longPress.onContextMenu}
+                  onClick={longPress.onClick}
                 >
                   <p className="drawing-reveal-name" style={{ color: 'var(--accent-blue)' }}>
                     {p2?.player_name || 'player 2'}
                   </p>
-                  <div style={{ position: 'relative' }}>
+                  <div style={{ position: 'relative', overflow: 'visible' }}>
                     <img
                       src={p2?.answers?.drawing}
                       alt={`${p2?.player_name}'s drawing`}
                     />
                     <div className="torn-edge-small" />
+                    <ReactionBadge
+                      myReaction={reactionMap[`${targetPackId}:player2`]?.[playerId] || null}
+                      partnerReaction={reactionMap[`${targetPackId}:player2`]?.[partnerId] || null}
+                    />
                   </div>
                 </motion.div>
               </div>
 
-              {/* Reaction badge + hint */}
+              {/* Hint */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                style={{ textAlign: 'center', marginTop: 20 }}
+                style={{ textAlign: 'center', marginTop: 16 }}
               >
-                <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.9rem', color: 'var(--text-light)', marginBottom: 4 }}>
-                  hold the drawings to react ~
+                <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.9rem', color: 'var(--text-light)' }}>
+                  hold a drawing to react ~
                 </p>
-                <ReactionBadge
-                  myReaction={reactionMap[targetPackId]?.[playerId] || null}
-                  partnerReaction={reactionMap[targetPackId]?.[partnerId] || null}
-                />
               </motion.div>
 
               {/* Action buttons */}
