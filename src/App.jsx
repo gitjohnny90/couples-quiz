@@ -11,6 +11,8 @@ import QuizPage from "./pages/QuizPage";
 import ResultsPage from "./pages/ResultsPage";
 import VaultPage from "./pages/VaultPage";
 import ProfilesPage from "./pages/ProfilesPage";
+import PersonalityPage from "./pages/PersonalityPage";
+import VisionPage from "./pages/VisionPage";
 import DrawPage from "./pages/DrawPage";
 import DrawResultsPage from "./pages/DrawResultsPage";
 import FunStuffPage from "./pages/FunStuffPage";
@@ -172,6 +174,8 @@ export default function App() {
           <Route path="/quiz-packs/:sessionId" element={<RequireAuth><QuizPacksPage /></RequireAuth>} />
           <Route path="/vault/:sessionId" element={<RequireAuth><VaultPage /></RequireAuth>} />
           <Route path="/profiles/:sessionId" element={<RequireAuth><ProfilesPage /></RequireAuth>} />
+          <Route path="/personality/:sessionId" element={<RequireAuth><PersonalityPage /></RequireAuth>} />
+          <Route path="/vision/:sessionId" element={<RequireAuth><VisionPage /></RequireAuth>} />
         </Routes>
         <BottomNav />
         <MissYouHeart />

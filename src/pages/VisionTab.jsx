@@ -35,7 +35,7 @@ const PIN_COLORS = ['#E55', '#E8B84C', '#5B8FC7']
 
 const DEFAULT_DATA = { northStar: '', goals: [], board: [] }
 
-export default function VisionTab({ sessionId, playerName, playerId }) {
+export default function VisionTab({ sessionId, playerName, playerId, visibleSection }) {
   const navigate = useNavigate()
   const [data, setData] = useState(DEFAULT_DATA)
   const [loading, setLoading] = useState(true)
@@ -166,8 +166,12 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
   const achievedGoals = data.goals.filter(g => g.status === 'achieved')
   const totalGoals = data.goals.length
 
+  const showVision = !visibleSection || visibleSection === 'vision'
+  const showDreams = !visibleSection || visibleSection === 'dreams'
+
   return (
     <div>
+      {showVision && <>
       {/* ===== NORTH STAR ===== */}
       <div style={{ position: 'relative', marginBottom: 24 }}>
         <div style={{ position: 'absolute', top: -8, left: 10, pointerEvents: 'none' }}>
@@ -318,7 +322,9 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
           )}
         </div>
       </div>
+      </>}
 
+      {showDreams && <>
       {/* ===== DREAM CATEGORIES ===== */}
       <div style={{ marginBottom: 24 }}>
         <h2 style={{
@@ -565,6 +571,7 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
           </div>
         </div>
       )}
+      </>}
 
     </div>
   )

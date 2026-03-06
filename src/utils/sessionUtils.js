@@ -31,6 +31,8 @@ export function getDocumentTitle(pathname) {
   if (pathname.startsWith('/tictactoe')) return 'Tic-Tac-Toe — The Us Quiz'
   if (pathname.startsWith('/love-notes')) return 'Love Note Hunt — The Us Quiz'
   if (pathname.startsWith('/profiles')) return 'About Us — The Us Quiz'
+  if (pathname.startsWith('/personality')) return 'Personality Tests — The Us Quiz'
+  if (pathname.startsWith('/vision')) return 'Our Vision — The Us Quiz'
   if (pathname.startsWith('/journal')) return 'Journal — The Us Quiz'
   if (pathname.startsWith('/join')) return 'Join — The Us Quiz'
   if (pathname.startsWith('/watch-guide')) return 'Watch Guide — The Us Quiz'
@@ -72,6 +74,8 @@ export function isTabActive(tabPath, pathname) {
   }
   if (base === '/profiles') {
     return pathname.startsWith('/profiles') ||
+           pathname.startsWith('/personality') ||
+           pathname.startsWith('/vision') ||
            pathname.startsWith('/journal')
   }
   return pathname.startsWith(base)
