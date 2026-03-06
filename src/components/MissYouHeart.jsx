@@ -207,7 +207,7 @@ export default function MissYouHeart() {
           />
           <text
             x="24"
-            y="21"
+            y="17"
             textAnchor="middle"
             dominantBaseline="central"
             fill="white"
@@ -217,7 +217,21 @@ export default function MissYouHeart() {
             opacity="0.92"
             style={{ letterSpacing: '0.5px', pointerEvents: 'none' }}
           >
-            MISS U
+            MISS
+          </text>
+          <text
+            x="24"
+            y="27"
+            textAnchor="middle"
+            dominantBaseline="central"
+            fill="white"
+            fontFamily="var(--font-hand)"
+            fontSize="9.5"
+            fontWeight="700"
+            opacity="0.92"
+            style={{ pointerEvents: 'none' }}
+          >
+            U
           </text>
         </svg>
       </motion.button>
