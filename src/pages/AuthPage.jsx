@@ -251,7 +251,7 @@ export default function AuthPage() {
               onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
               onMouseLeave={(e) => e.currentTarget.style.opacity = 0.6}
             >
-              {showPassword ? "🙈" : "👁️"}
+              {showPassword ? "🙈" : "🐵"}
             </button>
           </div>
 
