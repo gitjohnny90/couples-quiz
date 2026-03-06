@@ -52,7 +52,7 @@ All routes defined in `App.jsx`. `/auth` is public; all others require authentic
 |-------|---------|-------------|
 | `sessions` | One row per couple | `player1_name`, `player2_name`, `invite_code`, `player1_user_id`, `player2_user_id` |
 | `user_sessions` | Links auth users to sessions | `user_id`, `session_id`, `player_id` |
-| `responses` | Quiz answers & drawings | `session_id`, `pack_id`, `player_id`, `answers` (JSONB) |
+| `responses` | Quiz answers, drawings, & tic-tac-toe game state | `session_id`, `pack_id`, `player_id`, `answers` (JSONB) |
 | `profiles` | Personality test data | `session_id`, `player_id`, `profile_data` (JSONB) |
 | `deep_dive_responses` | Open-ended answers | `session_id`, `deck_id`, `question_id`, `answer` |
 | `shared_items` | Movie/book lists | `session_id`, `type`, `title`, `status`, ratings |
@@ -60,7 +60,7 @@ All routes defined in `App.jsx`. `/auth` is public; all others require authentic
 | `love_note_guesses` | Love Note Hunt guesses | `game_id`, `player_id`, `cell_index` |
 | `reactions` | Emoji reactions to answers | `session_id`, `player_id`, `target_type`, `target_id`, `reaction` |
 
-All tables use `player_id` as `'player1'` or `'player2'`. Auth user IDs stored in `sessions` and `user_sessions`.
+All tables use `player_id` as `'player1'` or `'player2'` (tic-tac-toe uses `'game'` for shared state). Auth user IDs stored in `sessions` and `user_sessions`.
 
 ## Styling
 
@@ -95,6 +95,7 @@ The visual theme is a hand-drawn notebook:
 - **Supabase queries**: `useEffect` with `supabase.from(table).select()` / `.upsert()` / `.insert()`
 - **Realtime**: `supabase.channel(name).on('postgres_changes', ...).subscribe()` — always unsubscribe in cleanup
 - **Reactions**: `useReactions(sessionId, targetType)` hook in `src/utils/reactions.js` manages fetch, toggle, and realtime subscription for emoji reactions. Target types: `'quiz'`, `'drawing'`, `'love_note'`, `'deep_dive'`. Long-press on answer cards triggers `ReactionPopup`; existing reactions display via `ReactionBadge`.
+- **Tic-Tac-Toe**: Multiplayer via Supabase — game state stored in `responses` table with `pack_id: 'tictactoe'` and `player_id: 'game'`. Each player can only place their own color heart (`player1` = coral, `player2` = blue) and must wait for partner's turn. Uses realtime subscription + 3s polling fallback for sync.
 - **No component library**: all UI is custom JSX with inline styles
 - **Error handling**: Most pages use an `error` state variable with user-visible feedback (inline `<p>` or banner). Some use `setTimeout` for auto-dismiss after 3 seconds.
 - **Dynamic page titles**: `useDocumentTitle()` hook in `App.jsx` sets `document.title` based on the current route.
