@@ -4,6 +4,8 @@ import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import deepDiveDecks, { MOOD_TAGS } from '../data/deepDiveDecks'
 import { determineDeepDivePhase } from '../utils/quizScoring'
+import { useReactions } from '../utils/reactions'
+import ReactionPicker from '../components/ReactionPicker'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline, DoodleHeart } from '../components/Doodles'
 
@@ -14,6 +16,8 @@ export default function DeepDiveDeckPage() {
   const { sessionId, deckId } = useParams()
   const { playerName, playerId } = useContext(SessionContext)
   const navigate = useNavigate()
+  const partnerId = playerId === 'player1' ? 'player2' : 'player1'
+  const { reactionMap, handleReact } = useReactions(sessionId, 'deep_dive')
 
   const deck = deepDiveDecks.find((d) => d.id === deckId)
 
@@ -153,15 +157,6 @@ export default function DeepDiveDeckPage() {
     if (currentQ > 0) setCurrentQ(currentQ - 1)
   }
 
-  // Fire reaction
-  const handleFire = async (responseId, currentFired) => {
-    await supabase
-      .from('deep_dive_responses')
-      .update({ is_fired: !currentFired })
-      .eq('id', responseId)
-    await fetchResponses()
-  }
-
   const copyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)
     setCopied(true)
@@ -211,7 +206,7 @@ export default function DeepDiveDeckPage() {
 
   // ── RESULTS PHASE ──
   if (phase === PHASE.RESULTS) {
-    const totalFires = responses.filter((r) => r.is_fired).length
+    const totalReactions = Object.values(reactionMap).reduce((sum, playerMap) => sum + Object.keys(playerMap).length, 0)
     return (
       <div className="page" style={{ position: 'relative' }}>
         <PageDoodles seed={deck.id.length + 20} />
@@ -228,12 +223,12 @@ export default function DeepDiveDeckPage() {
             </p>
           </div>
 
-          {/* Fire count */}
-          {totalFires > 0 && (
+          {/* Reaction count */}
+          {totalReactions > 0 && (
             <div className="sticky-note" style={{ padding: 16, textAlign: 'center', marginBottom: 18, transform: 'rotate(-0.5deg)' }}>
-              <span style={{ fontSize: '1.8rem' }}>🔥</span>
+              <span style={{ fontSize: '1.8rem' }}>✨</span>
               <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem', color: 'var(--accent-coral)' }}>
-                {totalFires} {totalFires === 1 ? 'answer' : 'answers'} hit different
+                {totalReactions} {totalReactions === 1 ? 'reaction' : 'reactions'} so far
               </p>
             </div>
           )}
@@ -262,7 +257,7 @@ export default function DeepDiveDeckPage() {
                   <p style={{ fontSize: '0.95rem', fontWeight: 500, marginBottom: 14, lineHeight: 1.5 }}>
                     {q.text}
                   </p>
-                  <JournalEntryPair mine={mine} theirs={theirs} onFire={handleFire} />
+                  <JournalEntryPair mine={mine} theirs={theirs} reactionMap={reactionMap} playerId={playerId} partnerId={partnerId} onReact={handleReact} />
                 </motion.div>
               )
             })}
@@ -449,7 +444,7 @@ export default function DeepDiveDeckPage() {
 }
 
 // ── Journal Entry Pair component ──
-function JournalEntryPair({ mine, theirs, onFire }) {
+function JournalEntryPair({ mine, theirs, reactionMap, playerId, partnerId, onReact }) {
   if (!mine || !theirs) return null
 
   const entries = [
@@ -469,12 +464,12 @@ function JournalEntryPair({ mine, theirs, onFire }) {
               {response.answer}
             </p>
           </div>
-          <button
-            className={`dd-fire-btn ${response.is_fired ? 'fired' : ''}`}
-            onClick={() => onFire(response.id, response.is_fired)}
-          >
-            🔥 {response.is_fired ? 'this one hit ✓' : 'mark this one'}
-          </button>
+          <ReactionPicker
+            myReaction={reactionMap?.[response.id]?.[playerId] || null}
+            partnerReaction={reactionMap?.[response.id]?.[partnerId] || null}
+            onReact={(emoji) => onReact(playerId, response.id, emoji)}
+            size="sm"
+          />
         </div>
       ))}
     </div>

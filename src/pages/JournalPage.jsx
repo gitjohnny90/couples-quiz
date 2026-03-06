@@ -5,6 +5,8 @@ import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
 import deepDiveDecks, { MOOD_TAGS, SERIES } from '../data/deepDiveDecks'
 import drawingPrompts, { DRAW_PACK_PREFIX } from '../data/drawingPrompts'
+import { useReactions } from '../utils/reactions'
+import ReactionPicker from '../components/ReactionPicker'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, DoodleHeart, SquigglyUnderline } from '../components/Doodles'
 
@@ -12,6 +14,10 @@ export default function JournalPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
   const { playerName, playerId } = useContext(SessionContext)
+  const partnerId = playerId === 'player1' ? 'player2' : 'player1'
+  const { reactionMap: quizReactions, handleReact: handleQuizReact } = useReactions(sessionId, 'quiz')
+  const { reactionMap: ddReactions, handleReact: handleDdReact } = useReactions(sessionId, 'deep_dive')
+  const { reactionMap: drawReactions, handleReact: handleDrawReact } = useReactions(sessionId, 'drawing')
 
   const [activeTab, setActiveTab] = useState('mc')
   const [mcResponses, setMcResponses] = useState([])
@@ -94,7 +100,7 @@ export default function JournalPage() {
   const completedPacks = loading ? [] : getCompletedPacks()
   const completedDecks = loading ? [] : getCompletedDecks()
   const completedDrawings = loading ? [] : getCompletedDrawings()
-  const totalFires = ddResponses.filter((r) => r.is_fired).length
+  const totalDdReactions = Object.values(ddReactions).reduce((sum, playerMap) => sum + Object.keys(playerMap).length, 0)
 
   // Stats
   const mcTotal = completedPacks.length
@@ -272,6 +278,12 @@ export default function JournalPage() {
                                         <span style={{ color: 'var(--text-light)' }}>✗ different ~</span>
                                       )}
                                     </div>
+                                    <ReactionPicker
+                                      myReaction={quizReactions[`${pack.id}:${q.id}`]?.[playerId] || null}
+                                      partnerReaction={quizReactions[`${pack.id}:${q.id}`]?.[partnerId] || null}
+                                      onReact={(emoji) => handleQuizReact(playerId, `${pack.id}:${q.id}`, emoji)}
+                                      size="sm"
+                                    />
                                   </div>
                                 )
                               })}
@@ -301,9 +313,9 @@ export default function JournalPage() {
                       </div>
                       <div>
                         <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.8rem', fontWeight: 700, color: 'var(--accent-coral)', lineHeight: 1 }}>
-                          🔥 {totalFires}
+                          ✨ {totalDdReactions}
                         </p>
-                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>ones that hit</p>
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>reactions</p>
                       </div>
                     </div>
                     <div style={{ position: 'absolute', top: -6, right: 12 }}>
@@ -330,7 +342,7 @@ export default function JournalPage() {
                     {completedDecks.map((deck, i) => {
                       const series = SERIES.find((s) => s.id === deck.series)
                       const isExpanded = expandedItem === deck.id
-                      const deckFires = ddResponses.filter((r) => r.deck_id === deck.id && r.is_fired).length
+                      const deckReactionCount = ddResponses.filter((r) => r.deck_id === deck.id && ddReactions[r.id]).length
 
                       return (
                         <motion.div
@@ -368,7 +380,7 @@ export default function JournalPage() {
                               </div>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              {deckFires > 0 && <span style={{ fontSize: '0.85rem' }}>🔥{deckFires}</span>}
+                              {deckReactionCount > 0 && <span style={{ fontSize: '0.85rem' }}>✨{deckReactionCount}</span>}
                               <span style={{ fontSize: '0.85rem', color: 'var(--text-light)', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)' }}>
                                 ▼
                               </span>
@@ -409,9 +421,12 @@ export default function JournalPage() {
                                             {response.answer}
                                           </p>
                                         </div>
-                                        {response.is_fired && (
-                                          <span style={{ fontSize: '0.75rem', color: 'var(--accent-coral)' }}>🔥 this one hit</span>
-                                        )}
+                                        <ReactionPicker
+                                          myReaction={ddReactions[response.id]?.[playerId] || null}
+                                          partnerReaction={ddReactions[response.id]?.[partnerId] || null}
+                                          onReact={(emoji) => handleDdReact(playerId, response.id, emoji)}
+                                          size="sm"
+                                        />
                                       </div>
                                     ) : null)}
                                   </div>
@@ -526,6 +541,12 @@ export default function JournalPage() {
                                   </div>
                                 </div>
                               </div>
+                              <ReactionPicker
+                                myReaction={drawReactions[drawing.packId]?.[playerId] || null}
+                                partnerReaction={drawReactions[drawing.packId]?.[partnerId] || null}
+                                onReact={(emoji) => handleDrawReact(playerId, drawing.packId, emoji)}
+                                size="sm"
+                              />
                             </motion.div>
                           )}
                         </motion.div>

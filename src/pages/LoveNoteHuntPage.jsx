@@ -6,6 +6,8 @@ import loveNoteSuggestions from '../data/loveNoteSuggestions'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../components/Doodles'
 import { determineLoveNotePhase } from '../utils/gameLogic'
+import { useReactions } from '../utils/reactions'
+import ReactionPicker from '../components/ReactionPicker'
 
 const PHASE = { SETUP: 'setup', WAITING: 'waiting', HUNTING: 'hunting', REVEAL: 'reveal' }
 const GRID_SIZE = 6
@@ -16,6 +18,9 @@ export default function LoveNoteHuntPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
   const { playerName, playerId, setSessionId } = useContext(SessionContext)
+
+  const partnerId = playerId === 'player1' ? 'player2' : 'player1'
+  const { reactionMap, handleReact } = useReactions(sessionId, 'love_note')
 
   const [phase, setPhase] = useState(PHASE.SETUP)
   const [round, setRound] = useState(1)
@@ -743,6 +748,11 @@ export default function LoveNoteHuntPage() {
                 }}>
                   "{note.message}"
                 </p>
+                <ReactionPicker
+                  myReaction={reactionMap[`${i}:${round}`]?.[playerId] || null}
+                  partnerReaction={reactionMap[`${i}:${round}`]?.[partnerId] || null}
+                  onReact={(emoji) => handleReact(playerId, `${i}:${round}`, emoji)}
+                />
                 <DoodleHeart
                   size={10}
                   color="#E88D7A"

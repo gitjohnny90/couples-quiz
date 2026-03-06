@@ -4,14 +4,18 @@ import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
 import { calculateMatchScore } from '../utils/quizScoring'
+import { useReactions } from '../utils/reactions'
+import ReactionPicker from '../components/ReactionPicker'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline, DoodleCloud } from '../components/Doodles'
 
 export default function ResultsPage() {
   const { sessionId, packId } = useParams()
   const navigate = useNavigate()
-  const { playerName } = useContext(SessionContext)
+  const { playerName, playerId } = useContext(SessionContext)
   const pack = quizPacks.find((p) => p.id === packId)
+  const partnerId = playerId === 'player1' ? 'player2' : 'player1'
+  const { reactionMap, handleReact } = useReactions(sessionId, 'quiz')
 
   const [responses, setResponses] = useState([])
   const [loading, setLoading] = useState(true)
@@ -227,6 +231,14 @@ export default function ResultsPage() {
                         <span style={{ color: 'var(--text-light)' }}>✗ different ~</span>
                       )}
                     </div>
+
+                    {/* Reactions */}
+                    <ReactionPicker
+                      myReaction={reactionMap[`${packId}:${q.id}`]?.[playerId] || null}
+                      partnerReaction={reactionMap[`${packId}:${q.id}`]?.[partnerId] || null}
+                      onReact={(emoji) => handleReact(playerId, `${packId}:${q.id}`, emoji)}
+                      size="sm"
+                    />
 
                     {/* Research note for The Research Round */}
                     {q.researchNote && (

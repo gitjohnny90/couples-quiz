@@ -3,13 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import drawingPrompts, { drawingRoundMeta, getDrawPackId } from '../data/drawingPrompts'
+import { useReactions } from '../utils/reactions'
+import ReactionPicker from '../components/ReactionPicker'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline } from '../components/Doodles'
 
 export default function DrawResultsPage() {
   const { sessionId, promptId } = useParams()
   const navigate = useNavigate()
-  const { playerName } = useContext(SessionContext)
+  const { playerName, playerId } = useContext(SessionContext)
+  const partnerId = playerId === 'player1' ? 'player2' : 'player1'
 
   const [responses, setResponses] = useState([])
   const [loading, setLoading] = useState(true)
@@ -18,6 +21,7 @@ export default function DrawResultsPage() {
 
   // Use per-prompt pack_id if promptId present, else legacy fallback
   const targetPackId = promptId ? getDrawPackId(promptId) : drawingRoundMeta.id
+  const { reactionMap, handleReact } = useReactions(sessionId, 'drawing')
 
   // Look up prompt text from static data when available
   const promptFromData = promptId ? drawingPrompts.find(p => p.id === promptId) : null
@@ -248,19 +252,21 @@ export default function DrawResultsPage() {
                 </motion.div>
               </div>
 
-              {/* Fun reaction */}
+              {/* Reactions */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
                 style={{ textAlign: 'center', marginTop: 20 }}
               >
-                <div className="sticky-note" style={{ padding: 16, display: 'inline-block' }}>
-                  <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem' }}>
-                    modern art, honestly 🎨
-                  </p>
-                  <DoodleHeart size={12} color="#E88D7A" opacity={0.5} style={{ position: 'absolute', top: -4, right: -4 }} />
-                </div>
+                <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--text-light)', marginBottom: 4 }}>
+                  react to the masterpieces
+                </p>
+                <ReactionPicker
+                  myReaction={reactionMap[targetPackId]?.[playerId] || null}
+                  partnerReaction={reactionMap[targetPackId]?.[partnerId] || null}
+                  onReact={(emoji) => handleReact(playerId, targetPackId, emoji)}
+                />
               </motion.div>
 
               {/* Action buttons */}
