@@ -12,9 +12,8 @@ const PHASE = { ANSWERING: 'answering', WAITING: 'waiting', RESULTS: 'results' }
 
 export default function DeepDiveDeckPage() {
   const { sessionId, deckId } = useParams()
-  const { playerName } = useContext(SessionContext)
+  const { playerName, playerId } = useContext(SessionContext)
   const navigate = useNavigate()
-  const playerId = localStorage.getItem('playerId')
 
   const deck = deepDiveDecks.find((d) => d.id === deckId)
 

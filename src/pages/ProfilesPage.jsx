@@ -30,8 +30,7 @@ const defaultProfile = {
 export default function ProfilesPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerName } = useContext(SessionContext)
-  const playerId = localStorage.getItem('playerId')
+  const { playerName, playerId } = useContext(SessionContext)
 
   const [myProfile, setMyProfile] = useState({ ...defaultProfile })
   const [partnerProfile, setPartnerProfile] = useState(null)

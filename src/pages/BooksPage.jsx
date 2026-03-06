@@ -37,7 +37,8 @@ function StarRating({ rating, onRate, size = 22 }) {
 export default function BooksPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { setSessionId, playerName } = useContext(SessionContext)
+  const { setSessionId, playerName, playerId: ctxPlayerId } = useContext(SessionContext)
+  const playerId = ctxPlayerId || 'player1'
 
   const [items, setItems] = useState([])
   const [session, setSession] = useState(null)
@@ -56,8 +57,6 @@ export default function BooksPage() {
   // Genre wheel state
   const [selectedGenre, setSelectedGenre] = useState(bookGenres[0]?.id)
   const [wheelResult, setWheelResult] = useState(null)
-
-  const playerId = localStorage.getItem('playerId') || 'player1'
 
   useEffect(() => {
     if (sessionId) setSessionId(sessionId)

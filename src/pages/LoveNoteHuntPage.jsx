@@ -15,8 +15,7 @@ const NOTES_REQUIRED = 3
 export default function LoveNoteHuntPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerName, setSessionId } = useContext(SessionContext)
-  const playerId = localStorage.getItem('playerId')
+  const { playerName, playerId, setSessionId } = useContext(SessionContext)
 
   const [phase, setPhase] = useState(PHASE.SETUP)
   const [round, setRound] = useState(1)

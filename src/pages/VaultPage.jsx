@@ -10,7 +10,7 @@ import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../comp
 export default function VaultPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { setSessionId } = useContext(SessionContext)
+  const { setSessionId, playerId } = useContext(SessionContext)
 
   const [session, setSession] = useState(null)
   const [mcCompletedCount, setMcCompletedCount] = useState(0)
@@ -45,7 +45,6 @@ export default function VaultPage() {
     }
 
     // Deep Dive completion count
-    const playerId = localStorage.getItem('playerId')
     const { data: ddData } = await supabase.from('deep_dive_responses').select('*').eq('session_id', sessionId)
     if (ddData) {
       const ddDone = deepDiveDecks.filter((deck) =>
@@ -61,8 +60,9 @@ export default function VaultPage() {
     setLoading(false)
   }
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)
+  const copyCode = () => {
+    const code = session?.invite_code || sessionId
+    navigator.clipboard.writeText(code)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -98,21 +98,25 @@ export default function VaultPage() {
           </p>
         </div>
 
-        {/* Share link card */}
+        {/* Share invite code card */}
         {!session?.player2_name && (
           <div className="glass" style={{ padding: 20, marginBottom: 18, textAlign: 'center' }}>
             <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.15rem', marginBottom: 8 }}>
-              send this to your person:
+              share this code with your person:
             </p>
             <div style={{
               background: '#fff', borderBottom: '2px solid var(--border-pencil)',
-              padding: '10px 14px', fontSize: '0.8rem', wordBreak: 'break-all',
-              color: 'var(--accent-coral)', marginBottom: 12, fontFamily: 'var(--font-body)'
+              padding: '14px', marginBottom: 12,
+              fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700,
+              letterSpacing: '0.1em', color: 'var(--accent-coral)',
             }}>
-              {window.location.origin}/join/{sessionId}
+              {session?.invite_code || '...'}
             </div>
-            <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyLink}>
-              {copied ? 'copied!' : 'copy link'}
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginBottom: 12, fontStyle: 'italic' }}>
+              they'll enter this after signing up
+            </p>
+            <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyCode}>
+              {copied ? 'copied!' : 'copy code'}
             </button>
           </div>
         )}

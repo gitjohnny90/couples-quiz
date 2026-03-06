@@ -1,24 +1,27 @@
 import { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { SessionContext } from "../App";
+import { AuthContext } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
-import { validatePlayerName, resolveJoinState } from "../utils/sessionUtils";
+import { resolveJoinState } from "../utils/sessionUtils";
 import { motion } from "framer-motion";
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleArrow } from "../components/Doodles";
 
 export default function JoinPage() {
   const { sessionId } = useParams();
-  const { setSessionId, setPlayerName } = useContext(SessionContext);
+  const { setSessionId, setPlayerName, setPlayerId } = useContext(SessionContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [player1Name, setPlayer1Name] = useState("");
   const [player2Name, setPlayer2Name] = useState("");
-  const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [alreadyJoined, setAlreadyJoined] = useState(false);
   const [error, setError] = useState("");
+
+  const displayName = user?.user_metadata?.display_name || "Player";
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -43,19 +46,30 @@ export default function JoinPage() {
   }, [sessionId]);
 
   const handleJoin = async () => {
-    const validated = validatePlayerName(name);
-    if (!validated) return;
     setJoining(true);
     setError("");
     try {
       const { error: joinError } = await supabase
         .from("sessions")
-        .update({ player2_name: validated })
+        .update({
+          player2_name: displayName,
+          player2_user_id: user?.id || null,
+        })
         .eq("id", sessionId);
       if (joinError) throw joinError;
+
+      // Create user_sessions link if authenticated
+      if (user) {
+        await supabase.from("user_sessions").upsert({
+          user_id: user.id,
+          session_id: sessionId,
+          player_id: "player2",
+        });
+      }
+
       setSessionId(sessionId);
-      setPlayerName(validated);
-      localStorage.setItem("playerId", "player2");
+      setPlayerName(displayName);
+      setPlayerId("player2");
       navigate(`/vault/${sessionId}`);
     } catch (err) {
       console.error("oops, couldn't join:", err);
@@ -104,7 +118,7 @@ export default function JoinPage() {
           <button className="btn btn-primary" onClick={() => {
             setSessionId(sessionId);
             setPlayerName(player2Name || "Player 2");
-            localStorage.setItem("playerId", "player2");
+            setPlayerId("player2");
             navigate(`/vault/${sessionId}`);
           }}>
             open the notebook anyway
@@ -138,20 +152,11 @@ export default function JoinPage() {
           <DoodleArrow width={50} color="#B8A08A" opacity={0.5} rotate={85} />
         </div>
 
-        <div className="glass" style={{ padding: "28px 24px 24px", width: "100%", maxWidth: 380, margin: "0 auto", transform: "rotate(0.4deg)" }}>
-          <label style={{ fontFamily: "var(--font-hand)", fontSize: "1.3rem", color: "var(--text-secondary)", display: "block", marginBottom: 10 }}>
-            and you are...?
-          </label>
-          <input
-            className="input"
-            type="text"
-            placeholder="write your name here..."
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-            style={{ width: "100%", marginBottom: 20, boxSizing: "border-box" }}
-          />
-          <button className="btn btn-primary" onClick={handleJoin} disabled={joining || !name.trim()} style={{ width: "100%" }}>
+        <div className="glass" style={{ padding: "28px 24px 24px", width: "100%", maxWidth: 380, margin: "0 auto", transform: "rotate(0.4deg)", textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-hand)", fontSize: "1.3rem", color: "var(--text-secondary)", marginBottom: 16 }}>
+            joining as <strong style={{ color: "var(--accent-coral)" }}>{displayName}</strong>
+          </p>
+          <button className="btn btn-primary" onClick={handleJoin} disabled={joining} style={{ width: "100%" }}>
             {joining ? "joining..." : "let's do this"}
           </button>
           {error && (

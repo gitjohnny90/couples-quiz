@@ -9,7 +9,7 @@ import PageDoodles, { DoodleStar, SquigglyUnderline } from '../components/Doodle
 export default function DeepDivePage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const playerId = localStorage.getItem('playerId')
+  const { playerId } = useContext(SessionContext)
 
   const [responses, setResponses] = useState([])
   const [loading, setLoading] = useState(true)

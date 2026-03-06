@@ -1,7 +1,9 @@
 import React, { createContext, useState, useEffect } from "react";
 import { Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { getDocumentTitle, isTabActive } from "./utils/sessionUtils";
+import { AuthContext } from "./contexts/AuthContext";
 
+import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
 import JoinPage from "./pages/JoinPage";
 import QuizPage from "./pages/QuizPage";
@@ -21,10 +23,19 @@ import QuizPacksPage from "./pages/QuizPacksPage";
 import TicTacToePage from "./pages/TicTacToePage";
 import LoveNoteHuntPage from "./pages/LoveNoteHuntPage";
 
-// Guard: redirects to home if no name has been entered yet
-function RequireName({ children }) {
-  const { playerName } = React.useContext(SessionContext);
-  if (!playerName) return <Navigate to="/" replace />;
+// Guard: redirects to /auth if not logged in
+function RequireAuth({ children }) {
+  const { user, loading } = React.useContext(AuthContext);
+  if (loading) {
+    return (
+      <div className="page" style={{ textAlign: "center", paddingTop: 60 }}>
+        <p style={{ fontFamily: "var(--font-hand)", fontSize: "1.4rem", color: "var(--text-secondary)" }}>
+          opening the notebook...
+        </p>
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/auth" replace />;
   return children;
 }
 
@@ -33,6 +44,8 @@ export const SessionContext = createContext({
   setSessionId: () => {},
   playerName: null,
   setPlayerName: () => {},
+  playerId: null,
+  setPlayerId: () => {},
 });
 
 function useDocumentTitle() {
@@ -94,6 +107,14 @@ export default function App() {
     }
   });
 
+  const [playerId, setPlayerId] = useState(() => {
+    try {
+      return localStorage.getItem("playerId") || null;
+    } catch {
+      return null;
+    }
+  });
+
   useEffect(() => {
     try {
       if (sessionId) {
@@ -114,29 +135,40 @@ export default function App() {
     } catch {}
   }, [playerName]);
 
+  useEffect(() => {
+    try {
+      if (playerId) {
+        localStorage.setItem("playerId", playerId);
+      } else {
+        localStorage.removeItem("playerId");
+      }
+    } catch {}
+  }, [playerId]);
+
   return (
-    <SessionContext.Provider value={{ sessionId, setSessionId, playerName, setPlayerName }}>
+    <SessionContext.Provider value={{ sessionId, setSessionId, playerName, setPlayerName, playerId, setPlayerId }}>
       <div className="app">
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/join/:sessionId" element={<JoinPage />} />
-          <Route path="/quiz/:sessionId/:packId" element={<RequireName><QuizPage /></RequireName>} />
-          <Route path="/results/:sessionId/:packId" element={<RequireName><ResultsPage /></RequireName>} />
-          <Route path="/draw/:sessionId" element={<RequireName><DrawPage /></RequireName>} />
-          <Route path="/draw-results/:sessionId/:promptId" element={<RequireName><DrawResultsPage /></RequireName>} />
-          <Route path="/draw-results/:sessionId" element={<RequireName><DrawResultsPage /></RequireName>} />
-          <Route path="/fun/:sessionId" element={<RequireName><FunStuffPage /></RequireName>} />
-          <Route path="/movies/:sessionId" element={<RequireName><MoviesPage /></RequireName>} />
-          <Route path="/watch-guide/:sessionId" element={<RequireName><WatchGuidePage /></RequireName>} />
-          <Route path="/books/:sessionId" element={<RequireName><BooksPage /></RequireName>} />
-          <Route path="/tictactoe/:sessionId" element={<RequireName><TicTacToePage /></RequireName>} />
-          <Route path="/love-notes/:sessionId" element={<RequireName><LoveNoteHuntPage /></RequireName>} />
-          <Route path="/deep-dive/:sessionId" element={<RequireName><DeepDivePage /></RequireName>} />
-          <Route path="/deep-dive/:sessionId/:deckId" element={<RequireName><DeepDiveDeckPage /></RequireName>} />
-          <Route path="/journal/:sessionId" element={<RequireName><JournalPage /></RequireName>} />
-          <Route path="/quiz-packs/:sessionId" element={<RequireName><QuizPacksPage /></RequireName>} />
-          <Route path="/vault/:sessionId" element={<RequireName><VaultPage /></RequireName>} />
-          <Route path="/profiles/:sessionId" element={<RequireName><ProfilesPage /></RequireName>} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/" element={<RequireAuth><HomePage /></RequireAuth>} />
+          <Route path="/join/:sessionId" element={<RequireAuth><JoinPage /></RequireAuth>} />
+          <Route path="/quiz/:sessionId/:packId" element={<RequireAuth><QuizPage /></RequireAuth>} />
+          <Route path="/results/:sessionId/:packId" element={<RequireAuth><ResultsPage /></RequireAuth>} />
+          <Route path="/draw/:sessionId" element={<RequireAuth><DrawPage /></RequireAuth>} />
+          <Route path="/draw-results/:sessionId/:promptId" element={<RequireAuth><DrawResultsPage /></RequireAuth>} />
+          <Route path="/draw-results/:sessionId" element={<RequireAuth><DrawResultsPage /></RequireAuth>} />
+          <Route path="/fun/:sessionId" element={<RequireAuth><FunStuffPage /></RequireAuth>} />
+          <Route path="/movies/:sessionId" element={<RequireAuth><MoviesPage /></RequireAuth>} />
+          <Route path="/watch-guide/:sessionId" element={<RequireAuth><WatchGuidePage /></RequireAuth>} />
+          <Route path="/books/:sessionId" element={<RequireAuth><BooksPage /></RequireAuth>} />
+          <Route path="/tictactoe/:sessionId" element={<RequireAuth><TicTacToePage /></RequireAuth>} />
+          <Route path="/love-notes/:sessionId" element={<RequireAuth><LoveNoteHuntPage /></RequireAuth>} />
+          <Route path="/deep-dive/:sessionId" element={<RequireAuth><DeepDivePage /></RequireAuth>} />
+          <Route path="/deep-dive/:sessionId/:deckId" element={<RequireAuth><DeepDiveDeckPage /></RequireAuth>} />
+          <Route path="/journal/:sessionId" element={<RequireAuth><JournalPage /></RequireAuth>} />
+          <Route path="/quiz-packs/:sessionId" element={<RequireAuth><QuizPacksPage /></RequireAuth>} />
+          <Route path="/vault/:sessionId" element={<RequireAuth><VaultPage /></RequireAuth>} />
+          <Route path="/profiles/:sessionId" element={<RequireAuth><ProfilesPage /></RequireAuth>} />
         </Routes>
         <BottomNav />
       </div>

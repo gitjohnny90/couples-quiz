@@ -8,9 +8,8 @@ import PageDoodles, { SquigglyUnderline, DoodleStar } from "../components/Doodle
 
 export default function QuizPage() {
   const { sessionId, packId } = useParams();
-  const { playerName } = useContext(SessionContext);
+  const { playerName, playerId } = useContext(SessionContext);
   const navigate = useNavigate();
-  const playerId = localStorage.getItem("playerId");
 
   const pack = quizPacks.find((p) => p.id === packId);
 

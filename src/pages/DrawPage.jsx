@@ -10,7 +10,7 @@ import PageDoodles, { DoodleSpiral, DoodleStar, SquigglyUnderline } from '../com
 export default function DrawPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerName } = useContext(SessionContext)
+  const { playerName, playerId } = useContext(SessionContext)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [donePromptIds, setDonePromptIds] = useState(new Set())
@@ -26,7 +26,6 @@ export default function DrawPage() {
   // Fetch which prompts this player has already completed
   useEffect(() => {
     const fetchDonePrompts = async () => {
-      const playerId = localStorage.getItem('playerId')
       const allPackIds = drawingPrompts.map(p => getDrawPackId(p.id))
       const { data } = await supabase
         .from('responses')
@@ -66,7 +65,6 @@ export default function DrawPage() {
     setSubmitting(true)
 
     try {
-      const playerId = localStorage.getItem('playerId')
       const { error } = await supabase.from('responses').upsert(
         {
           session_id: sessionId,

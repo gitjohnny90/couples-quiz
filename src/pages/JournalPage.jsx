@@ -11,8 +11,7 @@ import PageDoodles, { DoodleStar, DoodleHeart, SquigglyUnderline } from '../comp
 export default function JournalPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerName } = useContext(SessionContext)
-  const playerId = localStorage.getItem('playerId')
+  const { playerName, playerId } = useContext(SessionContext)
 
   const [activeTab, setActiveTab] = useState('mc')
   const [mcResponses, setMcResponses] = useState([])
