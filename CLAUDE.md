@@ -85,6 +85,7 @@ The visual theme is a hand-drawn notebook:
 - `src/components/ReactionPopup.jsx` — floating emoji picker (❤️ 😂 🔥) that appears on long-press. Uses framer-motion spring animations, fixed-position backdrop, smart positioning above/below the target card.
 - `src/components/ReactionBadge.jsx` — small inline pills showing existing reactions (coral for yours, blue for partner's). Returns null if no reactions.
 - `src/components/ReactionPicker.jsx` — re-export barrel for ReactionPopup, ReactionBadge, and useLongPress.
+- `src/components/MissYouHeart.jsx` — fixed-position candy conversation heart ("MISS U") in top-right corner. Tapping sends a nudge to partner via `responses` table (`pack_id: 'nudge'`). Partner sees a toast notification in real time. 30-second cooldown between sends. Rendered in `App.jsx` alongside `BottomNav`.
 
 ### Hooks
 
