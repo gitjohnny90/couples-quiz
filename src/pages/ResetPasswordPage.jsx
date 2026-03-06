@@ -17,15 +17,35 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false)
   const [ready, setReady] = useState(false)
 
-  // Wait for PASSWORD_RECOVERY event to confirm valid recovery session
+  // Detect recovery flow from URL hash (most reliable — fires before auth event)
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash && hash.includes('type=recovery')) {
+      setReady(true)
+    }
+  }, [])
+
+  // Also listen for PASSWORD_RECOVERY auth event as fallback
   useEffect(() => {
     if (authEvent === "PASSWORD_RECOVERY") {
       setReady(true)
     }
   }, [authEvent])
 
+  // Once Supabase processes hash tokens, user will be set — that also means ready
+  useEffect(() => {
+    if (user && window.location.hash.includes('access_token')) {
+      setReady(true)
+    }
+  }, [user])
+
   // If user lands here without hash tokens, redirect after timeout
   useEffect(() => {
+    const hasRecoveryHash = window.location.hash.includes('type=recovery') ||
+                            window.location.hash.includes('access_token')
+    // Don't redirect if hash tokens are present — Supabase may still be processing
+    if (hasRecoveryHash) return
+
     const timer = setTimeout(() => {
       if (!ready && !user) {
         navigate("/auth", { replace: true })
