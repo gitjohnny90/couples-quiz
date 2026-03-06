@@ -12,6 +12,7 @@ export default function AuthPage() {
   const [displayName, setDisplayName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -218,15 +219,41 @@ export default function AuthPage() {
           >
             password:
           </label>
-          <input
-            className="input"
-            type="password"
-            placeholder={mode === "signup" ? "at least 6 characters" : "your password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete={mode === "signup" ? "new-password" : "current-password"}
-            style={{ width: "100%", marginBottom: 20, boxSizing: "border-box" }}
-          />
+          <div style={{ position: "relative", width: "100%", marginBottom: 20 }}>
+            <input
+              className="input"
+              type={showPassword ? "text" : "password"}
+              placeholder={mode === "signup" ? "at least 6 characters" : "your password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              style={{ width: "100%", boxSizing: "border-box", paddingRight: 40 }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              style={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 4,
+                fontSize: "1.1rem",
+                color: "var(--text-light)",
+                lineHeight: 1,
+                opacity: 0.6,
+                transition: "opacity 0.15s",
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = 0.6}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </button>
+          </div>
 
           <button
             className="btn btn-primary"
