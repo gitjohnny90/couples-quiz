@@ -33,7 +33,12 @@ const BOARD_SLOTS = [
 
 const PIN_COLORS = ['#E55', '#E8B84C', '#5B8FC7']
 
-const DEFAULT_DATA = { northStar: '', goals: [], board: [] }
+const DEFAULT_DATA = { northStar: '', goals: [], board: [], futureLetters: [] }
+
+const PLAYER_COLORS = {
+  player1: '#E88D7A', // coral
+  player2: '#7EB8D8', // blue
+}
 
 export default function VisionTab({ sessionId, playerName, playerId, visibleSection }) {
   const navigate = useNavigate()
@@ -42,6 +47,7 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
   const [saving, setSaving] = useState(false)
   const [expandedCat, setExpandedCat] = useState(null)
   const [newGoalText, setNewGoalText] = useState('')
+  const [newLetterText, setNewLetterText] = useState('')
   const northStarTimeout = useRef(null)
   const captionTimeout = useRef(null)
   const fileInputRefs = useRef([])
@@ -151,6 +157,26 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
       clearTimeout(captionTimeout.current)
       captionTimeout.current = setTimeout(() => saveData({ ...data, board }), 800)
     }
+  }
+
+  // Letter handlers
+  const handleAddLetter = () => {
+    const text = newLetterText.trim()
+    if (!text) return
+    const entry = {
+      id: crypto.randomUUID(),
+      text,
+      writtenBy: playerId,
+      writerName: playerName,
+      writtenAt: new Date().toISOString(),
+    }
+    saveData({ ...data, futureLetters: [...(data.futureLetters || []), entry] })
+    setNewLetterText('')
+  }
+
+  const handleDeleteLetter = (letterId) => {
+    const updated = (data.futureLetters || []).filter(l => l.id !== letterId)
+    saveData({ ...data, futureLetters: updated })
   }
 
   if (loading) {
@@ -320,6 +346,71 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
               </p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* ===== LETTER TO FUTURE US ===== */}
+      <div style={{ marginBottom: 24 }}>
+        <h2 style={{
+          fontFamily: 'var(--font-hand)', fontSize: '1.3rem', fontWeight: 700,
+          textAlign: 'center', marginBottom: 4, color: 'var(--text-primary)',
+        }}>
+          ✉️ letter to future us
+        </h2>
+        <p style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-light)', fontStyle: 'italic', marginBottom: 14, maxWidth: 320, margin: '0 auto 14px' }}>
+          leave little notes, thoughts, and reflections for the two of you to look back on someday — each entry is color-coded so you can see who wrote what
+        </p>
+
+        <div className="glass" style={{
+          padding: '16px 18px',
+          background: 'linear-gradient(135deg, #FFFDF7 0%, #FFF8F0 100%)',
+        }}>
+          {/* Existing entries */}
+          {(data.futureLetters || []).length > 0 ? (
+            <div style={{ marginBottom: 14 }}>
+              {(data.futureLetters || []).map((entry, i) => (
+                <LetterEntry
+                  key={entry.id}
+                  entry={entry}
+                  isOwn={entry.writtenBy === playerId}
+                  onDelete={() => handleDeleteLetter(entry.id)}
+                  isLast={i === (data.futureLetters || []).length - 1}
+                />
+              ))}
+            </div>
+          ) : (
+            <p style={{
+              textAlign: 'center', fontFamily: 'var(--font-hand)', fontSize: '1rem',
+              color: 'var(--text-light)', fontStyle: 'italic', padding: '12px 0 16px',
+            }}>
+              your letter is blank — be the first to write something
+            </p>
+          )}
+
+          {/* Add entry */}
+          <textarea
+            value={newLetterText}
+            onChange={(e) => setNewLetterText(e.target.value)}
+            placeholder="write something to your future selves..."
+            maxLength={500}
+            rows={3}
+            style={{
+              width: '100%', border: '1.5px solid var(--border-pencil)', borderRadius: 3,
+              padding: '10px 12px', fontFamily: 'var(--font-hand)', fontSize: '1rem',
+              lineHeight: 1.5, color: 'var(--text-primary)', background: 'var(--bg-paper)',
+              outline: 'none', resize: 'none',
+            }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+            <button
+              className="btn btn-primary"
+              style={{ padding: '8px 18px', fontSize: '0.95rem' }}
+              onClick={handleAddLetter}
+              disabled={!newLetterText.trim()}
+            >
+              add to letter
+            </button>
+          </div>
         </div>
       </div>
       </>}
@@ -626,6 +717,52 @@ function GoalItem({ goal, onStatusChange, onDelete }) {
       >
         ✕
       </button>
+    </div>
+  )
+}
+
+function LetterEntry({ entry, isOwn, onDelete, isLast }) {
+  const color = PLAYER_COLORS[entry.writtenBy] || 'var(--text-primary)'
+  const date = new Date(entry.writtenAt).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  })
+
+  return (
+    <div style={{
+      paddingBottom: isLast ? 0 : 12,
+      marginBottom: isLast ? 0 : 12,
+      borderBottom: isLast ? 'none' : '1px dashed var(--rule-line)',
+    }}>
+      <p style={{
+        fontFamily: 'var(--font-hand)', fontSize: '1.05rem', lineHeight: 1.5,
+        color, whiteSpace: 'pre-wrap',
+      }}>
+        {entry.text}
+      </p>
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        marginTop: 4,
+      }}>
+        <span style={{
+          fontFamily: 'var(--font-hand)', fontSize: '0.8rem',
+          color: 'var(--text-light)', fontStyle: 'italic',
+        }}>
+          — {entry.writerName || (entry.writtenBy === 'player1' ? 'player 1' : 'player 2')}, {date}
+        </span>
+        {isOwn && (
+          <button
+            onClick={onDelete}
+            title="remove"
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontSize: '0.7rem', color: 'var(--text-light)', padding: '2px 4px',
+              opacity: 0.4,
+            }}
+          >
+            ✕
+          </button>
+        )}
+      </div>
     </div>
   )
 }
