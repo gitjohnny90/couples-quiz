@@ -26,7 +26,7 @@ No test runner or linter is configured.
 
 ### Authentication
 
-`AuthContext` (in `src/contexts/AuthContext.jsx`) wraps the app with Supabase Auth (email + password). Exports `user`, `loading`, `signUp`, `signIn`, `signOut`. All routes except `/auth` are wrapped in `<RequireAuth>` which redirects unauthenticated users to the sign-in page. The auth page (`src/pages/AuthPage.jsx`) has sign-in/sign-up tab toggle, and a show/hide password button using monkey emojis (🐵 show / 🙈 hide).
+`AuthContext` (in `src/contexts/AuthContext.jsx`) wraps the app with Supabase Auth (email + password). Exports `user`, `loading`, `authEvent`, `signUp`, `signIn`, `signOut`, `resetPasswordForEmail`. All routes except `/auth` and `/reset-password` are wrapped in `<RequireAuth>` which redirects unauthenticated users to the sign-in page. The auth page (`src/pages/AuthPage.jsx`) has sign-in/sign-up/forgot-password modes, and a show/hide password button using monkey emojis (🐵 show / 🙈 hide). Password reset uses `resetPasswordForEmail()` → Supabase email → `/reset-password` page (`src/pages/ResetPasswordPage.jsx`) which detects recovery via URL hash (`type=recovery`) and lets the user set a new password.
 
 ### Session & Identity
 
@@ -34,11 +34,11 @@ No test runner or linter is configured.
 
 ### Routing
 
-All routes defined in `App.jsx`. `/auth` is public; all others require authentication. Four nav tabs map to route groups:
+All routes defined in `App.jsx`. `/auth` and `/reset-password` are public; all others require authentication. Four nav tabs map to route groups:
 - **home** → `/` (HomePage — session creation/join via invite code)
 - **quizzes** → `/vault/:id`, `/quiz/:id/:packId`, `/results/:id/:packId`, `/deep-dive/:id`, `/deep-dive/:id/:deckId`, `/quiz-packs/:id`
 - **fun stuff** → `/fun/:id`, `/draw/:id`, `/movies/:id`, `/books/:id`, `/tictactoe/:id`, `/love-notes/:id`, `/watch-guide/:id`
-- **us** → `/profiles/:id` (personality profiles + vision board via tab param), `/journal/:id`
+- **us** → `/profiles/:id` (hub page with links to sub-pages), `/personality/:id` (edit/compare personality tests), `/vision/:id` (north star + vision board tab, dreams + sky + milestones tab), `/journal/:id`
 
 ### Data Flow
 
@@ -85,7 +85,7 @@ The visual theme is a hand-drawn notebook:
 - `src/components/ReactionPopup.jsx` — floating emoji picker (❤️ 😂 🔥) that appears on long-press. Uses framer-motion spring animations, fixed-position backdrop, smart positioning above/below the target. Highlights your current selection (coral border) and shows a blue dot on partner's pick.
 - `src/components/ReactionBadge.jsx` — bare emoji(s) positioned at the bottom-right edge of an answer/drawing box, hanging halfway off the corner (`position: absolute; bottom: -10; right: -6`). Parent must have `position: relative; overflow: visible`. Pop animation (spring: stiffness 500, damping 12) only fires for real-time arrivals, not pre-existing reactions on page load (800ms mount delay via ref). Shows one or two emojis (yours + partner's) with slight overlap when both exist.
 - `src/components/ReactionPicker.jsx` — re-export barrel for ReactionPopup, ReactionBadge, and useLongPress.
-- `src/components/MissYouHeart.jsx` — fixed-position candy conversation heart ("MISS U") in top-right corner. Tapping sends a nudge to partner via `responses` table (`pack_id: 'nudge'`). Partner sees a toast notification in real time. 30-second cooldown between sends. Rendered in `App.jsx` alongside `BottomNav`.
+- `src/components/MissYouHeart.jsx` — absolute-positioned candy conversation heart ("MISS U") in top-right corner (scrolls with page, does not follow viewport). Tapping sends a nudge to partner via `responses` table (`pack_id: 'nudge'`). Partner sees a toast notification in real time. 30-second cooldown between sends. Rendered in `App.jsx` alongside `BottomNav`. Parent `.app` div has `position: relative` for positioning context.
 
 ### Hooks
 
@@ -103,8 +103,16 @@ The visual theme is a hand-drawn notebook:
 - **Accessibility**: Bottom nav uses `aria-label`, `aria-current`; quiz options use `aria-pressed`; Love Note Hunt grid uses `role="gridcell"` with keyboard support.
 - **localStorage keys**: `sessionId`, `playerName`, `playerId`, plus feature-specific keys like movie vetoes
 
+## Dev Preview Bypass
+
+Set `VITE_DEV_BYPASS_AUTH=true` in `.env` to bypass Supabase auth during local dev/preview. This is double-gated: requires both `import.meta.env.DEV` (Vite dev mode only) and the env var, so it's dead code in production builds. When active:
+- `AuthContext` provides a mock user and skips Supabase auth initialization
+- `SessionContext` defaults to `sessionId: "preview"`, `playerName: "Preview"`, `playerId: "player1"` when no localStorage values exist
+- All authenticated pages render with their layouts and empty data states
+
 ## Environment Variables
 
 Required in `.env` (prefixed with `VITE_` for Vite):
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
+- `VITE_DEV_BYPASS_AUTH` — optional, set to `true` for dev preview auth bypass (see above)

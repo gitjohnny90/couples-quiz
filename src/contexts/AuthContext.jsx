@@ -11,12 +11,17 @@ export const AuthContext = createContext({
   resetPasswordForEmail: async () => {},
 })
 
+// Dev-only auth bypass for preview testing (double-safe: requires DEV mode AND env var)
+const DEV_BYPASS_AUTH = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(DEV_BYPASS_AUTH ? { id: 'dev-preview', email: 'preview@dev' } : null)
+  const [loading, setLoading] = useState(DEV_BYPASS_AUTH ? false : true)
   const [authEvent, setAuthEvent] = useState(null)
 
   useEffect(() => {
+    if (DEV_BYPASS_AUTH) return // Skip auth init in preview mode
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)

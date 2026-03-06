@@ -27,6 +27,9 @@ import TicTacToePage from "./pages/TicTacToePage";
 import LoveNoteHuntPage from "./pages/LoveNoteHuntPage";
 import MissYouHeart from "./components/MissYouHeart";
 
+// Dev-only auth bypass for preview testing (double-safe: requires DEV mode AND env var)
+const DEV_BYPASS_AUTH = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true';
+
 // Guard: redirects to /auth if not logged in
 function RequireAuth({ children }) {
   const { user, loading } = React.useContext(AuthContext);
@@ -97,25 +100,25 @@ function BottomNav() {
 export default function App() {
   const [sessionId, setSessionId] = useState(() => {
     try {
-      return localStorage.getItem("sessionId") || null;
+      return localStorage.getItem("sessionId") || (DEV_BYPASS_AUTH ? "preview" : null);
     } catch {
-      return null;
+      return DEV_BYPASS_AUTH ? "preview" : null;
     }
   });
 
   const [playerName, setPlayerName] = useState(() => {
     try {
-      return localStorage.getItem("playerName") || null;
+      return localStorage.getItem("playerName") || (DEV_BYPASS_AUTH ? "Preview" : null);
     } catch {
-      return null;
+      return DEV_BYPASS_AUTH ? "Preview" : null;
     }
   });
 
   const [playerId, setPlayerId] = useState(() => {
     try {
-      return localStorage.getItem("playerId") || null;
+      return localStorage.getItem("playerId") || (DEV_BYPASS_AUTH ? "player1" : null);
     } catch {
-      return null;
+      return DEV_BYPASS_AUTH ? "player1" : null;
     }
   });
 
