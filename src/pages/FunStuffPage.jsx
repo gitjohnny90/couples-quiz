@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
+import { AuthContext } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import drawingPrompts, { drawingRoundMeta, getDrawPackId } from '../data/drawingPrompts'
 import { motion } from 'framer-motion'
@@ -10,6 +11,7 @@ export default function FunStuffPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
   const { setSessionId } = useContext(SessionContext)
+  const { signOut } = useContext(AuthContext)
 
   const [drawStatus, setDrawStatus] = useState({ completedCount: 0, startedCount: 0, total: drawingPrompts.length })
   const [movieCount, setMovieCount] = useState(0)
@@ -201,6 +203,34 @@ export default function FunStuffPage() {
 
         <div style={{ position: 'absolute', bottom: 130, right: -6 }}>
           <DoodleSpiral size={18} opacity={0.18} rotate={-20} />
+        </div>
+
+        {/* Sign out */}
+        <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 8 }}>
+          <button
+            onClick={async () => {
+              await signOut()
+              navigate('/auth')
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-hand)',
+              fontSize: '1rem',
+              color: 'var(--text-light)',
+              padding: '8px 16px',
+              textDecoration: 'underline',
+              textDecorationStyle: 'wavy',
+              textDecorationColor: 'var(--border-pencil)',
+              textUnderlineOffset: 4,
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-coral)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-light)'}
+          >
+            sign out
+          </button>
         </div>
       </motion.div>
     </div>

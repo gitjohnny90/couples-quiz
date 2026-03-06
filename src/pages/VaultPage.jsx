@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
+import { AuthContext } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
 import deepDiveDecks from '../data/deepDiveDecks'
@@ -11,6 +12,7 @@ export default function VaultPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
   const { setSessionId, playerId } = useContext(SessionContext)
+  const { signOut } = useContext(AuthContext)
 
   const [session, setSession] = useState(null)
   const [mcCompletedCount, setMcCompletedCount] = useState(0)
@@ -228,6 +230,34 @@ export default function VaultPage() {
             </div>
           </motion.div>
 
+        </div>
+
+        {/* Sign out */}
+        <div style={{ textAlign: 'center', marginTop: 32, marginBottom: 8 }}>
+          <button
+            onClick={async () => {
+              await signOut()
+              navigate('/auth')
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-hand)',
+              fontSize: '1rem',
+              color: 'var(--text-light)',
+              padding: '8px 16px',
+              textDecoration: 'underline',
+              textDecorationStyle: 'wavy',
+              textDecorationColor: 'var(--border-pencil)',
+              textUnderlineOffset: 4,
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-coral)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-light)'}
+          >
+            sign out
+          </button>
         </div>
       </motion.div>
     </div>
