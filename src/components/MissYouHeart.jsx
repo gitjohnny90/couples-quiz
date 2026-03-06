@@ -162,9 +162,9 @@ export default function MissYouHeart() {
 
   return (
     <>
-      {/* Candy heart button — fixed wrapper keeps it pinned on mobile */}
+      {/* Candy heart button — stays at top of page, scrolls with content */}
       <div style={{
-        position: 'fixed',
+        position: 'absolute',
         top: 10,
         right: 14,
         zIndex: 50,

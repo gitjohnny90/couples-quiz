@@ -149,7 +149,7 @@ export default function App() {
 
   return (
     <SessionContext.Provider value={{ sessionId, setSessionId, playerName, setPlayerName, playerId, setPlayerId }}>
-      <div className="app">
+      <div className="app" style={{ position: 'relative' }}>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
