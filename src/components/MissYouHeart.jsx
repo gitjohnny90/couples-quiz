@@ -162,7 +162,13 @@ export default function MissYouHeart() {
 
   return (
     <>
-      {/* Candy heart button */}
+      {/* Candy heart button — fixed wrapper keeps it pinned on mobile */}
+      <div style={{
+        position: 'fixed',
+        top: 10,
+        right: 14,
+        zIndex: 50,
+      }}>
       <motion.button
         onClick={handleSend}
         disabled={isDisabled}
@@ -178,10 +184,6 @@ export default function MissYouHeart() {
         }
         whileTap={!isDisabled ? { scale: 0.85 } : undefined}
         style={{
-          position: 'fixed',
-          top: 10,
-          right: 14,
-          zIndex: 50,
           background: 'none',
           border: 'none',
           padding: 0,
@@ -235,6 +237,7 @@ export default function MissYouHeart() {
           </text>
         </svg>
       </motion.button>
+      </div>
 
       {/* "sent!" confirmation */}
       <AnimatePresence>
