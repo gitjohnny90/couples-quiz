@@ -26,7 +26,7 @@ No test runner or linter is configured.
 
 ### Authentication
 
-`AuthContext` (in `src/contexts/AuthContext.jsx`) wraps the app with Supabase Auth (email + password). Exports `user`, `loading`, `signUp`, `signIn`, `signOut`. All routes except `/auth` are wrapped in `<RequireAuth>` which redirects unauthenticated users to the sign-in page.
+`AuthContext` (in `src/contexts/AuthContext.jsx`) wraps the app with Supabase Auth (email + password). Exports `user`, `loading`, `signUp`, `signIn`, `signOut`. All routes except `/auth` are wrapped in `<RequireAuth>` which redirects unauthenticated users to the sign-in page. The auth page (`src/pages/AuthPage.jsx`) has sign-in/sign-up tab toggle, and a show/hide password button using monkey emojis (🐵 show / 🙈 hide).
 
 ### Session & Identity
 
@@ -82,8 +82,8 @@ The visual theme is a hand-drawn notebook:
 - `src/components/Doodles.jsx` — decorative SVG doodles (see Doodles section above)
 - `src/components/DrawingCanvas.jsx` — reusable canvas with color picker, eraser, undo/clear. Uses pointer events and `globalCompositeOperation` for erasing. Exports drawing as PNG data URL via `onDrawingChange` callback.
 - `src/components/SpinningWheel.jsx` — SVG genre wheel used by Movies and Books pages. Titles rendered via `<textPath>` along each slice's midline (flipped for bottom half so text is never upside-down). CSS transition spin animation with cubic-bezier easing; auto-scrolls to result card after landing.
-- `src/components/ReactionPopup.jsx` — floating emoji picker (❤️ 😂 🔥) that appears on long-press. Uses framer-motion spring animations, fixed-position backdrop, smart positioning above/below the target card.
-- `src/components/ReactionBadge.jsx` — small inline pills showing existing reactions (coral for yours, blue for partner's). Returns null if no reactions.
+- `src/components/ReactionPopup.jsx` — floating emoji picker (❤️ 😂 🔥) that appears on long-press. Uses framer-motion spring animations, fixed-position backdrop, smart positioning above/below the target. Highlights your current selection (coral border) and shows a blue dot on partner's pick.
+- `src/components/ReactionBadge.jsx` — bare emoji(s) positioned at the bottom-right edge of an answer/drawing box, hanging halfway off the corner (`position: absolute; bottom: -10; right: -6`). Parent must have `position: relative; overflow: visible`. Pop animation (spring: stiffness 500, damping 12) only fires for real-time arrivals, not pre-existing reactions on page load (800ms mount delay via ref). Shows one or two emojis (yours + partner's) with slight overlap when both exist.
 - `src/components/ReactionPicker.jsx` — re-export barrel for ReactionPopup, ReactionBadge, and useLongPress.
 - `src/components/MissYouHeart.jsx` — fixed-position candy conversation heart ("MISS U") in top-right corner. Tapping sends a nudge to partner via `responses` table (`pack_id: 'nudge'`). Partner sees a toast notification in real time. 30-second cooldown between sends. Rendered in `App.jsx` alongside `BottomNav`.
 
@@ -95,7 +95,7 @@ The visual theme is a hand-drawn notebook:
 
 - **Supabase queries**: `useEffect` with `supabase.from(table).select()` / `.upsert()` / `.insert()`
 - **Realtime**: `supabase.channel(name).on('postgres_changes', ...).subscribe()` — always unsubscribe in cleanup
-- **Reactions**: `useReactions(sessionId, targetType)` hook in `src/utils/reactions.js` manages fetch, toggle, and realtime subscription for emoji reactions. Target types: `'quiz'`, `'drawing'`, `'love_note'`, `'deep_dive'`. Long-press on answer cards triggers `ReactionPopup`; existing reactions display via `ReactionBadge`.
+- **Reactions**: `useReactions(sessionId, targetType)` hook in `src/utils/reactions.js` manages fetch, toggle, and realtime subscription for emoji reactions. Target types: `'quiz'`, `'drawing'`, `'love_note'`, `'deep_dive'`. Each individual answer/drawing is its own reaction target — long-press on a specific answer box opens `ReactionPopup`, and `ReactionBadge` displays at that answer's bottom-right edge. TargetId formats: `${packId}:${questionId}:player1` (quiz), `${packId}:player1` (drawing). Toggle behavior: same emoji = remove, different emoji = switch, none = create.
 - **Tic-Tac-Toe**: Multiplayer via Supabase — game state stored in `responses` table with `pack_id: 'tictactoe'` and `player_id: 'game'`. Each player can only place their own color heart (`player1` = coral, `player2` = blue) and must wait for partner's turn. Uses realtime subscription + 3s polling fallback for sync.
 - **No component library**: all UI is custom JSX with inline styles
 - **Error handling**: Most pages use an `error` state variable with user-visible feedback (inline `<p>` or banner). Some use `setTimeout` for auto-dismiss after 3 seconds.
