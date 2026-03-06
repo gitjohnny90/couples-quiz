@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { checkWinner, WINNING_COMBOS } from './gameLogic'
+import { checkWinner, WINNING_COMBOS, determineLoveNotePhase } from './gameLogic'
 
 describe('checkWinner', () => {
   it('returns null for an empty board', () => {
@@ -66,5 +66,61 @@ describe('checkWinner', () => {
 
   it('has exactly 8 winning combos', () => {
     expect(WINNING_COMBOS).toHaveLength(8)
+  })
+})
+
+describe('determineLoveNotePhase', () => {
+  const REQ = 3
+
+  it('returns setup when player has placed no notes', () => {
+    expect(determineLoveNotePhase(0, 0, 0, REQ)).toBe('setup')
+  })
+
+  it('returns setup when player has placed fewer than required', () => {
+    expect(determineLoveNotePhase(2, 0, 0, REQ)).toBe('setup')
+  })
+
+  it('returns setup when player has placed fewer even if partner is done', () => {
+    expect(determineLoveNotePhase(1, 3, 0, REQ)).toBe('setup')
+  })
+
+  it('returns waiting when player placed enough but partner has not', () => {
+    expect(determineLoveNotePhase(3, 0, 0, REQ)).toBe('waiting')
+  })
+
+  it('returns waiting when player placed enough but partner placed fewer', () => {
+    expect(determineLoveNotePhase(3, 2, 0, REQ)).toBe('waiting')
+  })
+
+  it('returns hunting when both placed enough and hits < required', () => {
+    expect(determineLoveNotePhase(3, 3, 0, REQ)).toBe('hunting')
+  })
+
+  it('returns hunting when both placed enough and some hits but not all', () => {
+    expect(determineLoveNotePhase(3, 3, 2, REQ)).toBe('hunting')
+  })
+
+  it('returns reveal when both placed enough and all hits found', () => {
+    expect(determineLoveNotePhase(3, 3, 3, REQ)).toBe('reveal')
+  })
+
+  it('returns reveal when hits exceed required', () => {
+    expect(determineLoveNotePhase(3, 3, 5, REQ)).toBe('reveal')
+  })
+
+  it('works with more notes than required', () => {
+    expect(determineLoveNotePhase(5, 4, 1, REQ)).toBe('hunting')
+  })
+
+  it('defaults notesRequired to 3', () => {
+    expect(determineLoveNotePhase(3, 3, 3)).toBe('reveal')
+    expect(determineLoveNotePhase(2, 2, 0)).toBe('setup')
+  })
+
+  it('works with custom notesRequired', () => {
+    expect(determineLoveNotePhase(5, 5, 5, 5)).toBe('reveal')
+    expect(determineLoveNotePhase(5, 5, 3, 5)).toBe('hunting')
+    expect(determineLoveNotePhase(5, 4, 0, 5)).toBe('waiting')
+    expect(determineLoveNotePhase(4, 5, 0, 5)).toBe('setup')
   })
 })

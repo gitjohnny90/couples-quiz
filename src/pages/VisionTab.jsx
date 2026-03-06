@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import { DoodleStar } from '../components/Doodles'
+import { createGoal, updateGoalStatus, deleteGoal } from '../utils/visionGoals'
 
 const PACK_ID = 'vision-data'
 const PLAYER_ID = 'shared'
@@ -110,36 +111,18 @@ export default function VisionTab({ sessionId, playerName, playerId }) {
 
   // Goal handlers
   const handleAddGoal = (categoryId) => {
-    if (!newGoalText.trim()) return
-    const newGoal = {
-      id: crypto.randomUUID(),
-      category: categoryId,
-      title: newGoalText.trim(),
-      status: 'dreaming',
-      createdBy: playerId,
-      createdAt: new Date().toISOString(),
-      achievedAt: null,
-    }
-    const updated = { ...data, goals: [...data.goals, newGoal] }
-    saveData(updated)
+    const newGoal = createGoal(categoryId, newGoalText, playerId, crypto.randomUUID())
+    if (!newGoal) return
+    saveData({ ...data, goals: [...data.goals, newGoal] })
     setNewGoalText('')
   }
 
   const handleStatusChange = (goalId, newStatus) => {
-    const updated = {
-      ...data,
-      goals: data.goals.map(g =>
-        g.id === goalId
-          ? { ...g, status: newStatus, achievedAt: newStatus === 'achieved' ? new Date().toISOString() : null }
-          : g
-      ),
-    }
-    saveData(updated)
+    saveData({ ...data, goals: updateGoalStatus(data.goals, goalId, newStatus) })
   }
 
   const handleDeleteGoal = (goalId) => {
-    const updated = { ...data, goals: data.goals.filter(g => g.id !== goalId) }
-    saveData(updated)
+    saveData({ ...data, goals: deleteGoal(data.goals, goalId) })
   }
 
   // Board handlers

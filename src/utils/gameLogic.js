@@ -16,3 +16,20 @@ export function checkWinner(board) {
   }
   return null
 }
+
+/**
+ * Determine the Love Note Hunt phase from DB state.
+ * @param {number} myNoteCount - how many notes the current player placed
+ * @param {number} partnerNoteCount - how many notes partner placed
+ * @param {number} hitCount - how many correct guesses player has made
+ * @param {number} notesRequired - notes needed per player (default 3)
+ * @returns {'setup'|'waiting'|'hunting'|'reveal'}
+ */
+export function determineLoveNotePhase(myNoteCount, partnerNoteCount, hitCount, notesRequired = 3) {
+  if (myNoteCount >= notesRequired && partnerNoteCount >= notesRequired) {
+    return hitCount >= notesRequired ? 'reveal' : 'hunting'
+  } else if (myNoteCount >= notesRequired) {
+    return 'waiting'
+  }
+  return 'setup'
+}

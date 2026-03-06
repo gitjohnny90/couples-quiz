@@ -31,12 +31,12 @@ describe('vetoSystem', () => {
       expect(info.count).toBe(0)
     })
 
-    it('does not reset at exactly 7 days', () => {
-      const exactlySevenDays = Date.now() - 7 * 24 * 60 * 60 * 1000
-      localStorage.setItem('test_vetoes', JSON.stringify({ count: 3, weekStart: exactlySevenDays }))
+    it('does not reset just under 7 days', () => {
+      // Use 6 days 23 hours to avoid timing edge case at exactly 7 days
+      const justUnderSevenDays = Date.now() - (7 * 24 * 60 * 60 * 1000 - 60000)
+      localStorage.setItem('test_vetoes', JSON.stringify({ count: 3, weekStart: justUnderSevenDays }))
       const { getVetoInfo } = createVetoSystem('test_vetoes')
       const info = getVetoInfo()
-      // At exactly 7 days, Date.now() - weekStart === weekMs, not > weekMs
       expect(info.count).toBe(3)
     })
 

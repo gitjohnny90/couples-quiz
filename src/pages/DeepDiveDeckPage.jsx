@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import deepDiveDecks, { MOOD_TAGS } from '../data/deepDiveDecks'
-import { hasFinishedAll as _hasFinishedAll } from '../utils/quizScoring'
+import { determineDeepDivePhase } from '../utils/quizScoring'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline, DoodleHeart } from '../components/Doodles'
 
@@ -40,22 +40,12 @@ export default function DeepDiveDeckPage() {
     return []
   }
 
-  const hasFinishedAll = (data, pid) => _hasFinishedAll(data, deck?.questions, pid)
-
   // Determine phase from existing responses on load/resume
   const resumeFromResponses = (data) => {
     if (!deck) return
-    const iFinished = hasFinishedAll(data, playerId)
-    const partnerFinished = data.some((r) => r.player_id !== playerId) && hasFinishedAll(data, data.find((r) => r.player_id !== playerId)?.player_id)
-
-    if (iFinished && partnerFinished) {
-      setPhase(PHASE.RESULTS)
-    } else if (iFinished) {
-      setPhase(PHASE.WAITING)
-    } else {
-      setPhase(PHASE.ANSWERING)
-      setCurrentQ(0)
-    }
+    const resolved = determineDeepDivePhase(data, deck.questions, playerId)
+    setPhase(resolved === 'results' ? PHASE.RESULTS : resolved === 'waiting' ? PHASE.WAITING : PHASE.ANSWERING)
+    if (resolved === 'answering') setCurrentQ(0)
   }
 
   // Initial load

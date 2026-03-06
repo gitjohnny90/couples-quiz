@@ -15,3 +15,21 @@ export function hasFinishedAll(data, questions, playerId) {
     data.some((r) => r.question_id === q.id && r.player_id === playerId)
   )
 }
+
+/**
+ * Determine the Deep Dive deck phase from response data.
+ * @param {Array} responses - DB rows with question_id and player_id
+ * @param {Array} questions - deck questions (each has .id)
+ * @param {string} playerId - current player ('player1' or 'player2')
+ * @returns {'answering'|'waiting'|'results'}
+ */
+export function determineDeepDivePhase(responses, questions, playerId) {
+  if (!questions) return 'answering'
+  const iFinished = hasFinishedAll(responses, questions, playerId)
+  const partnerId = responses.find(r => r.player_id !== playerId)?.player_id
+  const partnerFinished = partnerId ? hasFinishedAll(responses, questions, partnerId) : false
+
+  if (iFinished && partnerFinished) return 'results'
+  if (iFinished) return 'waiting'
+  return 'answering'
+}

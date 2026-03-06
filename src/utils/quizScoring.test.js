@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateMatchScore, hasFinishedAll } from './quizScoring'
+import { calculateMatchScore, hasFinishedAll, determineDeepDivePhase } from './quizScoring'
 
 describe('calculateMatchScore', () => {
   const questions = [
@@ -117,5 +117,79 @@ describe('hasFinishedAll', () => {
 
   it('returns true for empty questions array', () => {
     expect(hasFinishedAll([], [], 'player1')).toBe(true)
+  })
+})
+
+describe('determineDeepDivePhase', () => {
+  const questions = [{ id: 'q1' }, { id: 'q2' }, { id: 'q3' }]
+
+  it('returns answering when no responses exist', () => {
+    expect(determineDeepDivePhase([], questions, 'player1')).toBe('answering')
+  })
+
+  it('returns answering when player has not finished', () => {
+    const responses = [
+      { question_id: 'q1', player_id: 'player1' },
+    ]
+    expect(determineDeepDivePhase(responses, questions, 'player1')).toBe('answering')
+  })
+
+  it('returns waiting when player finished but partner has no responses', () => {
+    const responses = [
+      { question_id: 'q1', player_id: 'player1' },
+      { question_id: 'q2', player_id: 'player1' },
+      { question_id: 'q3', player_id: 'player1' },
+    ]
+    expect(determineDeepDivePhase(responses, questions, 'player1')).toBe('waiting')
+  })
+
+  it('returns waiting when player finished but partner has not', () => {
+    const responses = [
+      { question_id: 'q1', player_id: 'player1' },
+      { question_id: 'q2', player_id: 'player1' },
+      { question_id: 'q3', player_id: 'player1' },
+      { question_id: 'q1', player_id: 'player2' },
+    ]
+    expect(determineDeepDivePhase(responses, questions, 'player1')).toBe('waiting')
+  })
+
+  it('returns results when both players finished', () => {
+    const responses = [
+      { question_id: 'q1', player_id: 'player1' },
+      { question_id: 'q2', player_id: 'player1' },
+      { question_id: 'q3', player_id: 'player1' },
+      { question_id: 'q1', player_id: 'player2' },
+      { question_id: 'q2', player_id: 'player2' },
+      { question_id: 'q3', player_id: 'player2' },
+    ]
+    expect(determineDeepDivePhase(responses, questions, 'player1')).toBe('results')
+  })
+
+  it('returns results from player2 perspective too', () => {
+    const responses = [
+      { question_id: 'q1', player_id: 'player1' },
+      { question_id: 'q2', player_id: 'player1' },
+      { question_id: 'q3', player_id: 'player1' },
+      { question_id: 'q1', player_id: 'player2' },
+      { question_id: 'q2', player_id: 'player2' },
+      { question_id: 'q3', player_id: 'player2' },
+    ]
+    expect(determineDeepDivePhase(responses, questions, 'player2')).toBe('results')
+  })
+
+  it('returns answering when questions is null', () => {
+    expect(determineDeepDivePhase([], null, 'player1')).toBe('answering')
+  })
+
+  it('handles asymmetric progress correctly', () => {
+    // Player2 finished, player1 hasn't
+    const responses = [
+      { question_id: 'q1', player_id: 'player1' },
+      { question_id: 'q1', player_id: 'player2' },
+      { question_id: 'q2', player_id: 'player2' },
+      { question_id: 'q3', player_id: 'player2' },
+    ]
+    expect(determineDeepDivePhase(responses, questions, 'player1')).toBe('answering')
+    expect(determineDeepDivePhase(responses, questions, 'player2')).toBe('waiting')
   })
 })

@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import loveNoteSuggestions from '../data/loveNoteSuggestions'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../components/Doodles'
+import { determineLoveNotePhase } from '../utils/gameLogic'
 
 const PHASE = { SETUP: 'setup', WAITING: 'waiting', HUNTING: 'hunting', REVEAL: 'reveal' }
 const GRID_SIZE = 6
@@ -86,33 +87,19 @@ export default function LoveNoteHuntPage() {
     const savedGuesses = guessData?.answers?.guesses || []
     const savedHits = guessData?.answers?.hits || []
 
-    if (myRoundNotes.length >= NOTES_REQUIRED && partnerRoundNotes.length >= NOTES_REQUIRED) {
-      // Both placed notes
-      if (savedHits.length >= NOTES_REQUIRED) {
-        // Already found all — show reveal
-        setRound(latestRound)
-        setPartnerNotes(partnerRoundNotes)
-        setGuesses(savedGuesses)
-        setHits(savedHits)
-        setPhase(PHASE.REVEAL)
-      } else {
-        // Still hunting
-        setRound(latestRound)
-        setPartnerNotes(partnerRoundNotes)
-        setGuesses(savedGuesses)
-        setHits(savedHits)
-        setPhase(PHASE.HUNTING)
-      }
-    } else if (myRoundNotes.length >= NOTES_REQUIRED) {
-      // I placed, partner hasn't
-      setRound(latestRound)
+    const resolvedPhase = determineLoveNotePhase(
+      myRoundNotes.length, partnerRoundNotes.length, savedHits.length, NOTES_REQUIRED
+    )
+    setRound(latestRound)
+
+    if (resolvedPhase === 'hunting' || resolvedPhase === 'reveal') {
+      setPartnerNotes(partnerRoundNotes)
+      setGuesses(savedGuesses)
+      setHits(savedHits)
+    } else if (resolvedPhase === 'waiting') {
       setMyNotes(myRoundNotes.map(n => ({ position: n.grid_position, message: n.message })))
-      setPhase(PHASE.WAITING)
-    } else {
-      // Haven't placed yet (or partial — treat as fresh setup for this round)
-      setRound(latestRound)
-      setPhase(PHASE.SETUP)
     }
+    setPhase(resolvedPhase)
 
     setLoading(false)
   }
