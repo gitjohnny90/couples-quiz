@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from "../components/Doodles"
 
 export default function AuthPage() {
-  const { signUp, signIn } = useContext(AuthContext)
+  const { signUp, signIn, resetPasswordForEmail } = useContext(AuthContext)
   const navigate = useNavigate()
 
   const [mode, setMode] = useState("signin") // "signin" or "signup"
@@ -15,6 +15,7 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [resetSent, setResetSent] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -22,7 +23,15 @@ export default function AuthPage() {
     setError("")
 
     try {
-      if (mode === "signup") {
+      if (mode === "forgot") {
+        if (!email.trim()) {
+          setError("enter your email first")
+          setLoading(false)
+          return
+        }
+        await resetPasswordForEmail(email.trim())
+        setResetSent(true)
+      } else if (mode === "signup") {
         if (!displayName.trim()) {
           setError("what should we call you?")
           setLoading(false)
@@ -36,13 +45,16 @@ export default function AuthPage() {
           setLoading(false)
           return
         }
+        navigate("/")
       } else {
         await signIn(email.trim(), password)
+        navigate("/")
       }
-      navigate("/")
     } catch (err) {
       console.error("Auth error:", err)
-      if (err.message?.includes("Invalid login")) {
+      if (mode === "forgot") {
+        setError("couldn't send the reset link — check your email and try again")
+      } else if (err.message?.includes("Invalid login")) {
         setError("wrong email or password — try again")
       } else if (err.message?.includes("already registered")) {
         setError("that email is taken — try signing in instead")
@@ -113,43 +125,47 @@ export default function AuthPage() {
         >
           {mode === "signup"
             ? "let's get you set up"
+            : mode === "forgot"
+            ? "no worries, we'll fix this"
             : "welcome back"}
         </p>
 
         {/* Mode toggle tabs */}
-        <div
-          style={{
-            display: "flex",
-            gap: 0,
-            marginBottom: 16,
-            width: "100%",
-            maxWidth: 380,
-          }}
-        >
-          {["signin", "signup"].map((m) => (
-            <button
-              key={m}
-              onClick={() => { setMode(m); setError("") }}
-              style={{
-                flex: 1,
-                padding: "10px 0",
-                fontFamily: "var(--font-hand)",
-                fontSize: "1.15rem",
-                fontWeight: mode === m ? 700 : 400,
-                color: mode === m ? "var(--accent-coral)" : "var(--text-light)",
-                background: "none",
-                border: "none",
-                borderBottom: mode === m
-                  ? "2px solid var(--accent-coral)"
-                  : "1px solid var(--border-pencil)",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-            >
-              {m === "signin" ? "sign in" : "sign up"}
-            </button>
-          ))}
-        </div>
+        {mode !== "forgot" && (
+          <div
+            style={{
+              display: "flex",
+              gap: 0,
+              marginBottom: 16,
+              width: "100%",
+              maxWidth: 380,
+            }}
+          >
+            {["signin", "signup"].map((m) => (
+              <button
+                key={m}
+                onClick={() => { setMode(m); setError(""); setResetSent(false) }}
+                style={{
+                  flex: 1,
+                  padding: "10px 0",
+                  fontFamily: "var(--font-hand)",
+                  fontSize: "1.15rem",
+                  fontWeight: mode === m ? 700 : 400,
+                  color: mode === m ? "var(--accent-coral)" : "var(--text-light)",
+                  background: "none",
+                  border: "none",
+                  borderBottom: mode === m
+                    ? "2px solid var(--accent-coral)"
+                    : "1px solid var(--border-pencil)",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+              >
+                {m === "signin" ? "sign in" : "sign up"}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Form card */}
         <form
@@ -163,8 +179,51 @@ export default function AuthPage() {
             transform: "rotate(-0.3deg)",
           }}
         >
-          {mode === "signup" && (
+          {mode === "forgot" && resetSent ? (
+            <div style={{ textAlign: "center", padding: "8px 0" }}>
+              <p style={{
+                fontFamily: "var(--font-hand)",
+                fontSize: "1.3rem",
+                color: "var(--accent-sage)",
+                marginBottom: 8,
+              }}>
+                check your inbox!
+              </p>
+              <p style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "0.95rem",
+                color: "var(--text-secondary)",
+                lineHeight: 1.5,
+              }}>
+                we sent a reset link to <strong>{email}</strong> — click it to set a new password
+              </p>
+            </div>
+          ) : (
             <>
+              {mode === "signup" && (
+                <>
+                  <label
+                    style={{
+                      fontFamily: "var(--font-hand)",
+                      fontSize: "1.15rem",
+                      color: "var(--text-secondary)",
+                      display: "block",
+                      marginBottom: 6,
+                    }}
+                  >
+                    your name:
+                  </label>
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="what your partner calls you..."
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    style={{ width: "100%", marginBottom: 16, boxSizing: "border-box" }}
+                  />
+                </>
+              )}
+
               <label
                 style={{
                   fontFamily: "var(--font-hand)",
@@ -174,98 +233,108 @@ export default function AuthPage() {
                   marginBottom: 6,
                 }}
               >
-                your name:
+                email:
               </label>
               <input
                 className="input"
-                type="text"
-                placeholder="what your partner calls you..."
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                style={{ width: "100%", marginBottom: 16, boxSizing: "border-box" }}
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                style={{ width: "100%", marginBottom: mode === "forgot" ? 20 : 16, boxSizing: "border-box" }}
               />
+
+              {mode !== "forgot" && (
+                <>
+                  <label
+                    style={{
+                      fontFamily: "var(--font-hand)",
+                      fontSize: "1.15rem",
+                      color: "var(--text-secondary)",
+                      display: "block",
+                      marginBottom: 6,
+                    }}
+                  >
+                    password:
+                  </label>
+                  <div style={{ position: "relative", width: "100%", marginBottom: 20 }}>
+                    <input
+                      className="input"
+                      type={showPassword ? "text" : "password"}
+                      placeholder={mode === "signup" ? "at least 6 characters" : "your password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                      style={{ width: "100%", boxSizing: "border-box", paddingRight: 40 }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      style={{
+                        position: "absolute",
+                        right: 8,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 4,
+                        fontSize: "1.1rem",
+                        color: "var(--text-light)",
+                        lineHeight: 1,
+                        opacity: 0.6,
+                        transition: "opacity 0.15s",
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
+                      onMouseLeave={(e) => e.currentTarget.style.opacity = 0.6}
+                    >
+                      {showPassword ? "🙈" : "🐵"}
+                    </button>
+                  </div>
+                </>
+              )}
+
+              <button
+                className="btn btn-primary"
+                type="submit"
+                disabled={loading || !email.trim() || (mode !== "forgot" && !password)}
+                style={{ width: "100%" }}
+              >
+                {loading
+                  ? (mode === "forgot" ? "sending..." : mode === "signup" ? "creating account..." : "signing in...")
+                  : (mode === "forgot" ? "send reset link" : mode === "signup" ? "create account" : "sign in")
+                }
+              </button>
+
+              {mode === "signin" && (
+                <button
+                  type="button"
+                  onClick={() => { setMode("forgot"); setError(""); setResetSent(false) }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "var(--text-light)",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "0.9rem",
+                    fontStyle: "italic",
+                    cursor: "pointer",
+                    marginTop: 10,
+                    display: "block",
+                    width: "100%",
+                    textAlign: "center",
+                    textDecoration: "underline",
+                    textDecorationStyle: "wavy",
+                    textDecorationColor: "var(--border-pencil)",
+                    textUnderlineOffset: "3px",
+                  }}
+                >
+                  forgot password?
+                </button>
+              )}
             </>
           )}
-
-          <label
-            style={{
-              fontFamily: "var(--font-hand)",
-              fontSize: "1.15rem",
-              color: "var(--text-secondary)",
-              display: "block",
-              marginBottom: 6,
-            }}
-          >
-            email:
-          </label>
-          <input
-            className="input"
-            type="email"
-            placeholder="your@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            style={{ width: "100%", marginBottom: 16, boxSizing: "border-box" }}
-          />
-
-          <label
-            style={{
-              fontFamily: "var(--font-hand)",
-              fontSize: "1.15rem",
-              color: "var(--text-secondary)",
-              display: "block",
-              marginBottom: 6,
-            }}
-          >
-            password:
-          </label>
-          <div style={{ position: "relative", width: "100%", marginBottom: 20 }}>
-            <input
-              className="input"
-              type={showPassword ? "text" : "password"}
-              placeholder={mode === "signup" ? "at least 6 characters" : "your password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete={mode === "signup" ? "new-password" : "current-password"}
-              style={{ width: "100%", boxSizing: "border-box", paddingRight: 40 }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-              style={{
-                position: "absolute",
-                right: 8,
-                top: "50%",
-                transform: "translateY(-50%)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: 4,
-                fontSize: "1.1rem",
-                color: "var(--text-light)",
-                lineHeight: 1,
-                opacity: 0.6,
-                transition: "opacity 0.15s",
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = 0.6}
-            >
-              {showPassword ? "🙈" : "🐵"}
-            </button>
-          </div>
-
-          <button
-            className="btn btn-primary"
-            type="submit"
-            disabled={loading || !email.trim() || !password}
-            style={{ width: "100%" }}
-          >
-            {loading
-              ? (mode === "signup" ? "creating account..." : "signing in...")
-              : (mode === "signup" ? "create account" : "sign in")
-            }
-          </button>
 
           {error && (
             <p
@@ -281,6 +350,27 @@ export default function AuthPage() {
             </p>
           )}
         </form>
+
+        {mode === "forgot" && (
+          <button
+            type="button"
+            onClick={() => { setMode("signin"); setError(""); setResetSent(false) }}
+            style={{
+              background: "none",
+              border: "none",
+              fontFamily: "var(--font-body)",
+              fontSize: "0.9rem",
+              color: "var(--accent-coral)",
+              cursor: "pointer",
+              textDecoration: "underline",
+              textDecorationStyle: "wavy",
+              textDecorationColor: "rgba(232, 141, 122, 0.4)",
+              textUnderlineOffset: "3px",
+            }}
+          >
+            ← back to sign in
+          </button>
+        )}
       </motion.div>
     </div>
   )

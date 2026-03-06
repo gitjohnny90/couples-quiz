@@ -34,6 +34,7 @@ export function getDocumentTitle(pathname) {
   if (pathname.startsWith('/journal')) return 'Journal — The Us Quiz'
   if (pathname.startsWith('/join')) return 'Join — The Us Quiz'
   if (pathname.startsWith('/watch-guide')) return 'Watch Guide — The Us Quiz'
+  if (pathname.startsWith('/reset-password')) return 'Reset Password — The Us Quiz'
   return 'The Us Quiz'
 }
 

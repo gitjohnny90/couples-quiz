@@ -4,6 +4,7 @@ import { getDocumentTitle, isTabActive } from "./utils/sessionUtils";
 import { AuthContext } from "./contexts/AuthContext";
 
 import AuthPage from "./pages/AuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import HomePage from "./pages/HomePage";
 import JoinPage from "./pages/JoinPage";
 import QuizPage from "./pages/QuizPage";
@@ -151,6 +152,7 @@ export default function App() {
       <div className="app">
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/" element={<RequireAuth><HomePage /></RequireAuth>} />
           <Route path="/join/:sessionId" element={<RequireAuth><JoinPage /></RequireAuth>} />
           <Route path="/quiz/:sessionId/:packId" element={<RequireAuth><QuizPage /></RequireAuth>} />

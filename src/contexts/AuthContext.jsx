@@ -4,14 +4,17 @@ import { supabase } from '../lib/supabase'
 export const AuthContext = createContext({
   user: null,
   loading: true,
+  authEvent: null,
   signUp: async () => {},
   signIn: async () => {},
   signOut: async () => {},
+  resetPasswordForEmail: async () => {},
 })
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [authEvent, setAuthEvent] = useState(null)
 
   useEffect(() => {
     // Get initial session
@@ -22,8 +25,9 @@ export function AuthProvider({ children }) {
 
     // Listen for auth state changes (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setUser(session?.user ?? null)
+        setAuthEvent(event)
       }
     )
 
@@ -49,6 +53,14 @@ export function AuthProvider({ children }) {
     return data
   }
 
+  const resetPasswordForEmail = async (email) => {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) throw error
+    return data
+  }
+
   const signOut = async () => {
     await supabase.auth.signOut()
     localStorage.removeItem('sessionId')
@@ -57,7 +69,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading, authEvent, signUp, signIn, signOut, resetPasswordForEmail }}>
       {children}
     </AuthContext.Provider>
   )
