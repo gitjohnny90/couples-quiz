@@ -2,6 +2,7 @@ import { useContext, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { SessionContext } from "../App";
 import { supabase } from "../lib/supabase";
+import { validatePlayerName, resolveJoinState } from "../utils/sessionUtils";
 import { motion } from "framer-motion";
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleArrow } from "../components/Doodles";
 
@@ -28,9 +29,10 @@ export default function JoinPage() {
           .eq("id", sessionId)
           .single();
 
-        if (error || !data) { setNotFound(true); return; }
-        setPlayer1Name(data.player1_name);
-        if (data.player2_name) { setAlreadyJoined(true); setPlayer2Name(data.player2_name); }
+        const state = resolveJoinState(data, error);
+        setPlayer1Name(state.player1Name);
+        if (state.status === 'not_found') { setNotFound(true); return; }
+        if (state.status === 'already_joined') { setAlreadyJoined(true); setPlayer2Name(state.player2Name); }
       } catch (err) {
         setNotFound(true);
       } finally {
@@ -41,17 +43,18 @@ export default function JoinPage() {
   }, [sessionId]);
 
   const handleJoin = async () => {
-    if (!name.trim()) return;
+    const validated = validatePlayerName(name);
+    if (!validated) return;
     setJoining(true);
     setError("");
     try {
       const { error: joinError } = await supabase
         .from("sessions")
-        .update({ player2_name: name.trim() })
+        .update({ player2_name: validated })
         .eq("id", sessionId);
       if (joinError) throw joinError;
       setSessionId(sessionId);
-      setPlayerName(name.trim());
+      setPlayerName(validated);
       localStorage.setItem("playerId", "player2");
       navigate(`/vault/${sessionId}`);
     } catch (err) {

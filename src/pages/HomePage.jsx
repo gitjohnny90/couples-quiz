@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SessionContext } from "../App";
 import { supabase } from "../lib/supabase";
+import { validatePlayerName } from "../utils/sessionUtils";
 import { motion } from "framer-motion";
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar, DoodleFlower } from "../components/Doodles";
 
@@ -13,20 +14,21 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const handleCreate = async () => {
-    if (!name.trim()) return;
+    const validated = validatePlayerName(name);
+    if (!validated) return;
     setLoading(true);
     setError("");
     try {
       const { data: session, error: createError } = await supabase
         .from("sessions")
-        .insert({ player1_name: name.trim() })
+        .insert({ player1_name: validated })
         .select()
         .single();
 
       if (createError) throw createError;
 
       setSessionId(session.id);
-      setPlayerName(name.trim());
+      setPlayerName(validated);
       localStorage.setItem("playerId", "player1");
       navigate(`/vault/${session.id}`);
     } catch (err) {

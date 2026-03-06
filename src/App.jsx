@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { getDocumentTitle, isTabActive } from "./utils/sessionUtils";
 
 import HomePage from "./pages/HomePage";
 import JoinPage from "./pages/JoinPage";
@@ -37,23 +38,7 @@ export const SessionContext = createContext({
 function useDocumentTitle() {
   const location = useLocation();
   React.useEffect(() => {
-    const path = location.pathname;
-    let title = 'The Us Quiz';
-    if (path.startsWith('/vault')) title = 'Quizzes — The Us Quiz';
-    else if (path.startsWith('/quiz-packs')) title = 'Quiz Packs — The Us Quiz';
-    else if (path.startsWith('/quiz/')) title = 'Quiz — The Us Quiz';
-    else if (path.startsWith('/results')) title = 'Results — The Us Quiz';
-    else if (path.startsWith('/deep-dive')) title = 'Deep Dive — The Us Quiz';
-    else if (path.startsWith('/fun')) title = 'Fun Stuff — The Us Quiz';
-    else if (path.startsWith('/draw')) title = 'Draw — The Us Quiz';
-    else if (path.startsWith('/movies')) title = 'Movies — The Us Quiz';
-    else if (path.startsWith('/books')) title = 'Books — The Us Quiz';
-    else if (path.startsWith('/tictactoe')) title = 'Tic-Tac-Toe — The Us Quiz';
-    else if (path.startsWith('/love-notes')) title = 'Love Note Hunt — The Us Quiz';
-    else if (path.startsWith('/profiles')) title = 'About Us — The Us Quiz';
-    else if (path.startsWith('/journal')) title = 'Journal — The Us Quiz';
-    else if (path.startsWith('/join')) title = 'Join — The Us Quiz';
-    document.title = title;
+    document.title = getDocumentTitle(location.pathname);
   }, [location.pathname]);
 }
 
@@ -73,34 +58,7 @@ function BottomNav() {
     { label: "us", icon: "\u{1F495}", path: `/profiles/${sessionId}` },
   ];
 
-  const isActive = (tabPath) => {
-    if (tabPath === "/") return location.pathname === "/";
-    const base = "/" + tabPath.split("/")[1];
-    // "fun stuff" tab should also highlight for /draw and /draw-results pages
-    if (base === "/fun") {
-      return location.pathname.startsWith("/fun") ||
-             location.pathname.startsWith("/draw") ||
-             location.pathname.startsWith("/movies") ||
-             location.pathname.startsWith("/books") ||
-             location.pathname.startsWith("/watch-guide") ||
-             location.pathname.startsWith("/tictactoe") ||
-             location.pathname.startsWith("/love-notes");
-    }
-    // "quizzes" tab should also highlight for /quiz, /results, /deep-dive, /quiz-packs
-    if (base === "/vault") {
-      return location.pathname.startsWith("/vault") ||
-             location.pathname.startsWith("/quiz") ||
-             location.pathname.startsWith("/results") ||
-             location.pathname.startsWith("/deep-dive") ||
-             location.pathname.startsWith("/quiz-packs");
-    }
-    // "us" tab should also highlight for /journal
-    if (base === "/profiles") {
-      return location.pathname.startsWith("/profiles") ||
-             location.pathname.startsWith("/journal");
-    }
-    return location.pathname.startsWith(base);
-  };
+  const isActive = (tabPath) => isTabActive(tabPath, location.pathname);
 
   return (
     <nav className="bottom-nav" aria-label="Main navigation">
