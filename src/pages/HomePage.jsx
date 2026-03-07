@@ -4,7 +4,7 @@ import { SessionContext } from "../App";
 import { AuthContext } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
-import PageDoodles from "../components/Doodles";
+import PageDoodles, { SquigglyUnderline } from "../components/Doodles";
 
 function generateInviteCode() {
   const num = Math.floor(1000 + Math.random() * 9000);
@@ -18,6 +18,8 @@ export default function HomePage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [session, setSession] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   const displayName = user?.user_metadata?.display_name || "Player";
 
@@ -26,6 +28,33 @@ export default function HomePage() {
     if (!user) return;
     checkExistingSession();
   }, [user]);
+
+  // Poll for partner joining when showing invite code
+  useEffect(() => {
+    if (!session || session.player2_name) return;
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from("sessions")
+        .select("*")
+        .eq("id", session.id)
+        .single();
+      if (data?.player2_name) {
+        setSession(data);
+        // Partner joined — redirect to vault after a brief moment
+        setTimeout(() => {
+          navigate(`/vault/${data.id}`, { replace: true });
+        }, 1500);
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [session]);
+
+  const copyCode = () => {
+    const code = session?.invite_code || "";
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const checkExistingSession = async () => {
     try {
@@ -41,6 +70,21 @@ export default function HomePage() {
         setSessionId(userSession.session_id);
         setPlayerId(userSession.player_id);
         setPlayerName(displayName);
+
+        // Fetch session to check if partner has joined
+        const { data: sessionData } = await supabase
+          .from("sessions")
+          .select("*")
+          .eq("id", userSession.session_id)
+          .single();
+
+        if (sessionData && !sessionData.player2_name) {
+          // No partner yet — stay on home page, show invite code
+          setSession(sessionData);
+          setLoading(false);
+          return;
+        }
+
         navigate(`/vault/${userSession.session_id}`, { replace: true });
         return;
       }
@@ -189,7 +233,9 @@ export default function HomePage() {
         setSessionId(session.id);
         setPlayerId("player1");
         setPlayerName(displayName);
-        navigate(`/vault/${session.id}`, { replace: true });
+        // Show invite code on home page instead of redirecting
+        setSession(session);
+        setLoading(false);
         return;
       } catch (err) {
         if (attempt === 2) {
@@ -200,6 +246,83 @@ export default function HomePage() {
       }
     }
   };
+
+  // Show invite code page when session exists but no partner yet
+  if (session && !session.player2_name) {
+    return (
+      <div className="page" style={{ position: "relative" }}>
+        <PageDoodles seed={1} />
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ position: "relative", zIndex: 1 }}
+        >
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <h1 style={{ fontFamily: "var(--font-hand)", fontSize: "2rem", fontWeight: 700, marginBottom: 2 }}>
+              welcome, {displayName}
+            </h1>
+            <SquigglyUnderline width={110} color="#D4A843" opacity={0.4} style={{ margin: "0 auto 12px" }} />
+          </div>
+
+          <div className="glass" style={{ padding: 24, textAlign: "center", maxWidth: 340, margin: "0 auto" }}>
+            <p style={{ fontFamily: "var(--font-hand)", fontSize: "1.15rem", marginBottom: 10 }}>
+              share this code with your person:
+            </p>
+            <div style={{
+              background: "#fff", borderBottom: "2px solid var(--border-pencil)",
+              padding: "14px", marginBottom: 12,
+              fontFamily: "var(--font-hand)", fontSize: "2rem", fontWeight: 700,
+              letterSpacing: "0.1em", color: "var(--accent-coral)",
+            }}>
+              {session.invite_code || "..."}
+            </div>
+            <p style={{ fontSize: "0.8rem", color: "var(--text-light)", marginBottom: 14, fontStyle: "italic" }}>
+              they'll enter this when they sign up
+            </p>
+            <button className="btn btn-primary" style={{ width: "100%", marginBottom: 16 }} onClick={copyCode}>
+              {copied ? "copied!" : "copy code"}
+            </button>
+            <button
+              className="btn"
+              style={{ width: "100%", background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border-pencil)" }}
+              onClick={() => navigate(`/vault/${session.id}`)}
+            >
+              go to quizzes →
+            </button>
+          </div>
+
+          <p style={{
+            textAlign: "center", marginTop: 24,
+            fontFamily: "var(--font-hand)", fontSize: "0.95rem",
+            color: "var(--text-light)", fontStyle: "italic",
+          }}>
+            this page will update when they join ✨
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Partner already joined — show redirect text
+  if (session && session.player2_name) {
+    return (
+      <div className="page" style={{ position: "relative" }}>
+        <PageDoodles seed={1} />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{ textAlign: "center", paddingTop: 60, position: "relative", zIndex: 1 }}
+        >
+          <p style={{ fontFamily: "var(--font-hand)", fontSize: "1.4rem", color: "var(--accent-sage)" }}>
+            {session.player2_name} joined! 💛
+          </p>
+          <p style={{ fontFamily: "var(--font-hand)", fontSize: "1.1rem", color: "var(--text-secondary)", marginTop: 8 }}>
+            heading to your quizzes...
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="page" style={{ position: "relative" }}>

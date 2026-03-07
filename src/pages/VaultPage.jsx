@@ -21,19 +21,10 @@ export default function VaultPage() {
   const [ddCompletedCount, setDdCompletedCount] = useState(0)
   const [ppCompletedCount, setPpCompletedCount] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [copied, setCopied] = useState(false)
-
   useEffect(() => {
     if (sessionId) setSessionId(sessionId)
     fetchData()
   }, [sessionId])
-
-  // Polling fallback — check for partner joining & quiz progress updates
-  useEffect(() => {
-    if (session?.player2_name) return
-    const interval = setInterval(fetchData, 5000)
-    return () => clearInterval(interval)
-  }, [sessionId, session?.player2_name])
 
   const fetchData = async () => {
     let { data: sessionData } = await supabase.from('sessions').select('*').eq('id', sessionId).single()
@@ -87,13 +78,6 @@ export default function VaultPage() {
     setLoading(false)
   }
 
-  const copyCode = () => {
-    const code = session?.invite_code || sessionId
-    navigator.clipboard.writeText(code)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   if (loading) {
     return (
       <div className="page">
@@ -125,30 +109,7 @@ export default function VaultPage() {
           </p>
         </div>
 
-        {/* Share invite code card */}
-        {!session?.player2_name && (
-          <div className="glass" style={{ padding: 20, marginBottom: 18, textAlign: 'center' }}>
-            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.15rem', marginBottom: 8 }}>
-              share this code with your person:
-            </p>
-            <div style={{
-              background: '#fff', borderBottom: '2px solid var(--border-pencil)',
-              padding: '14px', marginBottom: 12,
-              fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700,
-              letterSpacing: '0.1em', color: 'var(--accent-coral)',
-            }}>
-              {session?.invite_code || '...'}
-            </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginBottom: 12, fontStyle: 'italic' }}>
-              they'll enter this after signing up
-            </p>
-            <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyCode}>
-              {copied ? 'copied!' : 'copy code'}
-            </button>
-          </div>
-        )}
-
-        {/* Two quiz type cards */}
+        {/* Quiz type cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
           {/* Multiple Choice card */}
