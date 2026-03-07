@@ -288,8 +288,8 @@ export default function StudyTogetherPage() {
             study together
           </h1>
           <SquigglyUnderline width={110} color="#8DAE8B" opacity={0.4} style={{ margin: '0 auto 8px' }} />
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.4, maxWidth: 320, margin: '0 auto' }}>
-            read the same book, then share what you each took away — watch how differently (and beautifully) you think
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', lineHeight: 1.4, maxWidth: 340, margin: '0 auto' }}>
+            read the same book, then share what you each took away — watch how differently (and beautifully) you think. once you both reflect, the book earns a ✨ reflected badge!
           </p>
         </div>
 
