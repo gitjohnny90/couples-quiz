@@ -56,19 +56,32 @@ export default function PredictPartnerPage() {
     fetchPartner()
   }, [sessionId, playerId])
 
-  // Fetch all predict responses
+  // Fetch all predict responses from dedicated table
   const fetchResponses = async () => {
     const { data } = await supabase
-      .from('responses')
+      .from('predict_partner')
       .select('*')
       .eq('session_id', sessionId)
-      .like('pack_id', 'predict-pack-%')
 
     if (data) {
+      // Transform flat rows into same shape the UI expects:
+      // { packId: { player1: { responses: [...], partnerPredictionMarks: [...], completedAt }, player2: {...} } }
       const mapped = {}
-      data.forEach(r => {
-        if (!mapped[r.pack_id]) mapped[r.pack_id] = {}
-        mapped[r.pack_id][r.player_id] = r.answers || {}
+      data.forEach(row => {
+        if (!mapped[row.pack_id]) mapped[row.pack_id] = {}
+        if (!mapped[row.pack_id][row.player_id]) {
+          mapped[row.pack_id][row.player_id] = {
+            responses: [],
+            partnerPredictionMarks: [null, null, null],
+          }
+        }
+        const pd = mapped[row.pack_id][row.player_id]
+        pd.responses[row.question_index] = {
+          ownAnswer: row.own_answer,
+          prediction: row.prediction,
+        }
+        pd.partnerPredictionMarks[row.question_index] = row.prediction_correct
+        if (row.completed_at) pd.completedAt = row.completed_at
       })
       setAllResponses(mapped)
     }
@@ -84,12 +97,10 @@ export default function PredictPartnerPage() {
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'responses',
+        table: 'predict_partner',
         filter: `session_id=eq.${sessionId}`,
-      }, (payload) => {
-        if (payload.new && payload.new.pack_id?.startsWith('predict-pack-')) {
-          fetchResponses()
-        }
+      }, () => {
+        fetchResponses()
       })
       .subscribe()
     const interval = setInterval(fetchResponses, 5000)
@@ -162,23 +173,21 @@ export default function PredictPartnerPage() {
       setOwnAnswer('')
       setPrediction('')
     } else {
-      // All 3 done — save to DB
+      // All 3 done — save to DB as individual rows
       setSaving(true)
-      const answersPayload = {
-        responses: updated,
-        partnerPredictionMarks: [null, null, null],
-        completedAt: new Date().toISOString(),
-      }
-      const { error: saveError } = await supabase.from('responses').upsert(
-        {
-          session_id: sessionId,
-          pack_id: activePack.id,
-          player_id: playerId,
-          player_name: playerName || playerId,
-          answers: answersPayload,
-        },
-        { onConflict: 'session_id,pack_id,player_id' }
-      )
+      const completedAt = new Date().toISOString()
+      const rows = updated.map((ans, idx) => ({
+        session_id: sessionId,
+        pack_id: activePack.id,
+        player_id: playerId,
+        question_index: idx,
+        own_answer: ans.ownAnswer,
+        prediction: ans.prediction,
+        completed_at: completedAt,
+      }))
+      const { error: saveError } = await supabase
+        .from('predict_partner')
+        .upsert(rows, { onConflict: 'session_id,pack_id,player_id,question_index' })
       setSaving(false)
 
       if (saveError) {
@@ -199,24 +208,13 @@ export default function PredictPartnerPage() {
   }
 
   const handleMarkPrediction = async (qIdx, isCorrect) => {
-    const packData = allResponses[activePack.id]
-    const myData = packData?.[playerId]
-    if (!myData) return
-
-    const marks = [...(myData.partnerPredictionMarks || [null, null, null])]
-    marks[qIdx] = isCorrect
-
-    const updatedAnswers = { ...myData, partnerPredictionMarks: marks }
-    await supabase.from('responses').upsert(
-      {
-        session_id: sessionId,
-        pack_id: activePack.id,
-        player_id: playerId,
-        player_name: playerName || playerId,
-        answers: updatedAnswers,
-      },
-      { onConflict: 'session_id,pack_id,player_id' }
-    )
+    await supabase
+      .from('predict_partner')
+      .update({ prediction_correct: isCorrect })
+      .eq('session_id', sessionId)
+      .eq('pack_id', activePack.id)
+      .eq('player_id', playerId)
+      .eq('question_index', qIdx)
     fetchResponses()
   }
 

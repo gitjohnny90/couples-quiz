@@ -55,12 +55,16 @@ export default function VaultPage() {
       setMcCompletedCount(done)
     }
 
-    // Predict Partner completion count
-    if (responseData) {
+    // Predict Partner completion count (from dedicated table)
+    const { data: ppData } = await supabase
+      .from('predict_partner')
+      .select('pack_id, player_id')
+      .eq('session_id', sessionId)
+    if (ppData) {
       const ppDone = allPredictPacks.filter(pack => {
-        const packResponses = responseData.filter(r => r.pack_id === pack.id)
-        return packResponses.length >= 2 &&
-          packResponses.every(r => r.answers?.responses?.length === 3)
+        const p1Rows = ppData.filter(r => r.pack_id === pack.id && r.player_id === 'player1')
+        const p2Rows = ppData.filter(r => r.pack_id === pack.id && r.player_id === 'player2')
+        return p1Rows.length === 3 && p2Rows.length === 3
       }).length
       setPpCompletedCount(ppDone)
     }
