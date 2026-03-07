@@ -71,6 +71,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('sessionId')
     localStorage.removeItem('playerName')
     localStorage.removeItem('playerId')
+    localStorage.removeItem('pendingInviteCode')
   }
 
   return (

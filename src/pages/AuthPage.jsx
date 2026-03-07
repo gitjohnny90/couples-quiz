@@ -13,6 +13,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [inviteCode, setInviteCode] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [resetSent, setResetSent] = useState(false)
@@ -36,6 +37,10 @@ export default function AuthPage() {
           setError("what should we call you?")
           setLoading(false)
           return
+        }
+        // Store invite code before sign-up (persists through email confirmation)
+        if (inviteCode.trim()) {
+          localStorage.setItem("pendingInviteCode", inviteCode.trim())
         }
         const data = await signUp(email.trim(), password, displayName.trim())
         // If email confirmation is required, user won't be auto-signed in
@@ -293,6 +298,38 @@ export default function AuthPage() {
                       {showPassword ? "🙈" : "🐵"}
                     </button>
                   </div>
+                </>
+              )}
+
+              {mode === "signup" && (
+                <>
+                  <label
+                    style={{
+                      fontFamily: "var(--font-hand)",
+                      fontSize: "1.15rem",
+                      color: "var(--text-secondary)",
+                      display: "block",
+                      marginBottom: 6,
+                    }}
+                  >
+                    invite code <span style={{ fontStyle: "italic", color: "var(--text-light)", fontSize: "0.85rem" }}>(optional)</span>:
+                  </label>
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="LOVE-7742"
+                    value={inviteCode}
+                    onChange={(e) => setInviteCode(e.target.value)}
+                    style={{
+                      width: "100%",
+                      marginBottom: 20,
+                      boxSizing: "border-box",
+                      textAlign: "center",
+                      fontFamily: "var(--font-hand)",
+                      fontSize: "1.3rem",
+                      letterSpacing: "0.1em",
+                    }}
+                  />
                 </>
               )}
 

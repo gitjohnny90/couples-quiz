@@ -26,16 +26,16 @@ No test runner or linter is configured.
 
 ### Authentication
 
-`AuthContext` (in `src/contexts/AuthContext.jsx`) wraps the app with Supabase Auth (email + password). Exports `user`, `loading`, `authEvent`, `signUp`, `signIn`, `signOut`, `resetPasswordForEmail`. All routes except `/auth` and `/reset-password` are wrapped in `<RequireAuth>` which redirects unauthenticated users to the sign-in page. The auth page (`src/pages/AuthPage.jsx`) has sign-in/sign-up/forgot-password modes, and a show/hide password button using monkey emojis (🐵 show / 🙈 hide). Password reset uses `resetPasswordForEmail()` → Supabase email → `/reset-password` page (`src/pages/ResetPasswordPage.jsx`) which detects recovery via URL hash (`type=recovery`) and lets the user set a new password.
+`AuthContext` (in `src/contexts/AuthContext.jsx`) wraps the app with Supabase Auth (email + password). Exports `user`, `loading`, `authEvent`, `signUp`, `signIn`, `signOut`, `resetPasswordForEmail`. All routes except `/auth` and `/reset-password` are wrapped in `<RequireAuth>` which redirects unauthenticated users to the sign-in page. The auth page (`src/pages/AuthPage.jsx`) has sign-in/sign-up/forgot-password modes, and a show/hide password button using monkey emojis (🐵 show / 🙈 hide). Sign-up includes an optional invite code field — if provided, the code is stored in `localStorage` as `pendingInviteCode` (persists through email confirmation). Password reset uses `resetPasswordForEmail()` → Supabase email → `/reset-password` page (`src/pages/ResetPasswordPage.jsx`) which detects recovery via URL hash (`type=recovery`) and lets the user set a new password.
 
 ### Session & Identity
 
-`SessionContext` (in `App.jsx`) holds `sessionId`, `playerName`, and `playerId`, persisted to localStorage. Partners join via an invite code (`LOVE-XXXX`) generated on session creation. The `user_sessions` table links Supabase auth users to sessions so they can resume on login. Legacy sessions (pre-auth) are auto-claimed when a user signs in.
+`SessionContext` (in `App.jsx`) holds `sessionId`, `playerName`, and `playerId`, persisted to localStorage. Sessions are auto-created on first sign-in: if a `pendingInviteCode` exists in localStorage, the user auto-joins their partner's session as player2; otherwise a new session is auto-created with a `LOVE-XXXX` invite code and the user becomes player1. The `user_sessions` table links Supabase auth users to sessions so they can resume on login. Legacy sessions (pre-auth) are auto-claimed when a user signs in. The home page (`/`) acts as an auto-setup redirector — users with existing sessions are sent straight to the vault.
 
 ### Routing
 
 All routes defined in `App.jsx`. `/auth` and `/reset-password` are public; all others require authentication. Four nav tabs map to route groups:
-- **home** → `/` (HomePage — session creation/join via invite code)
+- **home** → `/` (HomePage — auto-setup redirector, sends to vault)
 - **quizzes** → `/vault/:id`, `/quiz/:id/:packId`, `/results/:id/:packId`, `/deep-dive/:id`, `/deep-dive/:id/:deckId`, `/quiz-packs/:id`
 - **fun stuff** → `/fun/:id`, `/draw/:id`, `/movies/:id`, `/tictactoe/:id`, `/love-notes/:id`, `/watch-guide/:id`
 - **us** → `/profiles/:id` (hub page with links to sub-pages), `/personality/:id` (edit/compare personality tests), `/vision/:id` (north star + vision board tab, dreams + sky + milestones tab), `/journal/:id` (four tabs: quizzes, deep dive, drawings, books), `/study/:id` (Study Together — shared reading + reflections)
