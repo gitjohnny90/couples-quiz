@@ -27,6 +27,7 @@ import TicTacToePage from "./pages/TicTacToePage";
 import LoveNoteHuntPage from "./pages/LoveNoteHuntPage";
 import PredictPartnerPage from "./pages/PredictPartnerPage";
 import FinishSentencePage from "./pages/FinishSentencePage";
+import HotTakesPage from "./pages/HotTakesPage";
 import MissYouHeart from "./components/MissYouHeart";
 
 // Dev-only auth bypass for preview testing (double-safe: requires DEV mode AND env var)
@@ -175,6 +176,7 @@ export default function App() {
           <Route path="/love-notes/:sessionId" element={<RequireAuth><LoveNoteHuntPage /></RequireAuth>} />
           <Route path="/predict-partner/:sessionId" element={<RequireAuth><PredictPartnerPage /></RequireAuth>} />
           <Route path="/finish-sentence/:sessionId" element={<RequireAuth><FinishSentencePage /></RequireAuth>} />
+          <Route path="/hot-takes/:sessionId" element={<RequireAuth><HotTakesPage /></RequireAuth>} />
           <Route path="/deep-dive/:sessionId" element={<RequireAuth><DeepDivePage /></RequireAuth>} />
           <Route path="/deep-dive/:sessionId/:deckId" element={<RequireAuth><DeepDiveDeckPage /></RequireAuth>} />
           <Route path="/journal/:sessionId" element={<RequireAuth><JournalPage /></RequireAuth>} />

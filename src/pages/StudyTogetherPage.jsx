@@ -11,7 +11,7 @@ const PLAYER_ID = 'shared'
 const SHELVES = [
   { key: 'growth', label: 'Personal Growth', emoji: '🌳', color: '#8DAE8B', bg: '#EFF5EF' },
   { key: 'couples', label: 'Marriage & Couples', emoji: '💕', color: '#E88D7A', bg: '#FFF0EC' },
-  { key: 'faith', label: 'Faith & Christian', emoji: '🕊️', color: '#7EB8D8', bg: '#EDF5FA' },
+  { key: 'faith', label: 'Christian', emoji: '🕊️', color: '#7EB8D8', bg: '#EDF5FA' },
 ]
 
 const STATUSES = ['want', 'reading', 'finished', 'reflected']
