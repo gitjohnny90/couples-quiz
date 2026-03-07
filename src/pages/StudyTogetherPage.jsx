@@ -83,7 +83,27 @@ export default function StudyTogetherPage() {
       .maybeSingle()
 
     if (row?.answers) {
-      setData({ ...DEFAULT_DATA, ...row.answers })
+      const fetched = { ...DEFAULT_DATA, ...row.answers }
+      // Auto-fix: if both partners reflected but status is still "finished", update to "reflected"
+      let needsSave = false
+      const corrected = {
+        ...fetched,
+        books: (fetched.books || []).map(b => {
+          if (b.status === 'finished' && b.reflections?.player1?.savedAt && b.reflections?.player2?.savedAt) {
+            needsSave = true
+            return { ...b, status: 'reflected' }
+          }
+          return b
+        }),
+      }
+      if (needsSave) {
+        // Save the corrected data back
+        supabase.from('responses').upsert(
+          { session_id: sessionId, pack_id: PACK_ID, player_id: PLAYER_ID, player_name: 'shared', answers: corrected },
+          { onConflict: 'session_id,pack_id,player_id' }
+        )
+      }
+      setData(corrected)
     }
     setLoading(false)
   }
@@ -525,39 +545,151 @@ function BookCard({
                     reflections
                   </h4>
 
-                  {/* My reflection form */}
-                  <ReflectionForm
-                    draft={draft}
-                    onUpdateDraft={onUpdateDraft}
-                    onUpdateDraftGuided={onUpdateDraftGuided}
-                    onSave={onSaveReflection}
-                    saving={saving}
-                    existing={myReflection}
-                    playerColor={PLAYER_COLORS[playerId]}
-                    label="your reflections"
-                  />
-
-                  {/* Partner's reflections */}
-                  <div style={{ marginTop: 16 }}>
-                    {partnerReflection?.savedAt ? (
-                      <ReflectionDisplay
-                        reflection={partnerReflection}
-                        playerColor={PLAYER_COLORS[partnerId]}
-                        label={`${partnerName || 'your partner'}'s reflections`}
+                  {/* Unified questionnaire — both players per prompt */}
+                  {GUIDED_PROMPTS.map((prompt) => (
+                    <div key={prompt.key} style={{ marginBottom: 14 }}>
+                      <label style={{
+                        display: 'block',
+                        fontFamily: 'var(--font-body)',
+                        fontSize: '0.78rem',
+                        color: 'var(--text-secondary)',
+                        marginBottom: 5,
+                      }}>
+                        {prompt.label}
+                      </label>
+                      {/* Your input */}
+                      <textarea
+                        value={draft?.guided?.[prompt.key] || ''}
+                        onChange={(e) => onUpdateDraftGuided(prompt.key, e.target.value)}
+                        placeholder={`${playerName || 'you'}...`}
+                        rows={2}
+                        style={{
+                          width: '100%',
+                          fontFamily: 'var(--font-hand)',
+                          fontSize: '0.9rem',
+                          padding: '6px 10px',
+                          border: `1.5px solid ${PLAYER_COLORS[playerId]}40`,
+                          borderRadius: 8,
+                          background: `${PLAYER_COLORS[playerId]}08`,
+                          color: PLAYER_COLORS[playerId],
+                          resize: 'vertical',
+                          outline: 'none',
+                          lineHeight: 1.4,
+                          boxSizing: 'border-box',
+                        }}
                       />
+                      {/* Partner's answer */}
+                      {partnerReflection?.guided?.[prompt.key] ? (
+                        <p style={{
+                          fontFamily: 'var(--font-hand)',
+                          fontSize: '0.88rem',
+                          color: PLAYER_COLORS[partnerId],
+                          lineHeight: 1.4,
+                          margin: '4px 0 0',
+                          padding: '6px 10px',
+                          background: `${PLAYER_COLORS[partnerId]}08`,
+                          borderRadius: 8,
+                          border: `1px dashed ${PLAYER_COLORS[partnerId]}30`,
+                          whiteSpace: 'pre-wrap',
+                        }}>
+                          {partnerReflection.guided[prompt.key]}
+                        </p>
+                      ) : (
+                        <p style={{
+                          fontFamily: 'var(--font-hand)',
+                          fontSize: '0.78rem',
+                          color: 'var(--text-light)',
+                          fontStyle: 'italic',
+                          margin: '3px 0 0',
+                          padding: '0 10px',
+                        }}>
+                          {partnerName || 'partner'}: waiting...
+                        </p>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Freeform — your input */}
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={{
+                      display: 'block',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: '0.78rem',
+                      color: 'var(--text-secondary)',
+                      marginBottom: 5,
+                    }}>
+                      anything else you want to remember
+                    </label>
+                    <textarea
+                      value={draft?.freeform || ''}
+                      onChange={(e) => onUpdateDraft('freeform', e.target.value)}
+                      placeholder={`${playerName || 'you'}...`}
+                      rows={3}
+                      style={{
+                        width: '100%',
+                        fontFamily: 'var(--font-hand)',
+                        fontSize: '0.9rem',
+                        padding: '6px 10px',
+                        border: `1.5px solid ${PLAYER_COLORS[playerId]}40`,
+                        borderRadius: 8,
+                        background: `${PLAYER_COLORS[playerId]}08`,
+                        color: PLAYER_COLORS[playerId],
+                        resize: 'vertical',
+                        outline: 'none',
+                        lineHeight: 1.4,
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    {/* Partner's freeform */}
+                    {partnerReflection?.freeform ? (
+                      <p style={{
+                        fontFamily: 'var(--font-hand)',
+                        fontSize: '0.88rem',
+                        color: PLAYER_COLORS[partnerId],
+                        lineHeight: 1.4,
+                        margin: '4px 0 0',
+                        padding: '6px 10px',
+                        background: `${PLAYER_COLORS[partnerId]}08`,
+                        borderRadius: 8,
+                        border: `1px dashed ${PLAYER_COLORS[partnerId]}30`,
+                        whiteSpace: 'pre-wrap',
+                      }}>
+                        {partnerReflection.freeform}
+                      </p>
                     ) : (
                       <p style={{
                         fontFamily: 'var(--font-hand)',
-                        fontSize: '0.85rem',
+                        fontSize: '0.78rem',
                         color: 'var(--text-light)',
                         fontStyle: 'italic',
-                        textAlign: 'center',
-                        padding: '8px 0',
+                        margin: '3px 0 0',
+                        padding: '0 10px',
                       }}>
-                        waiting for {partnerName || 'your partner'}'s reflections...
+                        {partnerName || 'partner'}: waiting...
                       </p>
                     )}
                   </div>
+
+                  {/* Save button */}
+                  <button
+                    onClick={onSaveReflection}
+                    disabled={saving}
+                    style={{
+                      fontFamily: 'var(--font-hand)',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      padding: '6px 18px',
+                      borderRadius: 10,
+                      border: `1.5px solid ${PLAYER_COLORS[playerId]}`,
+                      background: PLAYER_COLORS[playerId],
+                      color: 'white',
+                      cursor: saving ? 'default' : 'pointer',
+                      opacity: saving ? 0.5 : 1,
+                      transition: 'opacity 0.2s',
+                    }}
+                  >
+                    {myReflection?.savedAt ? 'update reflections' : 'save reflections'}
+                  </button>
                 </div>
               </div>
             )}
@@ -612,196 +744,3 @@ function StatusPill({ status, color }) {
   )
 }
 
-// ── ReflectionForm ──
-
-function ReflectionForm({ draft, onUpdateDraft, onUpdateDraftGuided, onSave, saving, existing, playerColor, label }) {
-  const hasExisting = !!existing?.savedAt
-  const savedDate = hasExisting
-    ? new Date(existing.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    : null
-
-  return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <div style={{ width: 8, height: 8, borderRadius: '50%', background: playerColor, flexShrink: 0 }} />
-        <span style={{
-          fontFamily: 'var(--font-hand)',
-          fontSize: '0.85rem',
-          fontWeight: 600,
-          color: playerColor,
-        }}>
-          {label}
-        </span>
-        {savedDate && (
-          <span style={{ fontFamily: 'var(--font-hand)', fontSize: '0.7rem', color: 'var(--text-light)' }}>
-            — saved {savedDate}
-          </span>
-        )}
-      </div>
-
-      {/* Guided prompts */}
-      {GUIDED_PROMPTS.map((prompt) => (
-        <div key={prompt.key} style={{ marginBottom: 10 }}>
-          <label style={{
-            display: 'block',
-            fontFamily: 'var(--font-body)',
-            fontSize: '0.78rem',
-            color: 'var(--text-secondary)',
-            marginBottom: 3,
-          }}>
-            {prompt.label}
-          </label>
-          <textarea
-            value={draft?.guided?.[prompt.key] || ''}
-            onChange={(e) => onUpdateDraftGuided(prompt.key, e.target.value)}
-            rows={2}
-            style={{
-              width: '100%',
-              fontFamily: 'var(--font-hand)',
-              fontSize: '0.9rem',
-              padding: '6px 10px',
-              border: `1px solid ${playerColor}30`,
-              borderRadius: 8,
-              background: `${playerColor}08`,
-              color: 'var(--text-primary)',
-              resize: 'vertical',
-              outline: 'none',
-              lineHeight: 1.4,
-              boxSizing: 'border-box',
-            }}
-          />
-        </div>
-      ))}
-
-      {/* Freeform */}
-      <div style={{ marginBottom: 10 }}>
-        <label style={{
-          display: 'block',
-          fontFamily: 'var(--font-body)',
-          fontSize: '0.78rem',
-          color: 'var(--text-secondary)',
-          marginBottom: 3,
-        }}>
-          anything else you want to remember
-        </label>
-        <textarea
-          value={draft?.freeform || ''}
-          onChange={(e) => onUpdateDraft('freeform', e.target.value)}
-          rows={3}
-          style={{
-            width: '100%',
-            fontFamily: 'var(--font-hand)',
-            fontSize: '0.9rem',
-            padding: '6px 10px',
-            border: `1px solid ${playerColor}30`,
-            borderRadius: 8,
-            background: `${playerColor}08`,
-            color: 'var(--text-primary)',
-            resize: 'vertical',
-            outline: 'none',
-            lineHeight: 1.4,
-            boxSizing: 'border-box',
-          }}
-        />
-      </div>
-
-      {/* Save button */}
-      <button
-        onClick={onSave}
-        disabled={saving}
-        style={{
-          fontFamily: 'var(--font-hand)',
-          fontSize: '0.85rem',
-          fontWeight: 600,
-          padding: '6px 18px',
-          borderRadius: 10,
-          border: `1.5px solid ${playerColor}`,
-          background: playerColor,
-          color: 'white',
-          cursor: saving ? 'default' : 'pointer',
-          opacity: saving ? 0.5 : 1,
-          transition: 'opacity 0.2s',
-        }}
-      >
-        {hasExisting ? 'update reflections' : 'save reflections'}
-      </button>
-    </div>
-  )
-}
-
-// ── ReflectionDisplay (read-only partner view) ──
-
-function ReflectionDisplay({ reflection, playerColor, label }) {
-  const savedDate = new Date(reflection.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-
-  return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <div style={{ width: 8, height: 8, borderRadius: '50%', background: playerColor, flexShrink: 0 }} />
-        <span style={{
-          fontFamily: 'var(--font-hand)',
-          fontSize: '0.85rem',
-          fontWeight: 600,
-          color: playerColor,
-        }}>
-          {label}
-        </span>
-        <span style={{ fontFamily: 'var(--font-hand)', fontSize: '0.7rem', color: 'var(--text-light)' }}>
-          — saved {savedDate}
-        </span>
-      </div>
-
-      {GUIDED_PROMPTS.map((prompt) => {
-        const val = reflection.guided?.[prompt.key]
-        if (!val) return null
-        return (
-          <div key={prompt.key} style={{ marginBottom: 8 }}>
-            <span style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '0.72rem',
-              color: 'var(--text-light)',
-              display: 'block',
-              marginBottom: 2,
-            }}>
-              {prompt.label}
-            </span>
-            <p style={{
-              fontFamily: 'var(--font-hand)',
-              fontSize: '0.9rem',
-              color: playerColor,
-              lineHeight: 1.4,
-              margin: 0,
-              whiteSpace: 'pre-wrap',
-            }}>
-              {val}
-            </p>
-          </div>
-        )
-      })}
-
-      {reflection.freeform && (
-        <div style={{ marginTop: 6 }}>
-          <span style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: '0.72rem',
-            color: 'var(--text-light)',
-            display: 'block',
-            marginBottom: 2,
-          }}>
-            other thoughts
-          </span>
-          <p style={{
-            fontFamily: 'var(--font-hand)',
-            fontSize: '0.9rem',
-            color: playerColor,
-            lineHeight: 1.4,
-            margin: 0,
-            whiteSpace: 'pre-wrap',
-          }}>
-            {reflection.freeform}
-          </p>
-        </div>
-      )}
-    </div>
-  )
-}
