@@ -97,8 +97,7 @@ export default function StudyTogetherPage() {
         }),
       }
       if (needsSave) {
-        // Save the corrected data back
-        supabase.from('responses').upsert(
+        await supabase.from('responses').upsert(
           { session_id: sessionId, pack_id: PACK_ID, player_id: PLAYER_ID, player_name: 'shared', answers: corrected },
           { onConflict: 'session_id,pack_id,player_id' }
         )
@@ -173,10 +172,23 @@ export default function StudyTogetherPage() {
     saveData({ ...data, books })
   }
 
-  const handleSaveReflection = (bookId) => {
+  const handleSaveReflection = async (bookId) => {
     const draft = draftReflections[bookId]
     if (!draft) return
-    const books = data.books.map(b => {
+    setSaving(true)
+
+    // Fresh fetch to avoid race condition when both partners save close together
+    const { data: freshRow } = await supabase
+      .from('responses')
+      .select('answers')
+      .eq('session_id', sessionId)
+      .eq('pack_id', PACK_ID)
+      .eq('player_id', PLAYER_ID)
+      .maybeSingle()
+
+    const freshData = freshRow?.answers ? { ...DEFAULT_DATA, ...freshRow.answers } : data
+
+    const books = freshData.books.map(b => {
       if (b.id !== bookId) return b
       const updatedReflections = {
         ...b.reflections,
@@ -194,7 +206,14 @@ export default function StudyTogetherPage() {
         status: bothReflected ? 'reflected' : b.status,
       }
     })
-    saveData({ ...data, books })
+
+    const updatedData = { ...freshData, books }
+    await supabase.from('responses').upsert(
+      { session_id: sessionId, pack_id: PACK_ID, player_id: PLAYER_ID, player_name: 'shared', answers: updatedData },
+      { onConflict: 'session_id,pack_id,player_id' }
+    )
+    setData(updatedData)
+    setSaving(false)
   }
 
   const handleDeleteBook = (bookId) => {
