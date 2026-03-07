@@ -20,6 +20,7 @@ export default function VaultPage() {
   const [mcTotalPacks] = useState(quizPacks.length)
   const [ddCompletedCount, setDdCompletedCount] = useState(0)
   const [ppCompletedCount, setPpCompletedCount] = useState(0)
+  const [fsCount, setFsCount] = useState(0)
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     if (sessionId) setSessionId(sessionId)
@@ -60,6 +61,18 @@ export default function VaultPage() {
           packResponses.every(r => r.answers?.responses?.length === 3)
       }).length
       setPpCompletedCount(ppDone)
+    }
+
+    // Finish My Sentence completed rounds count
+    const { data: fsData } = await supabase
+      .from('finish_sentence')
+      .select('round, sentence_finish')
+      .eq('session_id', sessionId)
+    if (fsData) {
+      const rounds = {}
+      fsData.forEach(r => { if (!rounds[r.round]) rounds[r.round] = []; rounds[r.round].push(r) })
+      const done = Object.values(rounds).filter(rows => rows.length === 2 && rows.every(r => r.sentence_finish)).length
+      setFsCount(done)
     }
 
     // Deep Dive completion count
@@ -214,6 +227,42 @@ export default function VaultPage() {
                 ) : (
                   <div style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--text-light)' }}>
                     play →
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Finish My Sentence card */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="glass"
+            style={{ padding: 18, cursor: 'pointer', transform: 'rotate(0.25deg)' }}
+            onClick={() => navigate(`/finish-sentence/${sessionId}`)}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ fontSize: 28, flexShrink: 0 }}>✍️</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 600, marginBottom: 1, color: 'var(--text-primary)' }}>
+                  Finish My Sentence
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
+                  write a sentence for your person to finish — see how they complete your thoughts
+                </p>
+              </div>
+              <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                {fsCount > 0 ? (
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent-sage)' }}>
+                      {fsCount}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>rounds</div>
+                  </div>
+                ) : (
+                  <div style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--text-light)' }}>
+                    write →
                   </div>
                 )}
               </div>
