@@ -19,9 +19,6 @@ export default function MissYouHeart() {
   const baselineLoadedRef = useRef(false)
   const cooldownRef = useRef(null)
 
-  // Don't render if not in a session
-  if (!sessionId || !playerId) return null
-
   // ── On mount: check if our nudge row exists + fetch partner's baseline ──
   useEffect(() => {
     if (!sessionId || !playerId) return
@@ -157,6 +154,9 @@ export default function MissYouHeart() {
     setCooldown(COOLDOWN_SECONDS)
     setTimeout(() => setSendState('idle'), 2000)
   }, [cooldown, sendState, sessionId, playerId, playerName])
+
+  // Don't render if not in a session (must be AFTER all hooks to avoid Rules of Hooks violation)
+  if (!sessionId || !playerId) return null
 
   const isDisabled = cooldown > 0 || sendState === 'sending'
 
