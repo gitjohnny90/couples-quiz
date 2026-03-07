@@ -5,6 +5,7 @@ import { AuthContext } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
 import deepDiveDecks from '../data/deepDiveDecks'
+import { allPredictPacks } from '../data/predictPartnerQuestions'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../components/Doodles'
 
@@ -18,6 +19,7 @@ export default function VaultPage() {
   const [mcCompletedCount, setMcCompletedCount] = useState(0)
   const [mcTotalPacks] = useState(quizPacks.length)
   const [ddCompletedCount, setDdCompletedCount] = useState(0)
+  const [ppCompletedCount, setPpCompletedCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
 
@@ -57,6 +59,16 @@ export default function VaultPage() {
       responseData.forEach((r) => { if (!packMap[r.pack_id]) packMap[r.pack_id] = []; packMap[r.pack_id].push(r) })
       const done = Object.values(packMap).filter((responses) => responses.length >= 2).length
       setMcCompletedCount(done)
+    }
+
+    // Predict Partner completion count
+    if (responseData) {
+      const ppDone = allPredictPacks.filter(pack => {
+        const packResponses = responseData.filter(r => r.pack_id === pack.id)
+        return packResponses.length >= 2 &&
+          packResponses.every(r => r.answers?.responses?.length === 3)
+      }).length
+      setPpCompletedCount(ppDone)
     }
 
     // Deep Dive completion count
@@ -211,22 +223,39 @@ export default function VaultPage() {
             </div>
           </motion.div>
 
-          {/* Coming soon placeholder */}
+          {/* Predict Your Partner card */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="sticky-note"
-            style={{ padding: 20, textAlign: 'center', marginTop: 8 }}
+            className="glass"
+            style={{ padding: 18, cursor: 'pointer', transform: 'rotate(-0.2deg)' }}
+            onClick={() => navigate(`/predict-partner/${sessionId}`)}
           >
-            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.15rem', color: 'var(--text-secondary)' }}>
-              more quizzes coming soon...
-            </p>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', marginTop: 4 }}>
-              stay tuned ✨
-            </p>
-            <div style={{ position: 'absolute', top: -4, right: 10 }}>
-              <DoodleStar size={14} opacity={0.3} rotate={10} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ fontSize: 28, flexShrink: 0 }}>🔮</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 600, marginBottom: 1, color: 'var(--text-primary)' }}>
+                  Predict Your Partner
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
+                  answer for yourself, then guess what your person would say
+                </p>
+              </div>
+              <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                {ppCompletedCount > 0 ? (
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent-sage)' }}>
+                      {ppCompletedCount}/{allPredictPacks.length}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>done</div>
+                  </div>
+                ) : (
+                  <div style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--text-light)' }}>
+                    play →
+                  </div>
+                )}
+              </div>
             </div>
           </motion.div>
 
