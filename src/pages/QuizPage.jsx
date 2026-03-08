@@ -17,6 +17,7 @@ export default function QuizPage() {
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [direction, setDirection] = useState(1);
+  const [error, setError] = useState('');
 
   if (!pack) {
     return (
@@ -49,15 +50,17 @@ export default function QuizPage() {
     if (!hasCurrentAnswer) return;
     if (isLastQuestion) {
       setSubmitted(true);
+      setError('');
       try {
-        const { error } = await supabase.from("responses").upsert(
+        const { error: saveErr } = await supabase.from("responses").upsert(
           { session_id: sessionId, pack_id: packId, player_id: playerId, player_name: playerName, answers },
           { onConflict: "session_id,pack_id,player_id" }
         );
-        if (error) throw error;
+        if (saveErr) throw saveErr;
         navigate(`/results/${sessionId}/${packId}`);
       } catch (err) {
         console.error("oops, couldn't save:", err);
+        setError("couldn't save your answers — try again");
         setSubmitted(false);
       }
     } else {
@@ -99,6 +102,12 @@ export default function QuizPage() {
             {pack.title}
           </h1>
         </div>
+
+        {error && (
+          <p style={{ color: 'var(--accent-coral)', textAlign: 'center', fontSize: '0.9rem', marginBottom: 12 }}>
+            {error}
+          </p>
+        )}
 
         {/* Crayon progress bar */}
         <div style={{ marginBottom: 20 }}>
