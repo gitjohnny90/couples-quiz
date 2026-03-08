@@ -144,22 +144,15 @@ export default function FinishSentencePage() {
         setArchive(completedRounds)
         setScreen('wait-for-partner-starter')
       } else if (!theirRow.sentence_finish) {
-        // Both starters exist, I need to finish theirs (or already did)
-        if (myRow.sentence_finish) {
-          // I finished, waiting on partner
-          setCurrentRound(maxRound)
-          setArchive(completedRounds)
-          setScreen('wait-for-partner-finish')
-        } else {
-          setCurrentRound(maxRound)
-          setArchive(completedRounds)
-          setScreen('finish')
-        }
-      } else if (!myRow.sentence_finish) {
-        // Partner finished mine, I still need to finish theirs
+        // Partner's starter hasn't been finished by me yet — I need to finish it
         setCurrentRound(maxRound)
         setArchive(completedRounds)
         setScreen('finish')
+      } else if (!myRow.sentence_finish) {
+        // I finished theirs, waiting for partner to finish mine
+        setCurrentRound(maxRound)
+        setArchive(completedRounds)
+        setScreen('wait-for-partner-finish')
       } else {
         // Edge case — both done
         setCurrentRound(maxRound)
