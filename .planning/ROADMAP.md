@@ -29,11 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Player2 can access every page and see the same data as Player1 (no player1-only policy bugs)
   4. Realtime subscriptions continue delivering partner updates after RLS is enabled (verified from two browser windows)
   5. Supabase Storage buckets for drawings enforce access control
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Write RLS audit, index, and policy SQL migration files
+- [ ] 01-02-PLAN.md — Deploy SQL migrations to Supabase and verify RLS enforcement
 
 ### Phase 2: PYP Data Migration & Cleanup
 **Goal**: Predict Your Partner reads exclusively from the dedicated predict_partner table with no legacy code paths remaining
