@@ -9,11 +9,11 @@ Requirements for this polish & security milestone. No new features — hardening
 
 ### Security
 
-- [ ] **SEC-01**: User can only read/write data for sessions they belong to (RLS on all 12 tables)
-- [ ] **SEC-02**: RLS policies use `(SELECT auth.uid())` optimization for performance
-- [ ] **SEC-03**: Both partners can read shared session rows (sessions table policy allows player1 and player2)
-- [ ] **SEC-04**: Supabase Storage buckets enforce access control for drawings
-- [ ] **SEC-05**: RLS enable and policy deploy happen atomically (no window of empty results)
+- [x] **SEC-01**: User can only read/write data for sessions they belong to (RLS on all 12 tables)
+- [x] **SEC-02**: RLS policies use `(SELECT auth.uid())` optimization for performance
+- [x] **SEC-03**: Both partners can read shared session rows (sessions table policy allows player1 and player2)
+- [x] **SEC-04**: Supabase Storage buckets enforce access control for drawings
+- [x] **SEC-05**: RLS enable and policy deploy happen atomically (no window of empty results)
 - [ ] **SEC-06**: Realtime subscriptions continue working correctly after RLS is enabled
 
 ### Data Migration
@@ -68,11 +68,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 1 | Pending |
-| SEC-02 | Phase 1 | Pending |
-| SEC-03 | Phase 1 | Pending |
-| SEC-04 | Phase 1 | Pending |
-| SEC-05 | Phase 1 | Pending |
+| SEC-01 | Phase 1 | Complete |
+| SEC-02 | Phase 1 | Complete |
+| SEC-03 | Phase 1 | Complete |
+| SEC-04 | Phase 1 | Complete |
+| SEC-05 | Phase 1 | Complete |
 | SEC-06 | Phase 1 | Pending |
 | MIG-01 | Phase 2 | Pending |
 | MIG-02 | Phase 2 | Pending |
