@@ -87,11 +87,43 @@ CREATE POLICY "users_own_links"
   USING (user_id = (SELECT auth.uid()))
   WITH CHECK (user_id = (SELECT auth.uid()));
 
--- sessions: both partners access via user_sessions join (uses id, not session_id)
-CREATE POLICY "partners_access_session"
-  ON public.sessions FOR ALL
-  USING (id::text IN (SELECT session_id::text FROM user_sessions WHERE user_id = (SELECT auth.uid())))
-  WITH CHECK (id::text IN (SELECT session_id::text FROM user_sessions WHERE user_id = (SELECT auth.uid())));
+-- sessions: per-operation policies to handle bootstrap (no user_sessions row yet)
+--
+-- SELECT: partners read via user_sessions OR direct player match OR open sessions
+CREATE POLICY "partners_read_session"
+  ON public.sessions FOR SELECT
+  USING (
+    id::text IN (SELECT session_id::text FROM user_sessions WHERE user_id = (SELECT auth.uid()))
+    OR player1_user_id = (SELECT auth.uid())
+    OR player2_user_id = (SELECT auth.uid())
+    OR (invite_code IS NOT NULL AND player2_user_id IS NULL)  -- open for joining
+    OR (player1_user_id IS NULL AND player2_user_id IS NULL)  -- legacy unclaimed
+  );
+
+-- INSERT: creator sets player1_user_id (before user_sessions exists)
+CREATE POLICY "creator_insert_session"
+  ON public.sessions FOR INSERT
+  WITH CHECK (player1_user_id = (SELECT auth.uid()));
+
+-- UPDATE: linked partners, direct player match, or open join slot
+CREATE POLICY "partners_update_session"
+  ON public.sessions FOR UPDATE
+  USING (
+    id::text IN (SELECT session_id::text FROM user_sessions WHERE user_id = (SELECT auth.uid()))
+    OR player1_user_id = (SELECT auth.uid())
+    OR player2_user_id = (SELECT auth.uid())
+    OR (player2_user_id IS NULL AND player2_name IS NULL)  -- open for player2 join
+  )
+  WITH CHECK (
+    id::text IN (SELECT session_id::text FROM user_sessions WHERE user_id = (SELECT auth.uid()))
+    OR player1_user_id = (SELECT auth.uid())
+    OR player2_user_id = (SELECT auth.uid())
+  );
+
+-- DELETE: blocked
+CREATE POLICY "no_delete_sessions"
+  ON public.sessions FOR DELETE
+  USING (false);
 
 -- Pattern: session_id IN (user's sessions) — applies to 9 feature tables
 CREATE POLICY "partners_access_data"
