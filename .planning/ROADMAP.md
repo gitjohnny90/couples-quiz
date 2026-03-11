@@ -43,10 +43,10 @@ Plans:
   1. All historical Predict Your Partner answers are accessible in the app (no data lost from pre-migration sessions)
   2. No code in the codebase references the responses table for PYP pack IDs
   3. Running the migration SQL a second time produces no errors and no duplicate rows
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Deploy PYP backfill migration, verify data integrity and dead code absence
 
 ### Phase 3: Polling Fallback Standardization
 **Goal**: Every interactive page recovers from dropped realtime connections within 5 seconds via polling fallback
