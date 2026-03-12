@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useCallback } from 'react'
+import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
@@ -26,6 +26,14 @@ function partnerOf(pid) {
 export default function HotTakesPage() {
   const { sessionId } = useParams()
   const { playerId } = useContext(SessionContext)
+
+  const mountedRef = useRef(true)
+  const channelId = useRef(`hot-takes-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -58,17 +66,19 @@ export default function HotTakesPage() {
     try {
       const { data: sessionData } = await supabase
         .from('sessions').select('*').eq('id', sessionId).single()
+      if (!mountedRef.current) return
       if (sessionData) setSession(sessionData)
 
       const { data: votes, error: vErr } = await supabase
         .from('hot_takes').select('*').eq('session_id', sessionId)
+      if (!mountedRef.current) return
       if (vErr) throw vErr
       setAllVotes(votes || [])
     } catch (err) {
       console.error('Fetch error:', err)
-      setError('something went wrong loading takes')
+      if (mountedRef.current) setError('something went wrong loading takes')
     }
-    setLoading(false)
+    if (mountedRef.current) setLoading(false)
   }, [sessionId])
 
   useEffect(() => { fetchAll() }, [fetchAll])
@@ -83,7 +93,7 @@ export default function HotTakesPage() {
   // ── Realtime ──
   useEffect(() => {
     const channel = supabase
-      .channel(`hot-takes-${sessionId}`)
+      .channel(channelId.current)
       .on('postgres_changes', {
         event: '*', schema: 'public', table: 'hot_takes',
         filter: `session_id=eq.${sessionId}`,

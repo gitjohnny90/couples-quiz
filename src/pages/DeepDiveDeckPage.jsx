@@ -39,12 +39,20 @@ export default function DeepDiveDeckPage() {
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState('')
   const textareaRef = useRef(null)
+  const mountedRef = useRef(true)
+  const channelId = useRef(`deep-dive-${sessionId}-${deckId}-${Math.random().toString(36).slice(2, 8)}`)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   // Fetch existing responses for this deck
   const fetchResponses = useCallback(async () => {
     const { data, error } = await supabase
       .from('deep_dive_responses').select('*')
       .eq('session_id', sessionId).eq('deck_id', deckId)
+    if (!mountedRef.current) return []
     if (!error && data) {
       setResponses(data)
       return data
@@ -73,7 +81,7 @@ export default function DeepDiveDeckPage() {
   // Realtime subscription
   useEffect(() => {
     const channel = supabase
-      .channel(`deep-dive-${sessionId}-${deckId}`)
+      .channel(channelId.current)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',

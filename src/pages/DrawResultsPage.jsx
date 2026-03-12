@@ -29,6 +29,14 @@ export default function DrawResultsPage() {
   // Look up prompt text from static data when available
   const promptFromData = promptId ? drawingPrompts.find(p => p.id === promptId) : null
 
+  const mountedRef = useRef(true)
+  const channelId = useRef(`draw-${sessionId}-${promptId || 'legacy'}-${Math.random().toString(36).slice(2, 8)}`)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
+
   // Long-press for reaction popup
   const pressedCardRef = useRef(null)
   const onLongPressCard = useCallback(() => {
@@ -43,6 +51,7 @@ export default function DrawResultsPage() {
       .eq('session_id', sessionId)
       .eq('pack_id', targetPackId)
 
+    if (!mountedRef.current) return
     if (!error && data) setResponses(data)
     setLoading(false)
   }, [sessionId, targetPackId])
@@ -53,7 +62,7 @@ export default function DrawResultsPage() {
   // Realtime subscription — event: '*' catches both INSERT and UPDATE
   useEffect(() => {
     const channel = supabase
-      .channel(`draw-${sessionId}-${promptId || 'legacy'}`)
+      .channel(channelId.current)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'responses', filter: `session_id=eq.${sessionId}` }, () => fetchResponses())
       .subscribe()
     return () => { supabase.removeChannel(channel) }
