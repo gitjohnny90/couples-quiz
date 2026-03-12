@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 Phase: 2 of 4 (PYP Data Migration & Cleanup) — COMPLETE
 Next: Phase 3 (Polling Fallback Standardization)
 Status: In progress
-Last activity: 2026-03-11 — Completed plan 02-01 (PYP backfill migration and dead code verification)
+Last activity: 2026-03-12 - Completed quick task 1: Add .gitignore entries for local tool artifacts
 
 Progress: [███████░░░] 67%
 
@@ -89,6 +89,12 @@ None yet.
 ### Blockers/Concerns
 
 - Actual existing RLS policy state in Supabase dashboard is unknown — Phase 1 (01-02) must audit before declaring RLS complete
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Add .gitignore entries for local tool artifacts | 2026-03-12 | 8ca7460 | [1-add-gitignore-entries-for-local-tool-art](./quick/1-add-gitignore-entries-for-local-tool-art/) |
 
 ## Session Continuity
 
