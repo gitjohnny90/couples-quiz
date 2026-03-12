@@ -57,11 +57,11 @@ Plans:
   2. Every page that subscribes to realtime also has a paired polling fallback at 5s intervals
   3. Navigating away from any page cleanly tears down both the realtime channel and polling interval (no channel leaks)
   4. Polling only runs when the page is in a "waiting for partner" state (not during active input or after data is complete)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md — Add realtime + polling to QuizPage, fix ResultsPage/DrawResultsPage INSERT-only filters
+- [ ] 03-02-PLAN.md — Fix DeepDiveDeckPage useCallback/deps, audit RT-04/RT-05 compliance across all pages
 
 ### Phase 4: Quiz Bug Fixes & Code Cleanup
 **Goal**: Quiz submission is reliable and code patterns are consistent across all feature pages
