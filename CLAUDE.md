@@ -30,7 +30,7 @@ No test runner or linter is configured.
 
 ### Session & Identity
 
-`SessionContext` (in `App.jsx`) holds `sessionId`, `playerName`, and `playerId`, persisted to localStorage. Sessions are auto-created on first sign-in: if a `pendingInviteCode` exists in localStorage, the user auto-joins their partner's session as player2; otherwise a new session is auto-created with a `LOVE-XXXX` invite code and the user becomes player1. The `user_sessions` table links Supabase auth users to sessions so they can resume on login. Legacy sessions (pre-auth) are auto-claimed when a user signs in. The home page (`/`) acts as an auto-setup redirector — users with existing sessions are sent straight to the vault. `playerName` is sourced from the `sessions` table (authoritative) rather than auth metadata to avoid name mismatches.
+`SessionContext` (in `App.jsx`) holds `sessionId`, `playerName`, and `playerId`, persisted to localStorage. Sessions are auto-created on first sign-in: if a `pendingInviteCode` exists in localStorage, the user auto-joins their partner's session as player2; otherwise a new session is auto-created with a `LOVE-XXXX` invite code and the user becomes player1. The `user_sessions` table links Supabase auth users to sessions so they can resume on login. Legacy sessions (pre-auth) are auto-claimed when a user signs in. The home page (`/`) acts as an auto-setup redirector — users with existing sessions are sent straight to the vault. `playerName` is sourced from the `sessions` table (authoritative) rather than auth metadata to avoid name mismatches. Pages that display player names (PredictPartner, DeepDive, etc.) also fetch names directly from the session DB record via a `sessionMyName` state variable.
 
 ### Routing
 
@@ -66,7 +66,7 @@ All tables use `player_id` as `'player1'` or `'player2'` (tic-tac-toe uses `'gam
 
 ### Row Level Security (RLS)
 
-All 11 tables have RLS enabled with proper session-scoped policies. No "Allow all" policies exist. Policy SQL is in `supabase-rls-fix.sql`.
+All 11 tables have RLS enabled with proper session-scoped policies. No "Allow all" policies exist. No Supabase Storage buckets are used (drawings are base64 in JSONB). Policy SQL is in `supabase-rls-fix.sql`.
 
 - **`user_sessions`**: `FOR ALL` — `user_id = (SELECT auth.uid())`
 - **`sessions`**: 4 per-operation policies to handle bootstrap (before `user_sessions` row exists):
@@ -197,8 +197,14 @@ Required in `.env` (prefixed with `VITE_` for Vite):
 ## Milestone History
 
 ### v1.0 — Polish & Security (completed 2026-03-12)
-- **Phase 1**: RLS policies deployed on all 11 tables (removed "Allow all" policies, added session-scoped access)
-- **Phase 2**: Predict Your Partner data migration verified (dedicated `predict_partner` table, zero legacy rows)
-- **Phase 3**: Polling fallbacks standardized on all interactive pages (realtime `event: '*'` + 5s polling + cleanup)
-- **Phase 4**: Quiz bug fixes (sessionId sync, mountedRef guards, unique channel names across all pages)
-- **QA fixes**: Deep Dive color swap, player name consistency (session DB as source), PYP progressive scoring, Draw name truncation, setSessionId sync on all 22 routed pages
+- **Phase 1**: RLS policies deployed on all 11 tables (removed "Allow all" policies, added session-scoped access with per-operation policies on `sessions` for bootstrap flows)
+- **Phase 2**: Predict Your Partner data migration verified (dedicated `predict_partner` table with per-question rows, zero legacy rows in `responses`)
+- **Phase 3**: Polling fallbacks standardized on all interactive pages (realtime `event: '*'` + 5s polling + `useCallback` fetch functions + cleanup)
+- **Phase 4**: Quiz bug fixes (sessionId sync, mountedRef guards, unique channel names via `useRef` with random suffix)
+- **QA bug triage** (3 tester reports, 65+ findings triaged):
+  - Fixed: Deep Dive player colors now assigned by `player_id` not mine/theirs perspective
+  - Fixed: Player names sourced from session DB (`sessionMyName` state) instead of auth metadata
+  - Fixed: PYP score summary shows progressively as marks come in (not hidden until all 6 judged)
+  - Fixed: Draw Together `.drawing-reveal-name` CSS overflow/truncation handling
+  - Fixed: `setSessionId(sessionId)` sync added to all 22 routed pages (was only on 9)
+  - Not relevant: Home tab blank page (old build), Random card modal (already fixed), Miss You Heart feedback (already working)
