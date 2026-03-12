@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useCallback } from "react";
+import { useContext, useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { SessionContext } from "../App";
 import { supabase } from "../lib/supabase";
@@ -8,8 +8,23 @@ import PageDoodles, { SquigglyUnderline, DoodleStar } from "../components/Doodle
 
 export default function QuizPage() {
   const { sessionId, packId } = useParams();
-  const { playerName, playerId } = useContext(SessionContext);
+  const { playerName, playerId, setSessionId } = useContext(SessionContext);
   const navigate = useNavigate();
+
+  // Sync sessionId from URL params to SessionContext (fixes stuck button states)
+  useEffect(() => {
+    if (sessionId) setSessionId(sessionId)
+  }, [sessionId])
+
+  // isMounted guard — prevents setState after unmount
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
+
+  // Unique channel name per component instance — prevents cross-instance collisions
+  const channelId = useRef(`quiz-${sessionId}-${packId}-${Math.random().toString(36).slice(2, 8)}`)
 
   const pack = quizPacks.find((p) => p.id === packId);
 
@@ -27,7 +42,7 @@ export default function QuizPage() {
       .eq('session_id', sessionId)
       .eq('pack_id', packId)
       .neq('player_id', playerId)
-    if (data && data.length > 0) setPartnerAnswered(true)
+    if (data && data.length > 0 && mountedRef.current) setPartnerAnswered(true)
   }, [sessionId, packId, playerId])
 
   // Initial load — check if partner already submitted
@@ -36,7 +51,7 @@ export default function QuizPage() {
   // Realtime subscription — detect partner submission
   useEffect(() => {
     const channel = supabase
-      .channel(`quiz-${sessionId}-${packId}`)
+      .channel(channelId.current)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -99,8 +114,10 @@ export default function QuizPage() {
         navigate(`/results/${sessionId}/${packId}`);
       } catch (err) {
         console.error("oops, couldn't save:", err);
-        setError("couldn't save your answers — try again");
-        setSubmitted(false);
+        if (mountedRef.current) {
+          setError("couldn't save your answers — try again");
+          setSubmitted(false);
+        }
       }
     } else {
       setDirection(1);
