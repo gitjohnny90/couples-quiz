@@ -27,8 +27,8 @@ Requirements for this polish & security milestone. No new features — hardening
 - [x] **RT-01**: All sync-dependent pages have polling fallbacks alongside realtime subscriptions
 - [x] **RT-02**: QuizPage has realtime subscriptions for partner answer updates
 - [x] **RT-03**: QuizPage has polling fallback for partner answer sync
-- [ ] **RT-04**: All pages pair removeChannel with clearInterval in cleanup
-- [ ] **RT-05**: Polling is gated behind "waiting for partner" conditions (not polling when unnecessary)
+- [x] **RT-04**: All pages pair removeChannel with clearInterval in cleanup
+- [x] **RT-05**: Polling is gated behind "waiting for partner" conditions (not polling when unnecessary)
 
 ### Quiz Bug Fixes
 
@@ -80,8 +80,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RT-01 | Phase 3 | Complete |
 | RT-02 | Phase 3 | Complete |
 | RT-03 | Phase 3 | Complete |
-| RT-04 | Phase 3 | Pending |
-| RT-05 | Phase 3 | Pending |
+| RT-04 | Phase 3 | Complete |
+| RT-05 | Phase 3 | Complete |
 | QUIZ-01 | Phase 4 | Pending |
 | QUIZ-02 | Phase 4 | Pending |
 | QUIZ-03 | Phase 4 | Pending |
