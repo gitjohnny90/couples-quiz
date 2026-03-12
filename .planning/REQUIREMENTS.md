@@ -32,17 +32,17 @@ Requirements for this polish & security milestone. No new features — hardening
 
 ### Quiz Bug Fixes
 
-- [ ] **QUIZ-01**: Quiz buttons respond correctly to taps (no stuck/dead button states)
-- [ ] **QUIZ-02**: Quiz pages progress to next question/results without manual reload
-- [ ] **QUIZ-03**: ResultsPage realtime filter changed from INSERT to * (catches existing partner data)
-- [ ] **QUIZ-04**: QuizPage syncs sessionId from URL params consistently
-- [ ] **QUIZ-05**: Partner answers display correctly without data mix-ups
+- [x] **QUIZ-01**: Quiz buttons respond correctly to taps (no stuck/dead button states)
+- [x] **QUIZ-02**: Quiz pages progress to next question/results without manual reload
+- [x] **QUIZ-03**: ResultsPage realtime filter changed from INSERT to * (catches existing partner data)
+- [x] **QUIZ-04**: QuizPage syncs sessionId from URL params consistently
+- [x] **QUIZ-05**: Partner answers display correctly without data mix-ups
 
 ### Code Cleanup
 
 - [x] **CLN-01**: Async state operations guarded with isMounted refs to prevent memory leaks
 - [x] **CLN-02**: Realtime channel names are unique per page instance (no collisions)
-- [ ] **CLN-03**: General code cleanup pass across feature pages
+- [x] **CLN-03**: General code cleanup pass across feature pages
 
 ## v1.1 Requirements (Deferred)
 
@@ -82,14 +82,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RT-03 | Phase 3 | Complete |
 | RT-04 | Phase 3 | Complete |
 | RT-05 | Phase 3 | Complete |
-| QUIZ-01 | Phase 4 | Pending |
-| QUIZ-02 | Phase 4 | Pending |
-| QUIZ-03 | Phase 4 | Pending |
-| QUIZ-04 | Phase 4 | Pending |
-| QUIZ-05 | Phase 4 | Pending |
+| QUIZ-01 | Phase 4 | Complete |
+| QUIZ-02 | Phase 4 | Complete |
+| QUIZ-03 | Phase 4 | Complete |
+| QUIZ-04 | Phase 4 | Complete |
+| QUIZ-05 | Phase 4 | Complete |
 | CLN-01 | Phase 4 | Complete |
 | CLN-02 | Phase 4 | Complete |
-| CLN-03 | Phase 4 | Pending |
+| CLN-03 | Phase 4 | Complete |
 
 **Coverage:**
 - v1.0 requirements: 22 total
