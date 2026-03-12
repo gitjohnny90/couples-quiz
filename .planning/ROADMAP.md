@@ -73,11 +73,12 @@ Plans:
   3. ResultsPage shows partner answers as soon as they exist (whether submitted before or after the user arrives)
   4. Async state operations across feature pages are guarded with isMounted refs (no React warnings on navigation)
   5. Realtime channel names are unique per page instance (no cross-session event leaks)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — Fix QuizPage and ResultsPage: sessionId sync, isMounted guards, unique channels
+- [ ] 04-02-PLAN.md — Add isMounted guards and unique channels to 5 polling pages
+- [ ] 04-03-PLAN.md — Add isMounted guards and unique channels to remaining pages + CLN-03 cleanup
 
 ## Progress
 
@@ -89,4 +90,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. RLS Audit & Policy Deployment | 1/2 | In Progress|  |
 | 2. PYP Data Migration & Cleanup | 1/1 | Complete | 2026-03-11 |
 | 3. Polling Fallback Standardization | 1/2 | In Progress|  |
-| 4. Quiz Bug Fixes & Code Cleanup | 0/2 | Not started | - |
+| 4. Quiz Bug Fixes & Code Cleanup | 0/3 | Not started | - |
