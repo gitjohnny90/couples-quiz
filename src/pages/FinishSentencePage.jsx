@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useRef } from 'react'
+import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
@@ -45,33 +45,7 @@ export default function FinishSentencePage() {
     ? (playerId === 'player1' ? session.player1_name : session.player2_name) || 'you'
     : 'you'
 
-  // ── Fetch everything ──
-  useEffect(() => {
-    fetchAll()
-  }, [sessionId, playerId])
-
-  // ── Polling fallback ──
-  useEffect(() => {
-    if (screen === 'reveal') return
-    const interval = setInterval(fetchAll, 5000)
-    return () => clearInterval(interval)
-  }, [sessionId, playerId, screen])
-
-  // ── Realtime subscription ──
-  useEffect(() => {
-    const channel = supabase
-      .channel(`finish-sentence-${sessionId}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'finish_sentence',
-        filter: `session_id=eq.${sessionId}`,
-      }, () => fetchAll())
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [sessionId, playerId])
-
-  const fetchAll = async () => {
+  const fetchAll = useCallback(async () => {
     try {
       // Session info
       const { data: sessionData } = await supabase
@@ -164,7 +138,33 @@ export default function FinishSentencePage() {
       setError('something went wrong loading sentences')
     }
     setLoading(false)
-  }
+  }, [sessionId, playerId])
+
+  // ── Fetch everything ──
+  useEffect(() => {
+    fetchAll()
+  }, [fetchAll])
+
+  // ── Polling fallback ──
+  useEffect(() => {
+    if (screen === 'reveal') return
+    const interval = setInterval(fetchAll, 5000)
+    return () => clearInterval(interval)
+  }, [fetchAll, screen])
+
+  // ── Realtime subscription ──
+  useEffect(() => {
+    const channel = supabase
+      .channel(`finish-sentence-${sessionId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'finish_sentence',
+        filter: `session_id=eq.${sessionId}`,
+      }, () => fetchAll())
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [fetchAll, sessionId])
 
   // ── Submit starter ──
   const handleSubmitStarter = async () => {

@@ -140,7 +140,7 @@ export default function LoveNoteHuntPage() {
     const channel = supabase
       .channel(`love-notes-${sessionId}-r${round}`)
       .on('postgres_changes', {
-        event: 'INSERT',
+        event: '*',
         schema: 'public',
         table: 'love_notes',
         filter: `session_id=eq.${sessionId}`,
