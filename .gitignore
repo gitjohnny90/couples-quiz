@@ -2,3 +2,8 @@ node_modules
 dist
 .env
 .env.local
+
+# Local tool artifacts
+.claude/
+stdin_writer.js
+supabase/.temp/
