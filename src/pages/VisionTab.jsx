@@ -51,6 +51,13 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
   const northStarTimeout = useRef(null)
   const captionTimeout = useRef(null)
   const fileInputRefs = useRef([])
+  const mountedRef = useRef(true)
+  const channelId = useRef(`vision-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   // Fetch vision data
   const fetchData = async () => {
@@ -62,6 +69,7 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
       .eq('player_id', PLAYER_ID)
       .maybeSingle()
 
+    if (!mountedRef.current) return
     if (row?.answers) {
       setData({ ...DEFAULT_DATA, ...row.answers })
     }
@@ -73,7 +81,7 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
   // Realtime subscription
   useEffect(() => {
     const channel = supabase
-      .channel(`vision-${sessionId}`)
+      .channel(channelId.current)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',

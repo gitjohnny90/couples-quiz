@@ -52,6 +52,12 @@ export default function LoveNoteHuntPage() {
   const [partnerName, setPartnerName] = useState(null)
 
   const textareaRef = useRef(null)
+  const mountedRef = useRef(true)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   useEffect(() => {
     if (sessionId) setSessionId(sessionId)
@@ -61,7 +67,7 @@ export default function LoveNoteHuntPage() {
 
   const fetchPartnerName = async () => {
     const { data } = await supabase.from('sessions').select('player1_name, player2_name').eq('id', sessionId).single()
-    if (!data) return
+    if (!data || !mountedRef.current) return
     const myKey = playerId === 'player1' ? 'player1_name' : 'player2_name'
     const partnerKey = playerId === 'player1' ? 'player2_name' : 'player1_name'
     if (data[partnerKey]) setPartnerName(data[partnerKey])
@@ -78,6 +84,7 @@ export default function LoveNoteHuntPage() {
       .order('round', { ascending: false })
 
     if (notesErr || !allNotes || allNotes.length === 0) {
+      if (!mountedRef.current) return
       setRound(1)
       setPhase(PHASE.SETUP)
       setLoading(false)
@@ -100,6 +107,7 @@ export default function LoveNoteHuntPage() {
     const savedGuesses = guessData?.answers?.guesses || []
     const savedHits = guessData?.answers?.hits || []
 
+    if (!mountedRef.current) return
     const resolvedPhase = determineLoveNotePhase(
       myRoundNotes.length, partnerRoundNotes.length, savedHits.length, NOTES_REQUIRED
     )
@@ -137,8 +145,9 @@ export default function LoveNoteHuntPage() {
   useEffect(() => {
     if (phase !== PHASE.WAITING) return
 
+    const channelName = `love-notes-${sessionId}-r${round}-${Math.random().toString(36).slice(2, 8)}`
     const channel = supabase
-      .channel(`love-notes-${sessionId}-r${round}`)
+      .channel(channelName)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',

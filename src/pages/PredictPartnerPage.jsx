@@ -35,6 +35,13 @@ export default function PredictPartnerPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const mountedRef = useRef(true)
+  const channelId = useRef(`predict-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   useEffect(() => {
     if (sessionId) setSessionId(sessionId)
@@ -63,6 +70,7 @@ export default function PredictPartnerPage() {
       .select('*')
       .eq('session_id', sessionId)
 
+    if (!mountedRef.current) return
     if (data) {
       // Transform flat rows into same shape the UI expects:
       // { packId: { player1: { responses: [...], partnerPredictionMarks: [...], completedAt }, player2: {...} } }
@@ -93,7 +101,7 @@ export default function PredictPartnerPage() {
   // Realtime + polling
   useEffect(() => {
     const channel = supabase
-      .channel(`predict-${sessionId}`)
+      .channel(channelId.current)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',

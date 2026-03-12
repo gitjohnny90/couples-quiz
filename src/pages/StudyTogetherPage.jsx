@@ -49,6 +49,13 @@ export default function StudyTogetherPage() {
   // Per-book draft reflections so user can type before saving
   const [draftReflections, setDraftReflections] = useState({})
   const [partnerName, setPartnerName] = useState(null)
+  const mountedRef = useRef(true)
+  const channelId = useRef(`study-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   useEffect(() => {
     if (sessionId) setSessionId(sessionId)
@@ -102,8 +109,10 @@ export default function StudyTogetherPage() {
           { onConflict: 'session_id,pack_id,player_id' }
         )
       }
+      if (!mountedRef.current) return
       setData(corrected)
     }
+    if (!mountedRef.current) return
     setLoading(false)
   }
 
@@ -112,7 +121,7 @@ export default function StudyTogetherPage() {
   // Realtime + polling
   useEffect(() => {
     const channel = supabase
-      .channel(`study-${sessionId}`)
+      .channel(channelId.current)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',

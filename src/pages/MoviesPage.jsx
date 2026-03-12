@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useMemo } from 'react'
+import { useContext, useState, useEffect, useMemo, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
@@ -48,6 +48,13 @@ export default function MoviesPage() {
   const [newTitle, setNewTitle] = useState('')
   const [newGenre, setNewGenre] = useState('')
   const [error, setError] = useState('')
+  const mountedRef = useRef(true)
+  const channelId = useRef(`shared-items-movies-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   // Pick For Us state
   const [currentPick, setCurrentPick] = useState(null)
@@ -62,7 +69,7 @@ export default function MoviesPage() {
     if (sessionId) setSessionId(sessionId)
     fetchData()
     const channel = supabase
-      .channel(`shared-items-movies-${sessionId}`)
+      .channel(channelId.current)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'shared_items', filter: `session_id=eq.${sessionId}` }, () => fetchData())
       .subscribe()
     // Polling fallback — realtime can be unreliable
@@ -75,6 +82,7 @@ export default function MoviesPage() {
       supabase.from('sessions').select('*').eq('id', sessionId).single(),
       supabase.from('shared_items').select('*').eq('session_id', sessionId).eq('type', 'movie').order('created_at', { ascending: false }),
     ])
+    if (!mountedRef.current) return
     setSession(sessionData)
     if (itemData) setItems(itemData)
     setLoading(false)
