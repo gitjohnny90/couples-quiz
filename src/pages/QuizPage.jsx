@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { SessionContext } from "../App";
 import { supabase } from "../lib/supabase";
@@ -18,6 +18,45 @@ export default function QuizPage() {
   const [submitted, setSubmitted] = useState(false);
   const [direction, setDirection] = useState(1);
   const [error, setError] = useState('');
+  const [partnerAnswered, setPartnerAnswered] = useState(false);
+
+  const fetchPartnerResponse = useCallback(async () => {
+    const { data } = await supabase
+      .from('responses')
+      .select('player_id')
+      .eq('session_id', sessionId)
+      .eq('pack_id', packId)
+      .neq('player_id', playerId)
+    if (data && data.length > 0) setPartnerAnswered(true)
+  }, [sessionId, packId, playerId])
+
+  // Initial load — check if partner already submitted
+  useEffect(() => { fetchPartnerResponse() }, [fetchPartnerResponse])
+
+  // Realtime subscription — detect partner submission
+  useEffect(() => {
+    const channel = supabase
+      .channel(`quiz-${sessionId}-${packId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'responses',
+        filter: `session_id=eq.${sessionId}`,
+      }, (payload) => {
+        if (payload.new && payload.new.pack_id === packId && payload.new.player_id !== playerId) {
+          setPartnerAnswered(true)
+        }
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [sessionId, packId, playerId])
+
+  // Polling fallback — stops once partner is detected
+  useEffect(() => {
+    if (partnerAnswered) return
+    const interval = setInterval(fetchPartnerResponse, 5000)
+    return () => clearInterval(interval)
+  }, [fetchPartnerResponse, partnerAnswered])
 
   if (!pack) {
     return (
@@ -118,6 +157,19 @@ export default function QuizPage() {
             <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }} />
           </div>
         </div>
+
+        {partnerAnswered && !submitted && (
+          <p style={{
+            textAlign: 'center',
+            fontFamily: 'var(--font-hand)',
+            fontSize: '0.95rem',
+            color: 'var(--accent-sage)',
+            marginBottom: 8,
+            fontStyle: 'italic',
+          }}>
+            your person already answered this one!
+          </p>
+        )}
 
         {/* Question area — index card feel */}
         <div
