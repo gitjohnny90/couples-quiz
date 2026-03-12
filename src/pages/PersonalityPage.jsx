@@ -29,7 +29,10 @@ const defaultProfile = {
 export default function PersonalityPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerName, playerId } = useContext(SessionContext)
+  const { setSessionId, playerName, playerId } = useContext(SessionContext)
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   const [myProfile, setMyProfile] = useState({ ...defaultProfile })
   const [partnerProfile, setPartnerProfile] = useState(null)

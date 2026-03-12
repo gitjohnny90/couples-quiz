@@ -71,8 +71,12 @@ function JournalBookReflection({ reflection, color, label }) {
 export default function JournalPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerName, playerId } = useContext(SessionContext)
+  const { setSessionId, playerName, playerId } = useContext(SessionContext)
   const partnerId = playerId === 'player1' ? 'player2' : 'player1'
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
+
   const { reactionMap: quizReactions, handleReact: handleQuizReact } = useReactions(sessionId, 'quiz')
   const { reactionMap: ddReactions, handleReact: handleDdReact } = useReactions(sessionId, 'deep_dive')
   const { reactionMap: drawReactions, handleReact: handleDrawReact } = useReactions(sessionId, 'drawing')

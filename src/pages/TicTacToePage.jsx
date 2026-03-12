@@ -33,7 +33,10 @@ const INITIAL_STATE = {
 export default function TicTacToePage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerName, playerId } = useContext(SessionContext)
+  const { setSessionId, playerName, playerId } = useContext(SessionContext)
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   const mountedRef = useRef(true)
   const channelId = useRef(`tictactoe-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)

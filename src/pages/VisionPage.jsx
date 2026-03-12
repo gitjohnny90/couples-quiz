@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -7,7 +7,11 @@ import VisionTab from './VisionTab'
 
 export default function VisionPage() {
   const { sessionId } = useParams()
-  const { playerName, playerId } = useContext(SessionContext)
+  const { setSessionId, playerName, playerId } = useContext(SessionContext)
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
+
   const [activeTab, setActiveTab] = useState('vision')
 
   return (

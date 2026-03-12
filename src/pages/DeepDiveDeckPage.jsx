@@ -16,8 +16,11 @@ const PHASE = { ANSWERING: 'answering', WAITING: 'waiting', RESULTS: 'results' }
 
 export default function DeepDiveDeckPage() {
   const { sessionId, deckId } = useParams()
-  const { playerName, playerId } = useContext(SessionContext)
+  const { setSessionId, playerName, playerId } = useContext(SessionContext)
   const navigate = useNavigate()
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
   const partnerId = playerId === 'player1' ? 'player2' : 'player1'
   const { reactionMap, handleReact } = useReactions(sessionId, 'deep_dive')
 
@@ -30,6 +33,7 @@ export default function DeepDiveDeckPage() {
 
   const deck = deepDiveDecks.find((d) => d.id === deckId)
 
+  const [sessionMyName, setSessionMyName] = useState(null)
   const [currentQ, setCurrentQ] = useState(0)
   const [phase, setPhase] = useState(PHASE.ANSWERING)
   const [answers, setAnswers] = useState({}) // { questionId: "answer text" }
@@ -67,6 +71,16 @@ export default function DeepDiveDeckPage() {
     setPhase(resolved === 'results' ? PHASE.RESULTS : resolved === 'waiting' ? PHASE.WAITING : PHASE.ANSWERING)
     if (resolved === 'answering') setCurrentQ(0)
   }
+
+  // Fetch authoritative name from session
+  useEffect(() => {
+    if (!sessionId || !playerId) return
+    supabase.from('sessions').select('player1_name, player2_name')
+      .eq('id', sessionId).maybeSingle()
+      .then(({ data }) => {
+        if (data) setSessionMyName(playerId === 'player1' ? data.player1_name : data.player2_name)
+      })
+  }, [sessionId, playerId])
 
   // Initial load
   useEffect(() => {
@@ -134,7 +148,7 @@ export default function DeepDiveDeckPage() {
         deck_id: deckId,
         question_id: q.id,
         player_id: playerId,
-        player_name: playerName,
+        player_name: sessionMyName || playerName,
         answer: answers[q.id].trim(),
       }))
       const { error: upsertError } = await supabase
@@ -489,9 +503,14 @@ export default function DeepDiveDeckPage() {
 function JournalEntryPair({ mine, theirs, reactionMap, playerId, partnerId, longPress, pressedCardRef }) {
   if (!mine || !theirs) return null
 
+  // Color by player ID (player1 = coral, player2 = blue), not by mine/theirs perspective
+  const colorFor = (resp) => resp.player_id === 'player1'
+    ? { bg: '#FFF5E9', border: 'var(--accent-coral-light)', nameColor: 'var(--accent-coral)' }
+    : { bg: '#EDF3F8', border: '#B8CFDF', nameColor: 'var(--accent-blue)' }
+
   const entries = [
-    { response: mine, bg: '#FFF5E9', border: 'var(--accent-coral-light)', nameColor: 'var(--accent-coral)', label: mine.player_name },
-    { response: theirs, bg: '#EDF3F8', border: '#B8CFDF', nameColor: 'var(--accent-blue)', label: theirs.player_name },
+    { response: mine, ...colorFor(mine), label: mine.player_name },
+    { response: theirs, ...colorFor(theirs), label: theirs.player_name },
   ]
 
   return (

@@ -1,4 +1,6 @@
+import { useContext, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { SessionContext } from '../App'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline } from '../components/Doodles'
 
@@ -98,6 +100,10 @@ const tools = [
 export default function WatchGuidePage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
+  const { setSessionId } = useContext(SessionContext)
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   return (
     <div className="page" style={{ position: 'relative' }}>

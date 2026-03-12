@@ -9,7 +9,10 @@ import PageDoodles, { DoodleStar, SquigglyUnderline } from '../components/Doodle
 export default function DeepDivePage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerId } = useContext(SessionContext)
+  const { setSessionId, playerId } = useContext(SessionContext)
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   const [responses, setResponses] = useState([])
   const [loading, setLoading] = useState(true)

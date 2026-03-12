@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { AuthContext } from '../contexts/AuthContext'
@@ -8,8 +8,11 @@ import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../comp
 export default function ProfilesPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerId } = useContext(SessionContext)
+  const { setSessionId, playerId } = useContext(SessionContext)
   const { signOut } = useContext(AuthContext)
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   const activities = [
     {

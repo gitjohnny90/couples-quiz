@@ -25,7 +25,10 @@ function partnerOf(pid) {
 
 export default function HotTakesPage() {
   const { sessionId } = useParams()
-  const { playerId } = useContext(SessionContext)
+  const { setSessionId, playerId } = useContext(SessionContext)
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   const mountedRef = useRef(true)
   const channelId = useRef(`hot-takes-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)

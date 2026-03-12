@@ -9,7 +9,10 @@ import PageDoodles, { SquigglyUnderline, DoodleStar } from '../components/Doodle
 export default function QuizPacksPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerName } = useContext(SessionContext)
+  const { setSessionId, playerName } = useContext(SessionContext)
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   const [completedPacks, setCompletedPacks] = useState({})
   const [loading, setLoading] = useState(true)

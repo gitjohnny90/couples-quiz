@@ -69,7 +69,6 @@ export default function HomePage() {
       if (userSession) {
         setSessionId(userSession.session_id);
         setPlayerId(userSession.player_id);
-        setPlayerName(displayName);
 
         // Fetch session to check if partner has joined
         const { data: sessionData } = await supabase
@@ -77,6 +76,12 @@ export default function HomePage() {
           .select("*")
           .eq("id", userSession.session_id)
           .single();
+
+        // Use session DB name as authoritative source (not auth metadata)
+        const sessionName = sessionData
+          ? (userSession.player_id === 'player1' ? sessionData.player1_name : sessionData.player2_name)
+          : null;
+        setPlayerName(sessionName || displayName);
 
         if (sessionData && !sessionData.player2_name) {
           // No partner yet — stay on home page, show invite code

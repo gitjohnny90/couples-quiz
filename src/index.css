@@ -611,6 +611,10 @@ select option {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 /* ===== MEDIA PAGE TABS (Movies/Books) ===== */

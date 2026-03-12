@@ -10,7 +10,10 @@ import PageDoodles, { DoodleSpiral, DoodleStar, SquigglyUnderline } from '../com
 export default function DrawPage() {
   const { sessionId } = useParams()
   const navigate = useNavigate()
-  const { playerName, playerId } = useContext(SessionContext)
+  const { setSessionId, playerName, playerId } = useContext(SessionContext)
+
+  // Sync URL sessionId to context (fixes direct URL navigation)
+  useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [donePromptIds, setDonePromptIds] = useState(new Set())

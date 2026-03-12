@@ -47,10 +47,12 @@ export default function PredictPartnerPage() {
     if (sessionId) setSessionId(sessionId)
   }, [sessionId])
 
-  // Fetch partner name
+  const [sessionMyName, setSessionMyName] = useState(null)
+
+  // Fetch player names from session (authoritative source)
   useEffect(() => {
     if (!sessionId || !playerId) return
-    const fetchPartner = async () => {
+    const fetchNames = async () => {
       const { data: session } = await supabase
         .from('sessions')
         .select('player1_name, player2_name')
@@ -58,9 +60,10 @@ export default function PredictPartnerPage() {
         .maybeSingle()
       if (session) {
         setPartnerName(playerId === 'player1' ? session.player2_name : session.player1_name)
+        setSessionMyName(playerId === 'player1' ? session.player1_name : session.player2_name)
       }
     }
-    fetchPartner()
+    fetchNames()
   }, [sessionId, playerId])
 
   // Fetch all predict responses from dedicated table
@@ -563,7 +566,7 @@ export default function PredictPartnerPage() {
     const totalScore = myScore + partnerScore
     const allMarked = myMarks.every(m => m !== null) && partnerMarks.every(m => m !== null)
 
-    const myName = playerName || playerId
+    const myName = sessionMyName || playerName || playerId
     const theirName = partnerName || partnerId
 
     const series = getSeriesForPack(activePack.id)
@@ -644,47 +647,60 @@ export default function PredictPartnerPage() {
             )
           })}
 
-          {/* Score summary */}
-          <AnimatePresence>
-            {allMarked && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="sticky-note"
-                style={{ padding: '20px 16px', textAlign: 'center', marginBottom: 16 }}
-              >
-                <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.3rem', fontWeight: 700, marginBottom: 10, color: 'var(--text-primary)' }}>
-                  score: {totalScore}/6
-                </h3>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 12 }}>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: PLAYER_COLORS[playerId] }}>
-                      {myScore}/3
+          {/* Score summary — shows progressively as marks come in */}
+          {(() => {
+            const markedCount = myMarks.filter(m => m !== null).length + partnerMarks.filter(m => m !== null).length
+            const totalPossible = 6
+            return (
+              <AnimatePresence>
+                {markedCount > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="sticky-note"
+                    style={{ padding: '20px 16px', textAlign: 'center', marginBottom: 16 }}
+                  >
+                    <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.3rem', fontWeight: 700, marginBottom: 10, color: 'var(--text-primary)' }}>
+                      score: {totalScore}/{totalPossible}
+                    </h3>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 12 }}>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: PLAYER_COLORS[playerId] }}>
+                          {myScore}/3
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>{myName}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: PLAYER_COLORS[partnerId] }}>
+                          {partnerScore}/3
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>{theirName}</div>
+                      </div>
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>{myName}</div>
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.1rem', fontWeight: 700, color: PLAYER_COLORS[partnerId] }}>
-                      {partnerScore}/3
+                    {!allMarked && (
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginBottom: 6 }}>
+                        {markedCount}/{totalPossible} judged — keep marking!
+                      </p>
+                    )}
+                    {allMarked && (
+                      <p style={{
+                        fontFamily: 'var(--font-hand)',
+                        fontSize: '1.05rem',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.4,
+                        fontStyle: 'italic',
+                      }}>
+                        "{SCORE_LABELS[totalScore]}"
+                      </p>
+                    )}
+                    <div style={{ position: 'absolute', top: -6, right: 12 }}>
+                      <DoodleStar size={16} opacity={0.3} rotate={10} />
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>{theirName}</div>
-                  </div>
-                </div>
-                <p style={{
-                  fontFamily: 'var(--font-hand)',
-                  fontSize: '1.05rem',
-                  color: 'var(--text-secondary)',
-                  lineHeight: 1.4,
-                  fontStyle: 'italic',
-                }}>
-                  "{SCORE_LABELS[totalScore]}"
-                </p>
-                <div style={{ position: 'absolute', top: -6, right: 12 }}>
-                  <DoodleStar size={16} opacity={0.3} rotate={10} />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            )
+          })()}
 
           <button
             onClick={handleBackToPacks}
