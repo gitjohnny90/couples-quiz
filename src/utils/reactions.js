@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 
 export const REACTIONS = ['❤️', '😂', '🔥']
@@ -83,6 +83,7 @@ export function buildReactionMap(reactions) {
  */
 export function useReactions(sessionId, targetType) {
   const [reactions, setReactions] = useState([])
+  const channelId = useRef(`reactions-${sessionId}-${targetType}-${Math.random().toString(36).slice(2, 8)}`)
 
   const refresh = useCallback(async () => {
     const data = await fetchReactions(sessionId, targetType)
@@ -91,7 +92,19 @@ export function useReactions(sessionId, targetType) {
 
   useEffect(() => {
     refresh()
-    const channel = subscribeToReactions(sessionId, targetType, refresh)
+    const channel = supabase
+      .channel(channelId.current)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'reactions',
+        filter: `session_id=eq.${sessionId}`,
+      }, (payload) => {
+        if (payload.new?.target_type === targetType || payload.old?.target_type === targetType) {
+          refresh()
+        }
+      })
+      .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [sessionId, targetType, refresh])
 

@@ -18,6 +18,7 @@ export default function MissYouHeart() {
   const baselineRef = useRef(0)
   const baselineLoadedRef = useRef(false)
   const cooldownRef = useRef(null)
+  const channelId = useRef(`nudge-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
 
   // ── On mount: check if our nudge row exists + fetch partner's baseline ──
   useEffect(() => {
@@ -60,7 +61,7 @@ export default function MissYouHeart() {
     if (!sessionId || !playerId) return
 
     const channel = supabase
-      .channel(`nudge-${sessionId}`)
+      .channel(channelId.current)
       .on(
         'postgres_changes',
         {
