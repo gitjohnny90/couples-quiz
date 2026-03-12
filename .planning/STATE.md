@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-pyp-data-migration-cleanup/02-01-PLAN.md
-last_updated: "2026-03-12T01:08:18.179Z"
+stopped_at: Completed 03-polling-fallback-standardization/03-01-PLAN.md
+last_updated: "2026-03-12T01:40:22.772Z"
 last_activity: 2026-03-11 — Completed plan 02-01 (PYP backfill migration and dead code verification)
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
   percent: 67
 ---
 
@@ -51,6 +51,7 @@ Progress: [███████░░░] 67%
 - Trend: baseline
 
 *Updated after each plan completion*
+| Phase 03-polling-fallback-standardization P01 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting current work:
 - [Phase 01-rls-audit-policy-deployment]: SEC-04 addressed by responses table RLS policy — app stores drawings as base64 JSONB, no Supabase Storage buckets exist
 - [Phase 02-pyp-data-migration-cleanup]: Zero legacy rows found — commit 4982f6a had already migrated all PYP data to predict_partner before Phase 2 began; migration SQL committed as historical record only
 - [Phase 02-pyp-data-migration-cleanup]: Dead code grep confirmed zero references to responses table for predict-pack-* in any frontend file — MIG-02 satisfied
+- [Phase 03-polling-fallback-standardization]: event: '*' instead of event: 'INSERT' for realtime — catches pre-existing rows that arrive before page load
+- [Phase 03-polling-fallback-standardization]: useCallback-wrapped fetch functions prevent stale closures in polling and realtime callbacks
 
 ### Pending Todos
 
@@ -77,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T00:00:00.000Z
-Stopped at: Completed 02-pyp-data-migration-cleanup/02-01-PLAN.md
+Last session: 2026-03-12T01:40:22.769Z
+Stopped at: Completed 03-polling-fallback-standardization/03-01-PLAN.md
 Resume file: None
