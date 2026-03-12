@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useCallback } from 'react'
+import { useContext, useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
@@ -35,6 +35,14 @@ export default function TicTacToePage() {
   const navigate = useNavigate()
   const { playerName, playerId } = useContext(SessionContext)
 
+  const mountedRef = useRef(true)
+  const channelId = useRef(`tictactoe-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
+
   const [gameState, setGameState] = useState(INITIAL_STATE)
   const [loading, setLoading] = useState(true)
 
@@ -52,6 +60,7 @@ export default function TicTacToePage() {
       .order('created_at', { ascending: true })
       .limit(1)
 
+    if (!mountedRef.current) return
     if (!error && data && data.length > 0) {
       setGameState(data[0].answers)
     } else if (!error && (!data || data.length === 0)) {
@@ -68,11 +77,12 @@ export default function TicTacToePage() {
         .select()
         .single()
 
+      if (!mountedRef.current) return
       if (!insertErr && newRow) {
         setGameState(newRow.answers)
       }
     }
-    setLoading(false)
+    if (mountedRef.current) setLoading(false)
   }, [sessionId])
 
   // Place a heart on a cell
@@ -121,7 +131,7 @@ export default function TicTacToePage() {
     fetchGame()
 
     const channel = supabase
-      .channel(`tictactoe-${sessionId}`)
+      .channel(channelId.current)
       .on(
         'postgres_changes',
         {

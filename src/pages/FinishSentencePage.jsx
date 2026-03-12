@@ -16,6 +16,14 @@ export default function FinishSentencePage() {
   const { sessionId } = useParams()
   const { playerId } = useContext(SessionContext)
 
+  const mountedRef = useRef(true)
+  const channelId = useRef(`finish-sentence-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
+
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -50,6 +58,7 @@ export default function FinishSentencePage() {
       // Session info
       const { data: sessionData } = await supabase
         .from('sessions').select('*').eq('id', sessionId).single()
+      if (!mountedRef.current) return
       if (sessionData) setSession(sessionData)
 
       // All rows for this session, newest first
@@ -60,6 +69,7 @@ export default function FinishSentencePage() {
         .order('round', { ascending: false })
         .order('created_at', { ascending: false })
 
+      if (!mountedRef.current) return
       if (fetchErr) throw fetchErr
       if (!rows || rows.length === 0) {
         setCurrentRound(1)
@@ -135,9 +145,9 @@ export default function FinishSentencePage() {
       }
     } catch (err) {
       console.error('Fetch error:', err)
-      setError('something went wrong loading sentences')
+      if (mountedRef.current) setError('something went wrong loading sentences')
     }
-    setLoading(false)
+    if (mountedRef.current) setLoading(false)
   }, [sessionId, playerId])
 
   // ── Fetch everything ──
@@ -155,7 +165,7 @@ export default function FinishSentencePage() {
   // ── Realtime subscription ──
   useEffect(() => {
     const channel = supabase
-      .channel(`finish-sentence-${sessionId}`)
+      .channel(channelId.current)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -210,13 +220,13 @@ export default function FinishSentencePage() {
         })
 
       if (insertErr) throw insertErr
-      setStarterInput('')
+      if (mountedRef.current) setStarterInput('')
       await fetchAll()
     } catch (err) {
       console.error('Submit starter error:', err)
-      setError('couldn\'t send your sentence — try again')
+      if (mountedRef.current) setError('couldn\'t send your sentence — try again')
     }
-    setSubmitting(false)
+    if (mountedRef.current) setSubmitting(false)
   }
 
   // ── Submit finish ──
@@ -234,13 +244,13 @@ export default function FinishSentencePage() {
         .eq('id', partnerStarter.id)
 
       if (updateErr) throw updateErr
-      setFinishInput('')
+      if (mountedRef.current) setFinishInput('')
       await fetchAll()
     } catch (err) {
       console.error('Submit finish error:', err)
-      setError('couldn\'t save your answer — try again')
+      if (mountedRef.current) setError('couldn\'t save your answer — try again')
     }
-    setSubmitting(false)
+    if (mountedRef.current) setSubmitting(false)
   }
 
   // ── Start new round ──
