@@ -36,7 +36,7 @@ export default function DrawResultsPage() {
   }, [])
   const longPress = useLongPress(onLongPressCard)
 
-  const fetchResponses = async () => {
+  const fetchResponses = useCallback(async () => {
     const { data, error } = await supabase
       .from('responses')
       .select('*')
@@ -45,37 +45,26 @@ export default function DrawResultsPage() {
 
     if (!error && data) setResponses(data)
     setLoading(false)
-  }
+  }, [sessionId, targetPackId])
 
+  // Initial load
+  useEffect(() => { fetchResponses() }, [fetchResponses])
+
+  // Realtime subscription — event: '*' catches both INSERT and UPDATE
   useEffect(() => {
-    fetchResponses()
-
-    // Realtime: listen for partner's drawing submission
     const channel = supabase
       .channel(`draw-${sessionId}-${promptId || 'legacy'}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'responses',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        () => fetchResponses()
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'responses', filter: `session_id=eq.${sessionId}` }, () => fetchResponses())
       .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [sessionId, promptId])
+    return () => { supabase.removeChannel(channel) }
+  }, [sessionId, promptId, fetchResponses])
 
   // Polling fallback — realtime can be unreliable
   useEffect(() => {
     if (responses.length >= 2) return
     const interval = setInterval(fetchResponses, 5000)
     return () => clearInterval(interval)
-  }, [sessionId, promptId, responses.length])
+  }, [fetchResponses, responses.length])
 
   const copyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)

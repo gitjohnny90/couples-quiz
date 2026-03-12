@@ -37,29 +37,32 @@ export default function ResultsPage() {
 
   const longPress = useLongPress(onLongPressCard)
 
-  const fetchResponses = async () => {
+  const fetchResponses = useCallback(async () => {
     const { data, error } = await supabase
       .from('responses').select('*')
       .eq('session_id', sessionId).eq('pack_id', packId)
     if (!error && data) setResponses(data)
     setLoading(false)
-  }
+  }, [sessionId, packId])
 
+  // Initial load
+  useEffect(() => { fetchResponses() }, [fetchResponses])
+
+  // Realtime subscription
   useEffect(() => {
-    fetchResponses()
     const channel = supabase
       .channel(`responses-${sessionId}-${packId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'responses', filter: `session_id=eq.${sessionId}` }, () => fetchResponses())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'responses', filter: `session_id=eq.${sessionId}` }, () => fetchResponses())
       .subscribe()
     return () => { supabase.removeChannel(channel) }
-  }, [sessionId, packId])
+  }, [sessionId, packId, fetchResponses])
 
   // Polling fallback — realtime can be unreliable
   useEffect(() => {
     if (responses.length >= 2) return
     const interval = setInterval(fetchResponses, 5000)
     return () => clearInterval(interval)
-  }, [sessionId, packId, responses.length])
+  }, [fetchResponses, responses.length])
 
   const toggleReveal = (qId) => {
     setRevealedQuestions((prev) => {
