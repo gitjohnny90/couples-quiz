@@ -40,8 +40,8 @@ Requirements for this polish & security milestone. No new features — hardening
 
 ### Code Cleanup
 
-- [ ] **CLN-01**: Async state operations guarded with isMounted refs to prevent memory leaks
-- [ ] **CLN-02**: Realtime channel names are unique per page instance (no collisions)
+- [x] **CLN-01**: Async state operations guarded with isMounted refs to prevent memory leaks
+- [x] **CLN-02**: Realtime channel names are unique per page instance (no collisions)
 - [ ] **CLN-03**: General code cleanup pass across feature pages
 
 ## v1.1 Requirements (Deferred)
@@ -87,8 +87,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUIZ-03 | Phase 4 | Pending |
 | QUIZ-04 | Phase 4 | Pending |
 | QUIZ-05 | Phase 4 | Pending |
-| CLN-01 | Phase 4 | Pending |
-| CLN-02 | Phase 4 | Pending |
+| CLN-01 | Phase 4 | Complete |
+| CLN-02 | Phase 4 | Complete |
 | CLN-03 | Phase 4 | Pending |
 
 **Coverage:**

@@ -90,4 +90,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. RLS Audit & Policy Deployment | 1/2 | In Progress|  |
 | 2. PYP Data Migration & Cleanup | 1/1 | Complete | 2026-03-11 |
 | 3. Polling Fallback Standardization | 1/2 | In Progress|  |
-| 4. Quiz Bug Fixes & Code Cleanup | 0/3 | Not started | - |
+| 4. Quiz Bug Fixes & Code Cleanup | 2/3 | In Progress|  |
