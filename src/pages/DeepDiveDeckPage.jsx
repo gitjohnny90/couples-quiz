@@ -41,7 +41,7 @@ export default function DeepDiveDeckPage() {
   const textareaRef = useRef(null)
 
   // Fetch existing responses for this deck
-  const fetchResponses = async () => {
+  const fetchResponses = useCallback(async () => {
     const { data, error } = await supabase
       .from('deep_dive_responses').select('*')
       .eq('session_id', sessionId).eq('deck_id', deckId)
@@ -50,7 +50,7 @@ export default function DeepDiveDeckPage() {
       return data
     }
     return []
-  }
+  }, [sessionId, deckId])
 
   // Determine phase from existing responses on load/resume
   const resumeFromResponses = (data) => {
@@ -68,7 +68,7 @@ export default function DeepDiveDeckPage() {
       setLoading(false)
     }
     init()
-  }, [sessionId, deckId])
+  }, [fetchResponses])
 
   // Realtime subscription
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function DeepDiveDeckPage() {
       })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
-  }, [sessionId, deckId])
+  }, [sessionId, deckId, fetchResponses])
 
   // When responses update while waiting, check if partner finished all
   useEffect(() => {
@@ -113,7 +113,7 @@ export default function DeepDiveDeckPage() {
       }
     }, 5000)
     return () => clearInterval(interval)
-  }, [phase])
+  }, [phase, fetchResponses, deck, playerId])
 
   // Submit all answers at once
   const handleSubmitAll = async () => {
