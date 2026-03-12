@@ -14,8 +14,13 @@ import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline, DoodleCloud } 
 export default function ResultsPage() {
   const { sessionId, packId } = useParams()
   const navigate = useNavigate()
-  const { playerName, playerId } = useContext(SessionContext)
+  const { playerName, playerId, setSessionId } = useContext(SessionContext)
   const pack = quizPacks.find((p) => p.id === packId)
+
+  // Sync sessionId from URL params to SessionContext (fixes partner attribution bugs)
+  useEffect(() => {
+    if (sessionId) setSessionId(sessionId)
+  }, [sessionId])
   const partnerId = playerId === 'player1' ? 'player2' : 'player1'
   const { reactionMap, handleReact } = useReactions(sessionId, 'quiz')
 
@@ -25,6 +30,16 @@ export default function ResultsPage() {
   const [expandedNotes, setExpandedNotes] = useState(new Set())
   const [copied, setCopied] = useState(false)
   const [activeReaction, setActiveReaction] = useState(null) // { targetId, rect }
+
+  // isMounted guard — prevents setState after unmount
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
+
+  // Unique channel name per component instance — prevents cross-instance collisions
+  const channelId = useRef(`responses-${sessionId}-${packId}-${Math.random().toString(36).slice(2, 8)}`)
 
   // Track which card is being pressed for long-press
   const pressedCardRef = useRef(null)
@@ -41,6 +56,7 @@ export default function ResultsPage() {
     const { data, error } = await supabase
       .from('responses').select('*')
       .eq('session_id', sessionId).eq('pack_id', packId)
+    if (!mountedRef.current) return
     if (!error && data) setResponses(data)
     setLoading(false)
   }, [sessionId, packId])
@@ -51,7 +67,7 @@ export default function ResultsPage() {
   // Realtime subscription
   useEffect(() => {
     const channel = supabase
-      .channel(`responses-${sessionId}-${packId}`)
+      .channel(channelId.current)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'responses', filter: `session_id=eq.${sessionId}` }, () => fetchResponses())
       .subscribe()
     return () => { supabase.removeChannel(channel) }
