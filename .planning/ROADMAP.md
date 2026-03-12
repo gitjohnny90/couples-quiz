@@ -13,7 +13,7 @@ This milestone hardens an already-functional couples quiz app for active play te
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: RLS Audit & Policy Deployment** - Enable Row Level Security on all Supabase tables with correct policies for both partners
-- [ ] **Phase 2: PYP Data Migration & Cleanup** - Backfill legacy Predict Your Partner data and remove dead code paths
+- [x] **Phase 2: PYP Data Migration & Cleanup** - Backfill legacy Predict Your Partner data and remove dead code paths
 - [ ] **Phase 3: Polling Fallback Standardization** - Add 5s polling fallbacks alongside realtime on every interactive page
 - [ ] **Phase 4: Quiz Bug Fixes & Code Cleanup** - Fix quiz submission/progression bugs and standardize code patterns
 
@@ -46,7 +46,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md — Deploy PYP backfill migration, verify data integrity and dead code absence
+- [x] 02-01-PLAN.md — Deploy PYP backfill migration, verify data integrity and dead code absence
 
 ### Phase 3: Polling Fallback Standardization
 **Goal**: Every interactive page recovers from dropped realtime connections within 5 seconds via polling fallback
@@ -87,6 +87,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. RLS Audit & Policy Deployment | 1/2 | In Progress|  |
-| 2. PYP Data Migration & Cleanup | 0/1 | Not started | - |
+| 2. PYP Data Migration & Cleanup | 1/1 | Complete | 2026-03-11 |
 | 3. Polling Fallback Standardization | 0/2 | Not started | - |
 | 4. Quiz Bug Fixes & Code Cleanup | 0/2 | Not started | - |
