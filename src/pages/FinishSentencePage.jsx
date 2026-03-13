@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { SquigglyUnderline } from '../components/Doodles'
 import sentenceStarters from '../data/sentenceStarters'
 import PageGuide from '../components/PageGuide'
+import AppWaitlistPrompt, { trackActivityCompletion } from '../components/AppWaitlistPrompt'
 
 const PLAYER_COLORS = { player1: '#E88D7A', player2: '#7EB8D8' }
 
@@ -44,6 +45,9 @@ export default function FinishSentencePage() {
 
   // Archive
   const [archive, setArchive] = useState([])
+
+  // Track activity completion for waitlist prompt
+  const activityTrackedRef = useRef(false)
 
   // Screen: 'write' | 'wait-for-partner-starter' | 'finish' | 'wait-for-partner-finish' | 'reveal'
   const [screen, setScreen] = useState('write')
@@ -273,6 +277,14 @@ export default function FinishSentencePage() {
     if (screen === 'reveal' && revealStep === 0) {
       setTimeout(() => setRevealStep(1), 400)
       setTimeout(() => setRevealStep(2), 1400)
+    }
+  }, [screen])
+
+  // Track activity completion when reveal screen is shown
+  useEffect(() => {
+    if (screen === 'reveal' && !activityTrackedRef.current) {
+      activityTrackedRef.current = true
+      trackActivityCompletion()
     }
   }, [screen])
 
@@ -529,6 +541,7 @@ export default function FinishSentencePage() {
 
             {revealStep >= 2 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+                <AppWaitlistPrompt />
                 <button
                   className="btn btn-primary"
                   onClick={handleNewRound}

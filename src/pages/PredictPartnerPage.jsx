@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import predictPartnerSeries, { allPredictPacks, getPredictPack, getSeriesForPack } from '../data/predictPartnerQuestions'
 import PageDoodles, { SquigglyUnderline, DoodleStar } from '../components/Doodles'
 import PageGuide from '../components/PageGuide'
+import AppWaitlistPrompt, { trackActivityCompletion } from '../components/AppWaitlistPrompt'
 
 const SCORE_LABELS = [
   'Start over. From the beginning. Of the relationship.',
@@ -36,6 +37,7 @@ export default function PredictPartnerPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const activityTrackedRef = useRef(false)
   const mountedRef = useRef(true)
   const channelId = useRef(`predict-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
 
@@ -128,6 +130,14 @@ export default function PredictPartnerPage() {
       }
     }
   }, [allResponses, screen, activePack])
+
+  // Track activity completion when reveal screen is shown
+  useEffect(() => {
+    if (screen === 'reveal' && !activityTrackedRef.current) {
+      activityTrackedRef.current = true
+      trackActivityCompletion()
+    }
+  }, [screen])
 
   // ── Pack Status Helpers ──
 
@@ -706,6 +716,8 @@ export default function PredictPartnerPage() {
               </AnimatePresence>
             )
           })()}
+
+          <AppWaitlistPrompt />
 
           <button
             onClick={handleBackToPacks}

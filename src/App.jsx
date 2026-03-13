@@ -28,6 +28,7 @@ import LoveNoteHuntPage from "./pages/LoveNoteHuntPage";
 import PredictPartnerPage from "./pages/PredictPartnerPage";
 import FinishSentencePage from "./pages/FinishSentencePage";
 import HotTakesPage from "./pages/HotTakesPage";
+import WaitlistPage from "./pages/WaitlistPage";
 import MissYouHeart from "./components/MissYouHeart";
 
 // Dev-only auth bypass for preview testing (double-safe: requires DEV mode AND env var)
@@ -161,6 +162,7 @@ export default function App() {
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/waitlist" element={<WaitlistPage />} />
           <Route path="/" element={<RequireAuth><HomePage /></RequireAuth>} />
           <Route path="/join/:sessionId" element={<RequireAuth><JoinPage /></RequireAuth>} />
           <Route path="/quiz/:sessionId/:packId" element={<RequireAuth><QuizPage /></RequireAuth>} />

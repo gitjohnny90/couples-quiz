@@ -11,6 +11,7 @@ import useLongPress from '../hooks/useLongPress'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline, DoodleCloud } from '../components/Doodles'
 import PageGuide from '../components/PageGuide'
+import AppWaitlistPrompt, { trackActivityCompletion } from '../components/AppWaitlistPrompt'
 
 export default function ResultsPage() {
   const { sessionId, packId } = useParams()
@@ -41,6 +42,9 @@ export default function ResultsPage() {
 
   // Unique channel name per component instance — prevents cross-instance collisions
   const channelId = useRef(`responses-${sessionId}-${packId}-${Math.random().toString(36).slice(2, 8)}`)
+
+  // Track activity completion for waitlist prompt
+  const activityTrackedRef = useRef(false)
 
   // Track which card is being pressed for long-press
   const pressedCardRef = useRef(null)
@@ -80,6 +84,14 @@ export default function ResultsPage() {
     const interval = setInterval(fetchResponses, 5000)
     return () => clearInterval(interval)
   }, [fetchResponses, responses.length])
+
+  // Track activity completion when both players have answered
+  useEffect(() => {
+    if (responses.length >= 2 && !activityTrackedRef.current) {
+      activityTrackedRef.current = true
+      trackActivityCompletion()
+    }
+  }, [responses.length])
 
   const toggleReveal = (qId) => {
     setRevealedQuestions((prev) => {
@@ -361,6 +373,8 @@ export default function ResultsPage() {
             )
           })}
         </div>
+
+        <AppWaitlistPrompt />
 
         <button className="btn btn-secondary" style={{ width: '100%', marginTop: 22 }} onClick={() => navigate(`/vault/${sessionId}`)}>
           ← back to quizzes

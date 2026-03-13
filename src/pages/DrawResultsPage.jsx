@@ -10,6 +10,7 @@ import useLongPress from '../hooks/useLongPress'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline } from '../components/Doodles'
 import PageGuide from '../components/PageGuide'
+import AppWaitlistPrompt, { trackActivityCompletion } from '../components/AppWaitlistPrompt'
 
 export default function DrawResultsPage() {
   const { sessionId, promptId } = useParams()
@@ -40,6 +41,9 @@ export default function DrawResultsPage() {
     mountedRef.current = true
     return () => { mountedRef.current = false }
   }, [])
+
+  // Track activity completion for waitlist prompt
+  const activityTrackedRef = useRef(false)
 
   // Long-press for reaction popup
   const pressedCardRef = useRef(null)
@@ -78,6 +82,14 @@ export default function DrawResultsPage() {
     const interval = setInterval(fetchResponses, 5000)
     return () => clearInterval(interval)
   }, [fetchResponses, responses.length])
+
+  // Track activity completion when drawings are revealed
+  useEffect(() => {
+    if (revealed && !activityTrackedRef.current) {
+      activityTrackedRef.current = true
+      trackActivityCompletion()
+    }
+  }, [revealed])
 
   const copyLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)
@@ -306,6 +318,8 @@ export default function DrawResultsPage() {
                   hold a drawing to react ~
                 </p>
               </motion.div>
+
+              <AppWaitlistPrompt />
 
               {/* Action buttons */}
               <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { SquigglyUnderline } from '../components/Doodles'
 import hotTakesCategories, { allHotTakeGroups, getGroup } from '../data/hotTakesStatements'
 import PageGuide from '../components/PageGuide'
+import AppWaitlistPrompt, { trackActivityCompletion } from '../components/AppWaitlistPrompt'
 
 const PLAYER_COLORS = { player1: '#E88D7A', player2: '#7EB8D8' }
 const AGREE_COLOR = '#8DAE8B'
@@ -31,6 +32,7 @@ export default function HotTakesPage() {
   // Sync URL sessionId to context (fixes direct URL navigation)
   useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
+  const activityTrackedRef = useRef(false)
   const mountedRef = useRef(true)
   const channelId = useRef(`hot-takes-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
 
@@ -116,6 +118,14 @@ export default function HotTakesPage() {
       setScreen('results')
     }
   }, [allVotes, screen, activeGroup, playerId])
+
+  // Track activity completion when results screen is shown
+  useEffect(() => {
+    if (screen === 'results' && !activityTrackedRef.current) {
+      activityTrackedRef.current = true
+      trackActivityCompletion()
+    }
+  }, [screen])
 
   // ── Helpers ──
   const getVotesForStatement = (stId) => {
@@ -625,6 +635,8 @@ export default function HotTakesPage() {
                   )
                 })}
               </div>
+
+              <AppWaitlistPrompt />
 
               <button className="btn btn-primary" onClick={handleBackToCategories} style={{ width: '100%' }}>
                 back to categories
