@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import deepDiveDecks, { MOOD_TAGS, SERIES } from '../data/deepDiveDecks'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 export default function DeepDivePage() {
   const { sessionId } = useParams()
@@ -86,6 +87,7 @@ export default function DeepDivePage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="deepDive" />
       <PageDoodles seed={77} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

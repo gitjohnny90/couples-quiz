@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { SquigglyUnderline } from '../components/Doodles'
 import sentenceStarters from '../data/sentenceStarters'
+import PageGuide from '../components/PageGuide'
 
 const PLAYER_COLORS = { player1: '#E88D7A', player2: '#7EB8D8' }
 
@@ -290,6 +291,7 @@ export default function FinishSentencePage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="finishSentence" />
       <PageDoodles seed={7} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
         style={{ position: 'relative', zIndex: 1 }}>

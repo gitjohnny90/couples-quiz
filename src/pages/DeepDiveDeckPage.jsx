@@ -10,6 +10,7 @@ import ReactionBadge from '../components/ReactionBadge'
 import useLongPress from '../hooks/useLongPress'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline, DoodleHeart } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 // Answer all questions → submit → wait for partner → reveal all together
 const PHASE = { ANSWERING: 'answering', WAITING: 'waiting', RESULTS: 'results' }
@@ -240,6 +241,7 @@ export default function DeepDiveDeckPage() {
     const totalReactions = Object.values(reactionMap).reduce((sum, playerMap) => sum + Object.keys(playerMap).length, 0)
     return (
       <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="deepDiveDeck" />
         <PageDoodles seed={deck.id.length + 20} />
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 
@@ -336,6 +338,7 @@ export default function DeepDiveDeckPage() {
   // ── ANSWERING + WAITING PHASES ──
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="deepDiveDeck" />
       <PageDoodles seed={deck.id.length} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1, width: '100%' }}>
 

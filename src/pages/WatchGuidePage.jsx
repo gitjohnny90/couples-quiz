@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 const tools = [
   {
@@ -107,6 +108,7 @@ export default function WatchGuidePage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="watchGuide" />
       <PageDoodles seed={33} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

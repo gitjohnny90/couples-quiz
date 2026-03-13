@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import drawingPrompts, { drawingRoundMeta, getDrawPackId } from '../data/drawingPrompts'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleStar, DoodleSpiral, SquigglyUnderline } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 export default function FunStuffPage() {
   const { sessionId } = useParams()
@@ -114,6 +115,7 @@ export default function FunStuffPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="funStuff" />
       <PageDoodles seed={11} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

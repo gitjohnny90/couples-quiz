@@ -5,6 +5,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { supabase } from "../lib/supabase";
 import { motion } from "framer-motion";
 import PageDoodles, { SquigglyUnderline } from "../components/Doodles";
+import PageGuide from '../components/PageGuide'
 
 function generateInviteCode() {
   const num = Math.floor(1000 + Math.random() * 9000);
@@ -256,6 +257,7 @@ export default function HomePage() {
   if (session && !session.player2_name) {
     return (
       <div className="page" style={{ position: "relative" }}>
+        <PageGuide pageKey="home" />
         <PageDoodles seed={1} />
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -312,6 +314,7 @@ export default function HomePage() {
   if (session && session.player2_name) {
     return (
       <div className="page" style={{ position: "relative" }}>
+        <PageGuide pageKey="home" />
         <PageDoodles seed={1} />
         <motion.div
           initial={{ opacity: 0 }}
@@ -331,6 +334,7 @@ export default function HomePage() {
 
   return (
     <div className="page" style={{ position: "relative" }}>
+      <PageGuide pageKey="home" />
       <PageDoodles seed={1} />
       <motion.div
         initial={{ opacity: 0 }}

@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import predictPartnerSeries, { allPredictPacks, getPredictPack, getSeriesForPack } from '../data/predictPartnerQuestions'
 import PageDoodles, { SquigglyUnderline, DoodleStar } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 const SCORE_LABELS = [
   'Start over. From the beginning. Of the relationship.',
@@ -258,6 +259,7 @@ export default function PredictPartnerPage() {
   if (screen === 'packs') {
     return (
       <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="predictPartner" />
         <PageDoodles seed={21} />
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ textAlign: 'center', marginBottom: 8 }}>
@@ -362,6 +364,7 @@ export default function PredictPartnerPage() {
     const q = activePack.questions[questionIndex]
     return (
       <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="predictPartner" />
         <PageDoodles seed={22} />
         <motion.div
           key={`q-${questionIndex}`}
@@ -498,6 +501,7 @@ export default function PredictPartnerPage() {
   if (screen === 'waiting' && activePack) {
     return (
       <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="predictPartner" />
         <PageDoodles seed={23} />
         <motion.div
           initial={{ opacity: 0 }}
@@ -573,6 +577,7 @@ export default function PredictPartnerPage() {
 
     return (
       <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="predictPartner" />
         <PageDoodles seed={24} />
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

@@ -4,6 +4,7 @@ import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleFlower } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 const LOVE_LANGUAGES = ['Words of Affirmation', 'Quality Time', 'Physical Touch', 'Acts of Service', 'Receiving Gifts']
 const MBTI_TYPES = ['', 'INTJ', 'INTP', 'ENTJ', 'ENTP', 'INFJ', 'INFP', 'ENFJ', 'ENFP', 'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ', 'ISTP', 'ISFP', 'ESTP', 'ESFP']
@@ -114,6 +115,7 @@ export default function PersonalityPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="personality" />
       <PageDoodles seed={6} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

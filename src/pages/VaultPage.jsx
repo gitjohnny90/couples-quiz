@@ -9,6 +9,7 @@ import { allPredictPacks } from '../data/predictPartnerQuestions'
 import { allHotTakeGroups, allHotTakeStatements } from '../data/hotTakesStatements'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 export default function VaultPage() {
   const { sessionId } = useParams()
@@ -127,6 +128,7 @@ export default function VaultPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="vault" />
       <PageDoodles seed={4} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

@@ -11,6 +11,7 @@ import ReactionBadge from '../components/ReactionBadge'
 import useLongPress from '../hooks/useLongPress'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, DoodleHeart, SquigglyUnderline } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 const BOOK_SHELVES = [
   { key: 'growth', label: 'Personal Growth', emoji: '🌳', color: '#8DAE8B' },
@@ -201,6 +202,7 @@ export default function JournalPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="journal" />
       <PageDoodles seed={88} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

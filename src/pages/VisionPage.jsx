@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { SessionContext } from '../App'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 import VisionTab from './VisionTab'
 
 export default function VisionPage() {
@@ -16,6 +17,7 @@ export default function VisionPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="vision" />
       <PageDoodles seed={9} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

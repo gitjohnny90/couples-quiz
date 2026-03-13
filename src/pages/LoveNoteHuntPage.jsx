@@ -10,6 +10,7 @@ import { useReactions } from '../utils/reactions'
 import ReactionPopup from '../components/ReactionPopup'
 import ReactionBadge from '../components/ReactionBadge'
 import useLongPress from '../hooks/useLongPress'
+import PageGuide from '../components/PageGuide'
 
 const PHASE = { SETUP: 'setup', WAITING: 'waiting', HUNTING: 'hunting', REVEAL: 'reveal' }
 const GRID_SIZE = 6
@@ -429,6 +430,7 @@ export default function LoveNoteHuntPage() {
   if (phase === PHASE.SETUP) {
     return (
       <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="loveNotes" />
         <PageDoodles seed={42} />
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -567,6 +569,7 @@ export default function LoveNoteHuntPage() {
   if (phase === PHASE.WAITING) {
     return (
       <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="loveNotes" />
         <PageDoodles seed={43} />
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -618,6 +621,7 @@ export default function LoveNoteHuntPage() {
   if (phase === PHASE.HUNTING) {
     return (
       <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="loveNotes" />
         <PageDoodles seed={44} />
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -727,6 +731,7 @@ export default function LoveNoteHuntPage() {
 
     return (
       <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="loveNotes" />
         <PageDoodles seed={45} />
         <motion.div
           initial={{ opacity: 0, y: 15 }}

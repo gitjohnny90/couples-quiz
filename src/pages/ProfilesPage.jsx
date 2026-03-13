@@ -4,6 +4,7 @@ import { SessionContext } from '../App'
 import { AuthContext } from '../contexts/AuthContext'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 export default function ProfilesPage() {
   const { sessionId } = useParams()
@@ -47,6 +48,7 @@ export default function ProfilesPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="profiles" />
       <PageDoodles seed={6} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

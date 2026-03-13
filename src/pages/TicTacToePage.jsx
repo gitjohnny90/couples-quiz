@@ -4,6 +4,7 @@ import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import { motion } from 'framer-motion'
 import PageDoodles, { SquigglyUnderline } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 import { checkWinner } from '../utils/gameLogic'
 
 const PACK_ID = 'tictactoe'
@@ -182,6 +183,7 @@ export default function TicTacToePage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="tictactoe" />
       <PageDoodles seed={13} />
       <motion.div
         initial={{ opacity: 0, y: 15 }}

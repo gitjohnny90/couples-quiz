@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { SquigglyUnderline } from '../components/Doodles'
 import hotTakesCategories, { allHotTakeGroups, getGroup } from '../data/hotTakesStatements'
+import PageGuide from '../components/PageGuide'
 
 const PLAYER_COLORS = { player1: '#E88D7A', player2: '#7EB8D8' }
 const AGREE_COLOR = '#8DAE8B'
@@ -273,6 +274,7 @@ export default function HotTakesPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="hotTakes" />
       <PageDoodles seed={9} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
         style={{ position: 'relative', zIndex: 1 }}>

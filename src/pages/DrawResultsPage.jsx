@@ -9,6 +9,7 @@ import ReactionBadge from '../components/ReactionBadge'
 import useLongPress from '../hooks/useLongPress'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleHeart, DoodleStar, SquigglyUnderline } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 export default function DrawResultsPage() {
   const { sessionId, promptId } = useParams()
@@ -166,6 +167,7 @@ export default function DrawResultsPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="drawResults" />
       <PageDoodles seed={9} />
       <motion.div
         initial={{ opacity: 0, y: 15 }}

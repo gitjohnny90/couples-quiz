@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabase";
 import quizPacks from "../data/quizPacks";
 import { motion, AnimatePresence } from "framer-motion";
 import PageDoodles, { SquigglyUnderline, DoodleStar } from "../components/Doodles";
+import PageGuide from '../components/PageGuide'
 
 export default function QuizPage() {
   const { sessionId, packId } = useParams();
@@ -143,6 +144,7 @@ export default function QuizPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="quiz" />
       <PageDoodles seed={3} />
 
       <motion.div

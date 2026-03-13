@@ -6,6 +6,7 @@ import drawingPrompts, { drawingRoundMeta, getDrawPackId } from '../data/drawing
 import DrawingCanvas from '../components/DrawingCanvas'
 import { motion } from 'framer-motion'
 import PageDoodles, { DoodleSpiral, DoodleStar, SquigglyUnderline } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 export default function DrawPage() {
   const { sessionId } = useParams()
@@ -123,6 +124,7 @@ export default function DrawPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="draw" />
       <PageDoodles seed={7} />
       <motion.div
         initial={{ opacity: 0, y: 15 }}

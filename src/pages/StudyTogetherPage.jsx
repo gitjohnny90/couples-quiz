@@ -4,6 +4,7 @@ import { SessionContext } from '../App'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { SquigglyUnderline, DoodleStar } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 const PACK_ID = 'study-together'
 const PLAYER_ID = 'shared'
@@ -288,6 +289,7 @@ export default function StudyTogetherPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="studyTogether" />
       <PageDoodles seed={17} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 

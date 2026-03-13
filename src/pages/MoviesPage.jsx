@@ -6,6 +6,7 @@ import movieGenres from '../data/movieGenres'
 import SpinningWheel from '../components/SpinningWheel'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { DoodleStar, SquigglyUnderline, DoodleHeart } from '../components/Doodles'
+import PageGuide from '../components/PageGuide'
 
 import { createVetoSystem } from '../utils/vetoSystem'
 
@@ -202,6 +203,7 @@ export default function MoviesPage() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
+      <PageGuide pageKey="movies" />
       <PageDoodles seed={20} />
       <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} style={{ position: 'relative', zIndex: 1 }}>
 
