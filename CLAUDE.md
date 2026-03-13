@@ -32,12 +32,28 @@ No test runner or linter is configured.
 
 `SessionContext` (in `App.jsx`) holds `sessionId`, `playerName`, and `playerId`, persisted to localStorage. Sessions are auto-created on first sign-in: if a `pendingInviteCode` exists in localStorage, the user auto-joins their partner's session as player2; otherwise a new session is auto-created with a `LOVE-XXXX` invite code and the user becomes player1. The `user_sessions` table links Supabase auth users to sessions so they can resume on login. Legacy sessions (pre-auth) are auto-claimed when a user signs in. The home page (`/`) acts as an auto-setup redirector — users with existing sessions are sent straight to the vault. `playerName` is sourced from the `sessions` table (authoritative) rather than auth metadata to avoid name mismatches. Pages that display player names (PredictPartner, DeepDive, etc.) also fetch names directly from the session DB record via a `sessionMyName` state variable.
 
+## CEO Reporting (Automatic)
+
+After every `git push`, write a brief report to:
+C:\Users\mcfat\projects\us-quiz-ceo\reports\build-YYYY-MM-DD.md
+
+If a report for today already exists, append to it — don't overwrite.
+
+Each entry should include:
+- Timestamp
+- What was pushed (files changed, features added/fixed)
+- Any decisions made during the session
+- Current status (what's working, what's next)
+- Any blockers or issues encountered
+
+Keep it concise — the CEO session reads these for a quick briefing, not a novel.
+
 ### Routing
 
-All routes defined in `App.jsx`. `/auth` and `/reset-password` are public; all others require authentication. Four nav tabs map to route groups:
+All routes defined in `App.jsx`. `/auth`, `/reset-password`, and `/waitlist` are public; all others require authentication. Four nav tabs map to route groups:
 - **home** → `/` (HomePage — auto-setup redirector, sends to vault)
 - **quizzes** → `/vault/:id`, `/quiz/:id/:packId`, `/results/:id/:packId`, `/deep-dive/:id`, `/deep-dive/:id/:deckId`, `/predict-partner/:id`, `/quiz-packs/:id`, `/finish-sentence/:id`, `/hot-takes/:id`
-- **fun stuff** → `/fun/:id`, `/draw/:id`, `/movies/:id`, `/tictactoe/:id`, `/love-notes/:id`, `/watch-guide/:id`
+- **fun stuff** → `/fun/:id`, `/draw/:id`, `/draw-results/:id/:promptId`, `/movies/:id`, `/tictactoe/:id`, `/love-notes/:id`, `/watch-guide/:id`
 - **us** → `/profiles/:id` (hub page with links to sub-pages), `/personality/:id` (edit/compare personality tests), `/vision/:id` (north star + vision board tab, dreams + sky + milestones tab), `/journal/:id` (four tabs: quizzes, deep dive, drawings, books), `/study/:id` (Study Together — shared reading + reflections)
 
 ### Data Flow
@@ -61,12 +77,13 @@ All routes defined in `App.jsx`. `/auth` and `/reset-password` are public; all o
 | `predict_partner` | Predict Your Partner answers (dedicated table) | `session_id`, `player_id`, `pack_id`, `question_index`, `own_answer`, `prediction`, `prediction_correct`, `completed_at` |
 | `finish_sentence` | Finish My Sentence rounds | `session_id`, `round`, `player_id`, `sentence_starter`, `sentence_finish` |
 | `hot_takes` | Hot Takes votes & defenses | `session_id`, `player_id`, `statement_id`, `vote`, `defense` |
+| `waitlist` | App Store email waitlist | `email` (unique), `source` (nullable, from `?src=` param), `created_at` |
 
 All tables use `player_id` as `'player1'` or `'player2'` (tic-tac-toe uses `'game'`, study-together and vision use `'shared'` for shared state). Auth user IDs stored in `sessions` and `user_sessions`.
 
 ### Row Level Security (RLS)
 
-All 11 tables have RLS enabled with proper session-scoped policies. No "Allow all" policies exist. No Supabase Storage buckets are used (drawings are base64 in JSONB). Policy SQL is in `supabase-rls-fix.sql`.
+All 12 tables have RLS enabled with proper session-scoped policies. No "Allow all" policies exist. No Supabase Storage buckets are used (drawings are base64 in JSONB). Policy SQL is in `supabase-rls-fix.sql` (core tables) and `supabase-waitlist.sql` (waitlist).
 
 - **`user_sessions`**: `FOR ALL` — `user_id = (SELECT auth.uid())`
 - **`sessions`**: 4 per-operation policies to handle bootstrap (before `user_sessions` row exists):
@@ -75,6 +92,7 @@ All 11 tables have RLS enabled with proper session-scoped policies. No "Allow al
   - UPDATE: linked partners OR direct player match OR open join slot (`player2_user_id IS NULL AND player2_name IS NULL`)
   - DELETE: blocked (`USING (false)`)
 - **9 feature tables** (`responses`, `profiles`, `deep_dive_responses`, `shared_items`, `love_notes`, `reactions`, `predict_partner`, `finish_sentence`, `hot_takes`): `FOR ALL` — `session_id IN (SELECT session_id FROM user_sessions WHERE user_id = (SELECT auth.uid()))`
+- **`waitlist`**: `FOR INSERT` only — `WITH CHECK (true)`. No SELECT/UPDATE/DELETE policies. Data only accessible from Supabase Dashboard or service role key.
 
 All policies use `(SELECT auth.uid())` (subquery form) for Postgres initPlan caching optimization. Performance indexes exist on `user_sessions(user_id)`, `user_sessions(session_id)`, and `session_id` columns on all feature tables.
 
@@ -103,6 +121,8 @@ The visual theme is a hand-drawn notebook:
 - `src/components/ReactionBadge.jsx` — bare emoji(s) positioned at the bottom-right edge of an answer/drawing box, hanging halfway off the corner (`position: absolute; bottom: -10; right: -6`). Parent must have `position: relative; overflow: visible`. Pop animation (spring: stiffness 500, damping 12) only fires for real-time arrivals, not pre-existing reactions on page load (800ms mount delay via ref). Shows one or two emojis (yours + partner's) with slight overlap when both exist.
 - `src/components/ReactionPicker.jsx` — re-export barrel for ReactionPopup, ReactionBadge, and useLongPress.
 - `src/components/MissYouHeart.jsx` — absolute-positioned candy conversation heart ("MISS U") in top-right corner (scrolls with page, does not follow viewport). Tapping sends a nudge to partner via `responses` table (`pack_id: 'nudge'`). Partner sees a toast notification in real time. 30-second cooldown between sends. Rendered in `App.jsx` alongside `BottomNav`. Parent `.app` div has `position: relative` for positioning context.
+- `src/components/PageGuide.jsx` — first-visit onboarding tooltip system. Shows a friendly overlay explaining what the current page does on first visit (tracked in localStorage `pageGuideSeen`). After dismissal, collapses into a persistent (?) button fixed in the top-right corner. Content defined in `src/data/pageGuides.js` with a `pageKey` per page. Integrated into all 22 authenticated pages via `<PageGuide pageKey="..." />`.
+- `src/components/AppWaitlistPrompt.jsx` — post-activity email capture card for App Store waitlist. Shows once after a user's first completed activity (tracked via `completedActivityCount` + `waitlistPromptDismissed` in localStorage). Exports `trackActivityCompletion()` which pages call from their results useEffect. Integrated into 5 results pages: ResultsPage, DrawResultsPage, FinishSentencePage, PredictPartnerPage, HotTakesPage.
 
 ### Hooks
 
@@ -178,7 +198,8 @@ useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 - **Error handling**: Most pages use an `error` state variable with user-visible feedback (inline `<p>` or banner). Some use `setTimeout` for auto-dismiss after 3 seconds.
 - **Dynamic page titles**: `useDocumentTitle()` hook in `App.jsx` sets `document.title` based on the current route.
 - **Accessibility**: Bottom nav uses `aria-label`, `aria-current`; quiz options use `aria-pressed`; Love Note Hunt grid uses `role="gridcell"` with keyboard support.
-- **localStorage keys**: `sessionId`, `playerName`, `playerId`, plus feature-specific keys like movie vetoes
+- **Waitlist**: `src/pages/WaitlistPage.jsx` — public standalone page at `/waitlist` (no auth required) for App Store email capture. Describes The Us Quiz, what the native app adds, and has an email form. Accepts `?src=` URL param for campaign attribution (e.g., `?src=reddit-longdistance`). Stored in `waitlist.source` column. Duplicate emails handled gracefully via Postgres unique constraint (23505 → show success). Submit logic in `src/utils/waitlist.js`.
+- **localStorage keys**: `sessionId`, `playerName`, `playerId`, `pageGuideSeen` (object tracking first-visit tooltips), `completedActivityCount`, `waitlistPromptDismissed`, plus feature-specific keys like movie vetoes
 
 ## Dev Preview Bypass
 
@@ -208,3 +229,7 @@ Required in `.env` (prefixed with `VITE_` for Vite):
   - Fixed: Draw Together `.drawing-reveal-name` CSS overflow/truncation handling
   - Fixed: `setSessionId(sessionId)` sync added to all 22 routed pages (was only on 9)
   - Not relevant: Home tab blank page (old build), Random card modal (already fixed), Miss You Heart feedback (already working)
+
+### Post-v1.0 — Soft Launch Prep (2026-03-12)
+- **Onboarding tooltips**: `PageGuide` component with first-visit overlays on all 22 pages. Persistent (?) help button. Content in `src/data/pageGuides.js`. Tracks visits in localStorage.
+- **Email waitlist**: Supabase `waitlist` table (insert-only RLS). Post-activity prompt on 5 results pages (shows once after first completed activity). Standalone `/waitlist` public page for community sharing. `?src=` URL param for campaign attribution.
