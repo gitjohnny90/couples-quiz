@@ -56,9 +56,12 @@ export default function SpinningWheel({ items = [], onResult, disabled = false }
     // Spin 4-6 full rotations + land on winner segment center
     const extraSpins = (4 + Math.random() * 2) * 360
     // The pointer is at the top (0 degrees)
-    // To land segment i at the top: rotate so segment center aligns with 0
+    // To land segment i at the top: rotation % 360 must equal (360 - targetAngle)
     const targetAngle = winnerIndex * segmentAngle + segmentAngle / 2
-    const totalRotation = rotation + extraSpins + (360 - targetAngle)
+    const desiredFinal = (360 - targetAngle + 360) % 360
+    const currentAngle = rotation % 360
+    const delta = (desiredFinal - currentAngle + 360) % 360
+    const totalRotation = rotation + extraSpins + delta
 
     setRotation(totalRotation)
 
