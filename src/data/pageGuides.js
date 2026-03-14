@@ -126,7 +126,7 @@ const pageGuides = {
     title: 'Personality Tests',
     lines: [
       'Add your results from popular personality tests (Love Languages, MBTI, Enneagram, and more).',
-      'You each fill in your own, then switch to the Compare tab to see them side by side. If you haven\'t taken a test yet, there are links to help you get started.'
+      'You each fill in your own, then switch to the Compare tab to see them side by side. If you haven\'t taken a test yet, you can search for any of them online — they\'re all free!'
     ]
   },
   vision: {
