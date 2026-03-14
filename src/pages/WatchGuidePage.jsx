@@ -23,7 +23,7 @@ const tools = [
   },
   {
     name: 'Flickcall',
-    tag: 'Most Intimate',
+    tag: 'All-in-One',
     tagColor: '#E88D7A',
     emoji: '💕',
     bullets: [
