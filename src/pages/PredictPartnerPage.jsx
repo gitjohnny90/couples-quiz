@@ -36,6 +36,7 @@ export default function PredictPartnerPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const activityTrackedRef = useRef(false)
+  const [activityCount, setActivityCount] = useState(0)
 
   // Fetch all predict responses from dedicated table
   const fetchResponses = useCallback(async () => {
@@ -96,7 +97,8 @@ export default function PredictPartnerPage() {
   useEffect(() => {
     if (screen === 'reveal' && !activityTrackedRef.current) {
       activityTrackedRef.current = true
-      trackActivityCompletion()
+      const count = trackActivityCompletion()
+      setActivityCount(count)
     }
   }, [screen])
 
@@ -678,7 +680,7 @@ export default function PredictPartnerPage() {
             )
           })()}
 
-          <AppWaitlistPrompt />
+          <AppWaitlistPrompt activityCount={activityCount} />
 
           <button
             onClick={handleBackToPacks}

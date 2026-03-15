@@ -35,6 +35,7 @@ export default function DeepDiveDeckPage() {
   const deck = deepDiveDecks.find((d) => d.id === deckId)
 
   const [sessionMyName, setSessionMyName] = useState(null)
+  const [sessionInfo, setSessionInfo] = useState(null)
   const [currentQ, setCurrentQ] = useState(0)
   const [phase, setPhase] = useState(PHASE.ANSWERING)
   const [answers, setAnswers] = useState({}) // { questionId: "answer text" }
@@ -73,13 +74,16 @@ export default function DeepDiveDeckPage() {
     if (resolved === 'answering') setCurrentQ(0)
   }
 
-  // Fetch authoritative name from session
+  // Fetch authoritative name and invite code from session
   useEffect(() => {
     if (!sessionId || !playerId) return
-    supabase.from('sessions').select('player1_name, player2_name')
+    supabase.from('sessions').select('player1_name, player2_name, player2_user_id, invite_code')
       .eq('id', sessionId).maybeSingle()
       .then(({ data }) => {
-        if (data) setSessionMyName(playerId === 'player1' ? data.player1_name : data.player2_name)
+        if (data) {
+          setSessionMyName(playerId === 'player1' ? data.player1_name : data.player2_name)
+          setSessionInfo(data)
+        }
       })
   }, [sessionId, playerId])
 
@@ -189,10 +193,12 @@ export default function DeepDiveDeckPage() {
     if (currentQ > 0) setCurrentQ(currentQ - 1)
   }
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const copyCode = () => {
+    if (sessionInfo?.invite_code) {
+      navigator.clipboard.writeText(sessionInfo.invite_code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   // Helper to get response pairs for a question
@@ -457,15 +463,23 @@ export default function DeepDiveDeckPage() {
                   </p>
                 </div>
 
-                {/* Share link */}
-                <div style={{ marginTop: 16 }}>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
-                    make sure they have the link:
-                  </p>
-                  <button className="btn btn-secondary" style={{ width: '100%' }} onClick={copyLink}>
-                    {copied ? 'copied!' : 'copy session link'}
-                  </button>
-                </div>
+                {/* Invite code — only show if partner hasn't joined yet */}
+                {!sessionInfo?.player2_user_id && sessionInfo?.invite_code && (
+                  <div style={{ marginTop: 16 }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 8 }}>
+                      share this code so they can join:
+                    </p>
+                    <div style={{
+                      fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700,
+                      color: 'var(--accent-coral)', letterSpacing: '0.05em', marginBottom: 14,
+                    }}>
+                      {sessionInfo.invite_code}
+                    </div>
+                    <button className="btn btn-secondary" style={{ width: '100%' }} onClick={copyCode}>
+                      {copied ? 'copied!' : 'copy code'}
+                    </button>
+                  </div>
+                )}
 
                 <button
                   className="btn btn-secondary"

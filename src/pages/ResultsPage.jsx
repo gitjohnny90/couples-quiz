@@ -46,6 +46,7 @@ export default function ResultsPage() {
 
   // Track activity completion for waitlist prompt
   const activityTrackedRef = useRef(false)
+  const [activityCount, setActivityCount] = useState(0)
 
   // Track which card is being pressed for long-press
   const pressedCardRef = useRef(null)
@@ -103,7 +104,8 @@ export default function ResultsPage() {
   useEffect(() => {
     if (responses.length >= 2 && !activityTrackedRef.current) {
       activityTrackedRef.current = true
-      trackActivityCompletion()
+      const count = trackActivityCompletion()
+      setActivityCount(count)
     }
   }, [responses.length])
 
@@ -401,7 +403,7 @@ export default function ResultsPage() {
           })}
         </div>
 
-        <AppWaitlistPrompt />
+        <AppWaitlistPrompt activityCount={activityCount} />
 
         <button className="btn btn-secondary" style={{ width: '100%', marginTop: 22 }} onClick={() => navigate(`/vault/${sessionId}`)}>
           ← back to quizzes

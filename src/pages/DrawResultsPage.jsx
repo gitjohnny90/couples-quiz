@@ -45,6 +45,7 @@ export default function DrawResultsPage() {
 
   // Track activity completion for waitlist prompt
   const activityTrackedRef = useRef(false)
+  const [activityCount, setActivityCount] = useState(0)
 
   // Long-press for reaction popup
   const pressedCardRef = useRef(null)
@@ -101,7 +102,8 @@ export default function DrawResultsPage() {
   useEffect(() => {
     if (revealed && !activityTrackedRef.current) {
       activityTrackedRef.current = true
-      trackActivityCompletion()
+      const count = trackActivityCompletion()
+      setActivityCount(count)
     }
   }, [revealed])
 
@@ -335,7 +337,7 @@ export default function DrawResultsPage() {
                 </p>
               </motion.div>
 
-              <AppWaitlistPrompt />
+              <AppWaitlistPrompt activityCount={activityCount} />
 
               {/* Action buttons */}
               <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>

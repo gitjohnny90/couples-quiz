@@ -48,6 +48,7 @@ export default function FinishSentencePage() {
 
   // Track activity completion for waitlist prompt
   const activityTrackedRef = useRef(false)
+  const [activityCount, setActivityCount] = useState(0)
 
   // Screen: 'write' | 'wait-for-partner-starter' | 'finish' | 'wait-for-partner-finish' | 'reveal'
   const [screen, setScreen] = useState('write')
@@ -284,7 +285,8 @@ export default function FinishSentencePage() {
   useEffect(() => {
     if (screen === 'reveal' && !activityTrackedRef.current) {
       activityTrackedRef.current = true
-      trackActivityCompletion()
+      const count = trackActivityCompletion()
+      setActivityCount(count)
     }
   }, [screen])
 
@@ -541,7 +543,7 @@ export default function FinishSentencePage() {
 
             {revealStep >= 2 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-                <AppWaitlistPrompt />
+                <AppWaitlistPrompt activityCount={activityCount} />
                 <button
                   className="btn btn-primary"
                   onClick={handleNewRound}

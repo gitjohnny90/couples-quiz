@@ -33,6 +33,7 @@ export default function HotTakesPage() {
   useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   const activityTrackedRef = useRef(false)
+  const [activityCount, setActivityCount] = useState(0)
   const mountedRef = useRef(true)
   const channelId = useRef(`hot-takes-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
 
@@ -123,7 +124,8 @@ export default function HotTakesPage() {
   useEffect(() => {
     if (screen === 'results' && !activityTrackedRef.current) {
       activityTrackedRef.current = true
-      trackActivityCompletion()
+      const count = trackActivityCompletion()
+      setActivityCount(count)
     }
   }, [screen])
 
@@ -640,7 +642,7 @@ export default function HotTakesPage() {
                 })}
               </div>
 
-              <AppWaitlistPrompt />
+              <AppWaitlistPrompt activityCount={activityCount} />
 
               <button className="btn btn-primary" onClick={handleBackToCategories} style={{ width: '100%' }}>
                 back to categories

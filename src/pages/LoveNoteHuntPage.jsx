@@ -49,8 +49,17 @@ export default function LoveNoteHuntPage() {
 
   // Waiting state
   const [copied, setCopied] = useState(false)
+  const [sessionInfo, setSessionInfo] = useState(null)
 
   const textareaRef = useRef(null)
+
+  // Fetch session info for invite code display
+  useEffect(() => {
+    if (!sessionId) return
+    supabase.from('sessions').select('player2_name, player2_user_id, invite_code')
+      .eq('id', sessionId).maybeSingle()
+      .then(({ data }) => { if (data) setSessionInfo(data) })
+  }, [sessionId])
 
   useEffect(() => {
     resumeGame()
@@ -246,12 +255,14 @@ export default function LoveNoteHuntPage() {
     setPhase(PHASE.SETUP)
   }
 
-  // --- COPY LINK ---
+  // --- COPY CODE ---
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const copyCode = () => {
+    if (sessionInfo?.invite_code) {
+      navigator.clipboard.writeText(sessionInfo.invite_code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   // --- GRID RENDERER ---
@@ -548,26 +559,22 @@ export default function LoveNoteHuntPage() {
             they need to hide their love notes too!
           </p>
 
-          <div className="glass" style={{ padding: 20, marginBottom: 16, textAlign: 'center' }}>
-            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', marginBottom: 8, color: 'var(--text-secondary)' }}>
-              send them this link:
-            </p>
-            <div style={{
-              background: '#fff',
-              borderBottom: '2px solid var(--border-pencil)',
-              padding: '10px 14px',
-              fontSize: '0.8rem',
-              wordBreak: 'break-all',
-              color: 'var(--accent-coral)',
-              marginBottom: 12,
-              fontFamily: 'var(--font-body)',
-            }}>
-              {window.location.origin}/join/{sessionId}
+          {!sessionInfo?.player2_user_id && sessionInfo?.invite_code && (
+            <div className="glass" style={{ padding: 20, marginBottom: 16, textAlign: 'center' }}>
+              <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', marginBottom: 8, color: 'var(--text-secondary)' }}>
+                share this code so they can join:
+              </p>
+              <div style={{
+                fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700,
+                color: 'var(--accent-coral)', letterSpacing: '0.05em', marginBottom: 14,
+              }}>
+                {sessionInfo.invite_code}
+              </div>
+              <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyCode}>
+                {copied ? 'copied!' : 'copy code'}
+              </button>
             </div>
-            <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyLink}>
-              {copied ? 'copied!' : 'copy link'}
-            </button>
-          </div>
+          )}
 
           <button
             className="btn btn-secondary"

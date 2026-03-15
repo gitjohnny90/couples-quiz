@@ -24,7 +24,7 @@ export function trackActivityCompletion() {
  * Shows once after the user's first completed activity, then never again.
  * Place this in results/reveal screens.
  */
-export default function AppWaitlistPrompt() {
+export default function AppWaitlistPrompt({ activityCount = 0 }) {
   const [visible, setVisible] = useState(false)
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle') // idle | submitting | done | error
@@ -39,7 +39,7 @@ export default function AppWaitlistPrompt() {
         setVisible(true)
       }
     } catch {}
-  }, [])
+  }, [activityCount])
 
   const dismiss = () => {
     setVisible(false)
