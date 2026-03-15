@@ -87,7 +87,7 @@ Plans:
   3. A user visiting a full session's JoinPage is shown a "session full" error, not given access to the session
   4. finish_sentence and hot_takes RLS policies enforce session membership without type errors
   5. No SQL files with open "allow all" policies remain active in the repo without clear superseded markers
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 05-01-PLAN.md — Add player_id RLS policies to all 9 feature tables and fix finish_sentence/hot_takes type mismatch
@@ -102,7 +102,7 @@ Plans:
   2. Editing a vision board image caption and waiting for autosave writes the current caption text, not a stale previous value
   3. After saving answers in PredictPartnerPage, the completion check reads fresh data from the database
   4. Polling queries on pages with large JSONB or base64 columns request only the columns they need (no select('*') on those tables)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 06-01-PLAN.md — Fix fake join URLs in ResultsPage and DrawResultsPage
@@ -116,7 +116,7 @@ Plans:
   1. Interactive cards on VaultPage, HotTakesPage, VisionTab, StudyTogetherPage, and ResultsPage are reachable and activatable via keyboard Tab and Enter/Space
   2. The PageGuide overlay announces itself as a dialog, traps focus while open, and closes on Escape with focus restored to the trigger button
   3. Every form field on AuthPage and WaitlistPage has a visible label that screen readers associate with the input
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 07-01-PLAN.md — Add button semantics and keyboard handlers to interactive cards across 5 pages
@@ -130,7 +130,7 @@ Plans:
   1. VisionTab caption styles are driven by React state, with no direct style mutations on DOM nodes
   2. Large page components have at least one extracted custom hook or helper module that reduces their line count
   3. The test suite runs with zero failures (stale /books route tests are fixed or removed)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 08-01-PLAN.md — Replace VisionTab DOM mutations with state-driven CSS; fix or remove stale /books route tests
