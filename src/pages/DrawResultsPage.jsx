@@ -22,6 +22,7 @@ export default function DrawResultsPage() {
   useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 
   const [responses, setResponses] = useState([])
+  const [sessionInfo, setSessionInfo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [revealed, setRevealed] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -67,6 +68,19 @@ export default function DrawResultsPage() {
   // Initial load
   useEffect(() => { fetchResponses() }, [fetchResponses])
 
+  // Fetch session info for two-state waiting screen
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: sess } = await supabase
+        .from('sessions')
+        .select('player2_name, player2_user_id, invite_code')
+        .eq('id', sessionId)
+        .single()
+      if (mountedRef.current && sess) setSessionInfo(sess)
+    }
+    fetchSession()
+  }, [sessionId])
+
   // Realtime subscription — event: '*' catches both INSERT and UPDATE
   useEffect(() => {
     const channel = supabase
@@ -91,12 +105,12 @@ export default function DrawResultsPage() {
     }
   }, [revealed])
 
-  const shareUrl = `${window.location.origin}/join/${sessionId}`
-
-  const copyLink = () => {
-    navigator.clipboard.writeText(shareUrl)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const copyCode = () => {
+    if (sessionInfo?.invite_code) {
+      navigator.clipboard.writeText(sessionInfo.invite_code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   if (loading) {
@@ -117,6 +131,7 @@ export default function DrawResultsPage() {
 
   // Waiting for partner
   if (!bothDone) {
+    const partnerHasJoined = !!(sessionInfo?.player2_name || sessionInfo?.player2_user_id)
     return (
       <div className="page" style={{ position: 'relative' }}>
         <PageDoodles seed={8} />
@@ -129,30 +144,29 @@ export default function DrawResultsPage() {
           <h2 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.8rem', fontWeight: 700, marginBottom: 8 }}>
             waiting for your person...
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: 24 }}>
-            they need to draw their masterpiece too!
-          </p>
-
-          <div className="glass" style={{ padding: 20, marginBottom: 16, textAlign: 'center' }}>
-            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', marginBottom: 8, color: 'var(--text-secondary)' }}>
-              send them this link:
+          {partnerHasJoined ? (
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: 24 }}>
+              they need to draw their masterpiece too!
             </p>
-            <div style={{
-              background: '#fff',
-              borderBottom: '2px solid var(--border-pencil)',
-              padding: '10px 14px',
-              fontSize: '0.8rem',
-              wordBreak: 'break-all',
-              color: 'var(--accent-coral)',
-              marginBottom: 12,
-              fontFamily: 'var(--font-body)',
-            }}>
-              {shareUrl}
+          ) : (
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginBottom: 16 }}>
+              share this code so they can join:
+            </p>
+          )}
+
+          {!partnerHasJoined && (
+            <div className="glass" style={{ padding: 20, marginBottom: 16, textAlign: 'center' }}>
+              <div style={{
+                fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700,
+                color: 'var(--accent-coral)', letterSpacing: '0.05em', marginBottom: 14,
+              }}>
+                {sessionInfo?.invite_code || '...'}
+              </div>
+              <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyCode}>
+                {copied ? 'copied!' : 'copy code'}
+              </button>
             </div>
-            <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyLink}>
-              {copied ? 'copied!' : 'copy link'}
-            </button>
-          </div>
+          )}
 
           <button
             className="btn btn-secondary"
