@@ -185,7 +185,21 @@ export default function WaitlistPage() {
               </p>
 
               <form onSubmit={handleSubmit}>
+                <label
+                  htmlFor="waitlist-email"
+                  style={{
+                    fontFamily: 'var(--font-hand)',
+                    fontSize: '1.15rem',
+                    color: 'var(--text-secondary)',
+                    display: 'block',
+                    marginBottom: 6,
+                    textAlign: 'left',
+                  }}
+                >
+                  your email:
+                </label>
                 <input
+                  id="waitlist-email"
                   type="email"
                   placeholder="your email"
                   value={email}

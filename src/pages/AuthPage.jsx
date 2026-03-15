@@ -208,6 +208,7 @@ export default function AuthPage() {
               {mode === "signup" && (
                 <>
                   <label
+                    htmlFor="auth-name"
                     style={{
                       fontFamily: "var(--font-hand)",
                       fontSize: "1.15rem",
@@ -219,6 +220,7 @@ export default function AuthPage() {
                     your name:
                   </label>
                   <input
+                    id="auth-name"
                     className="input"
                     type="text"
                     placeholder="what your partner calls you..."
@@ -230,6 +232,7 @@ export default function AuthPage() {
               )}
 
               <label
+                htmlFor="auth-email"
                 style={{
                   fontFamily: "var(--font-hand)",
                   fontSize: "1.15rem",
@@ -241,6 +244,7 @@ export default function AuthPage() {
                 email:
               </label>
               <input
+                id="auth-email"
                 className="input"
                 type="email"
                 placeholder="your@email.com"
@@ -253,6 +257,7 @@ export default function AuthPage() {
               {mode !== "forgot" && (
                 <>
                   <label
+                    htmlFor="auth-password"
                     style={{
                       fontFamily: "var(--font-hand)",
                       fontSize: "1.15rem",
@@ -265,6 +270,7 @@ export default function AuthPage() {
                   </label>
                   <div style={{ position: "relative", width: "100%", marginBottom: 20 }}>
                     <input
+                      id="auth-password"
                       className="input"
                       type={showPassword ? "text" : "password"}
                       placeholder={mode === "signup" ? "at least 6 characters" : "your password"}
@@ -304,6 +310,7 @@ export default function AuthPage() {
               {mode === "signup" && (
                 <>
                   <label
+                    htmlFor="auth-invite-code"
                     style={{
                       fontFamily: "var(--font-hand)",
                       fontSize: "1.15rem",
@@ -315,6 +322,7 @@ export default function AuthPage() {
                     invite code <span style={{ fontStyle: "italic", color: "var(--text-light)", fontSize: "0.85rem" }}>(optional)</span>:
                   </label>
                   <input
+                    id="auth-invite-code"
                     className="input"
                     type="text"
                     placeholder="LOVE-7742"
