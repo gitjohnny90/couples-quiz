@@ -26,11 +26,11 @@ No test runner or linter is configured.
 
 ### Authentication
 
-`AuthContext` (in `src/contexts/AuthContext.jsx`) wraps the app with Supabase Auth (email + password). Exports `user`, `loading`, `authEvent`, `signUp`, `signIn`, `signOut`, `resetPasswordForEmail`. All routes except `/auth` and `/reset-password` are wrapped in `<RequireAuth>` which redirects unauthenticated users to the sign-in page. The auth page (`src/pages/AuthPage.jsx`) has sign-in/sign-up/forgot-password modes, and a show/hide password button using monkey emojis. Sign-up includes an optional invite code field — if provided, the code is stored in `localStorage` as `pendingInviteCode` (persists through email confirmation). Password reset uses `resetPasswordForEmail()` → Supabase email → `/reset-password` page (`src/pages/ResetPasswordPage.jsx`) which detects recovery via URL hash (`type=recovery`) and lets the user set a new password.
+`AuthContext` (in `src/contexts/AuthContext.jsx`) wraps the app with Supabase Auth (email + password). Exports `user`, `loading`, `authEvent`, `signUp`, `signIn`, `signOut`, `resetPasswordForEmail`. All routes except `/auth` and `/reset-password` are wrapped in `<RequireAuth>` which redirects unauthenticated users to the sign-in page. The auth page (`src/pages/AuthPage.jsx`) has sign-in/sign-up/forgot-password modes, and a show/hide password button using monkey emojis. Sign-up includes an optional invite code field — if provided, the code is stored in both `localStorage` as `pendingInviteCode` AND in Supabase `user_metadata.invite_code` (belt-and-suspenders: localStorage for same-device, user_metadata for cross-device email confirmation). After use, the metadata field is cleared via `updateUser({ data: { invite_code: null } })`. Password reset uses `resetPasswordForEmail()` → Supabase email → `/reset-password` page (`src/pages/ResetPasswordPage.jsx`) which detects recovery via URL hash (`type=recovery`) and lets the user set a new password. Auth form fields have proper `htmlFor`/`id` label associations for screen reader accessibility.
 
 ### Session & Identity
 
-`SessionContext` (in `App.jsx`) holds `sessionId`, `playerName`, and `playerId`, persisted to localStorage. Sessions are auto-created on first sign-in: if a `pendingInviteCode` exists in localStorage, the user auto-joins their partner's session as player2; otherwise a new session is auto-created with a `LOVE-XXXX` invite code and the user becomes player1. The `user_sessions` table links Supabase auth users to sessions so they can resume on login. Legacy sessions (pre-auth) are auto-claimed when a user signs in. The home page (`/`) acts as an auto-setup redirector — users with existing sessions are sent straight to the vault. `playerName` is sourced from the `sessions` table (authoritative) rather than auth metadata to avoid name mismatches. Pages that display player names (PredictPartner, DeepDive, etc.) also fetch names directly from the session DB record via a `sessionMyName` state variable.
+`SessionContext` (in `App.jsx`) holds `sessionId`, `playerName`, and `playerId`, persisted to localStorage. Sessions are auto-created on first sign-in: if a `pendingInviteCode` exists in localStorage or `user_metadata.invite_code`, the user auto-joins their partner's session as player2; otherwise the user sees a manual join/create UI — they can enter an invite code to join, or create a new session with a `LOVE-XXXX` invite code as player1. The `user_sessions` table links Supabase auth users to sessions so they can resume on login. Legacy sessions (pre-auth) are auto-claimed when a user signs in. The home page (`/`) acts as an auto-setup redirector — users with existing sessions are sent straight to the vault. Player2 join uses an atomic conditional UPDATE (`WHERE player2_user_id IS NULL`) to prevent race-condition double-joins — only one user can claim the slot. `playerName` is sourced from the `sessions` table (authoritative) rather than auth metadata to avoid name mismatches. Pages that display player names (PredictPartner, DeepDive, etc.) also fetch names directly from the session DB record via a `sessionMyName` state variable (or via the `useSessionSetup` hook).
 
 ## CEO Reporting (Automatic)
 
@@ -83,7 +83,7 @@ All tables use `player_id` as `'player1'` or `'player2'` (tic-tac-toe uses `'gam
 
 ### Row Level Security (RLS)
 
-All 12 tables have RLS enabled with proper session-scoped policies. No "Allow all" policies exist. No Supabase Storage buckets are used (drawings are base64 in JSONB). Policy SQL is in `supabase-rls-fix.sql` (core tables) and `supabase-waitlist.sql` (waitlist).
+All 12 tables have RLS enabled with proper session-scoped policies. No "Allow all" policies exist. No Supabase Storage buckets are used (drawings are base64 in JSONB). Policy SQL is in `supabase-rls-fix.sql` (core tables), `supabase-waitlist.sql` (waitlist), and `supabase/migrations/05-player-id-rls.sql` (per-operation write policies). Stale bootstrap SQL files (`supabase-schema.sql`, `supabase-shared-items.sql`, `supabase-deep-dive.sql`) are marked SUPERSEDED — do not execute.
 
 - **`user_sessions`**: `FOR ALL` — `user_id = (SELECT auth.uid())`
 - **`sessions`**: 4 per-operation policies to handle bootstrap (before `user_sessions` row exists):
@@ -91,7 +91,10 @@ All 12 tables have RLS enabled with proper session-scoped policies. No "Allow al
   - INSERT: `player1_user_id = auth.uid()`
   - UPDATE: linked partners OR direct player match OR open join slot (`player2_user_id IS NULL AND player2_name IS NULL`)
   - DELETE: blocked (`USING (false)`)
-- **9 feature tables** (`responses`, `profiles`, `deep_dive_responses`, `shared_items`, `love_notes`, `reactions`, `predict_partner`, `finish_sentence`, `hot_takes`): `FOR ALL` — `session_id IN (SELECT session_id FROM user_sessions WHERE user_id = (SELECT auth.uid()))`
+- **9 feature tables** (`responses`, `profiles`, `deep_dive_responses`, `shared_items`, `love_notes`, `reactions`, `predict_partner`, `finish_sentence`, `hot_takes`):
+  - SELECT: `session_id IN (SELECT session_id FROM user_sessions WHERE user_id = (SELECT auth.uid()))` (session-scoped reads)
+  - INSERT/UPDATE: session membership check AND `player_id` must match the authenticated user's role in that session (via subquery to `user_sessions`). Special cases: `'game'`, `'shared'` player_id values are allowed for both partners (tic-tac-toe, study-together, vision board).
+  - DELETE: session membership check (same as SELECT)
 - **`waitlist`**: `FOR INSERT` only — `WITH CHECK (true)`. No SELECT/UPDATE/DELETE policies. Data only accessible from Supabase Dashboard or service role key.
 
 All policies use `(SELECT auth.uid())` (subquery form) for Postgres initPlan caching optimization. Performance indexes exist on `user_sessions(user_id)`, `user_sessions(session_id)`, and `session_id` columns on all feature tables.
@@ -121,18 +124,45 @@ The visual theme is a hand-drawn notebook:
 - `src/components/ReactionBadge.jsx` — bare emoji(s) positioned at the bottom-right edge of an answer/drawing box, hanging halfway off the corner (`position: absolute; bottom: -10; right: -6`). Parent must have `position: relative; overflow: visible`. Pop animation (spring: stiffness 500, damping 12) only fires for real-time arrivals, not pre-existing reactions on page load (800ms mount delay via ref). Shows one or two emojis (yours + partner's) with slight overlap when both exist.
 - `src/components/ReactionPicker.jsx` — re-export barrel for ReactionPopup, ReactionBadge, and useLongPress.
 - `src/components/MissYouHeart.jsx` — absolute-positioned candy conversation heart ("MISS U") in top-right corner (scrolls with page, does not follow viewport). Tapping sends a nudge to partner via `responses` table (`pack_id: 'nudge'`). Partner sees a toast notification in real time. 30-second cooldown between sends. Rendered in `App.jsx` alongside `BottomNav`. Parent `.app` div has `position: relative` for positioning context.
-- `src/components/PageGuide.jsx` — first-visit onboarding tooltip system. Shows a friendly overlay explaining what the current page does on first visit (tracked in localStorage `pageGuideSeen`). After dismissal, collapses into a persistent (?) button fixed in the top-left corner (top-right is reserved for MissYouHeart). Content defined in `src/data/pageGuides.js` with a `pageKey` per page. Integrated into all 22 authenticated pages via `<PageGuide pageKey="..." />`.
+- `src/components/PageGuide.jsx` — first-visit onboarding tooltip system. Shows a friendly overlay explaining what the current page does on first visit (tracked in localStorage `pageGuideSeen`). After dismissal, collapses into a persistent (?) button fixed in the top-left corner (top-right is reserved for MissYouHeart). Content defined in `src/data/pageGuides.js` with a `pageKey` per page. Integrated into all 22 authenticated pages via `<PageGuide pageKey="..." />`. Overlay uses `role="dialog"`, `aria-modal="true"`, focus trap (tabIndex=-1 on content div, gotIt button as sole tab stop), Escape-to-close, and focus restoration to trigger button on dismissal.
 - `src/components/AppWaitlistPrompt.jsx` — post-activity email capture card for App Store waitlist. Shows once after a user's first completed activity (tracked via `completedActivityCount` + `waitlistPromptDismissed` in localStorage). Exports `trackActivityCompletion()` which pages call from their results useEffect. Integrated into 5 results pages: ResultsPage, DrawResultsPage, FinishSentencePage, PredictPartnerPage, HotTakesPage.
 
 ### Hooks
 
 - `src/hooks/useLongPress.js` — detects press-and-hold gestures (500ms). Returns pointer event handlers to spread onto any element. Suppresses click after long-press so existing `onClick` handlers (like card fold/unfold) still work.
+- `src/hooks/useRealtimeSync.js` — reusable hook encapsulating the realtime subscription + polling fallback pattern. Accepts `{ table, sessionId, onUpdate, channelPrefix, pollingEnabled, pollingInterval }`. The `onUpdate` callback **must** be wrapped in `useCallback` by the caller to keep polling intervals and realtime channels stable. Creates a unique channel name via `useRef` with random suffix; cleans up both channel and interval on unmount.
+- `src/hooks/useSessionSetup.js` — reusable hook encapsulating sessionId URL sync, mountedRef lifecycle, and player/partner name fetching from the sessions table. Returns `{ sessionId, playerId, playerName, partnerId, partnerName, sessionMyName, mountedRef }`. Used by the three largest pages (PredictPartnerPage, LoveNoteHuntPage, StudyTogetherPage).
 
 ## Key Patterns
 
-### Realtime + Polling (standardized in v1.0)
+### Realtime + Polling (standardized in v1.0, hooks added in v1.1)
 
-Every interactive page follows this pattern:
+**Preferred approach (v1.1+):** Use `useRealtimeSync` hook + `useSessionSetup` hook:
+
+```javascript
+import useSessionSetup from '../hooks/useSessionSetup'
+import useRealtimeSync from '../hooks/useRealtimeSync'
+
+const { sessionId, playerId, playerName, partnerName, sessionMyName, mountedRef } = useSessionSetup()
+
+const fetchData = useCallback(async () => {
+  const { data } = await supabase.from('table').select('col1, col2').eq('session_id', sessionId)
+  if (!mountedRef.current) return
+  setData(data)
+}, [sessionId])
+
+useRealtimeSync({
+  table: 'table',
+  sessionId,
+  onUpdate: fetchData,        // MUST be useCallback-wrapped
+  channelPrefix: 'page-name',
+  pollingEnabled: screen !== 'results',  // gate on waiting state
+})
+```
+
+**CRITICAL:** The `onUpdate` callback passed to `useRealtimeSync` **must** be wrapped in `useCallback` with correct dependencies (typically `[sessionId]`). Without this, the polling interval and realtime channel tear down and recreate on every parent render. `supabase`, `mountedRef`, and state setters are stable refs/primitives — they don't need to be in the dep array.
+
+**Manual pattern (legacy pages):** Some pages still use the manual approach:
 
 1. **`useCallback`-wrapped fetch function** with `[sessionId, ...]` deps — prevents stale closures
 2. **Realtime subscription** using `event: '*'` (not `'INSERT'`) to catch all change types
@@ -141,42 +171,11 @@ Every interactive page follows this pattern:
 5. **Unique channel names** via `useRef` with random suffix (`Math.random().toString(36).slice(2, 8)`) — prevents duplicate subscriptions in React StrictMode
 6. **Cleanup**: both `supabase.removeChannel(channel)` and `clearInterval(interval)` in effect cleanups
 
-```javascript
-// Standard pattern (see any interactive page for full example)
-const mountedRef = useRef(true)
-const channelId = useRef(`page-name-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
-
-useEffect(() => {
-  mountedRef.current = true
-  return () => { mountedRef.current = false }
-}, [])
-
-const fetchData = useCallback(async () => {
-  const { data } = await supabase.from('table').select('*').eq('session_id', sessionId)
-  if (!mountedRef.current) return
-  setData(data)
-}, [sessionId])
-
-// Realtime
-useEffect(() => {
-  const channel = supabase.channel(channelId.current)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'table',
-      filter: `session_id=eq.${sessionId}` }, () => fetchData())
-    .subscribe()
-  return () => { supabase.removeChannel(channel) }
-}, [sessionId, fetchData])
-
-// Polling fallback (gated on waiting state)
-useEffect(() => {
-  if (screen === 'results') return
-  const interval = setInterval(fetchData, 5000)
-  return () => clearInterval(interval)
-}, [fetchData, screen])
-```
+**Query optimization:** All Supabase queries specify explicit columns (e.g., `.select('id, session_id, answers')`) — never use `select('*')` on tables with large JSONB or base64 columns.
 
 ### SessionId Sync
 
-All pages with `:sessionId` URL param sync it to SessionContext on mount. This ensures direct URL navigation works correctly:
+All pages with `:sessionId` URL param sync it to SessionContext on mount. This ensures direct URL navigation works correctly. Pages using `useSessionSetup()` get this automatically. Pages not using the hook do it manually:
 
 ```javascript
 const { sessionId } = useParams()
@@ -197,7 +196,7 @@ useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 - **No component library**: all UI is custom JSX with inline styles
 - **Error handling**: Most pages use an `error` state variable with user-visible feedback (inline `<p>` or banner). Some use `setTimeout` for auto-dismiss after 3 seconds.
 - **Dynamic page titles**: `useDocumentTitle()` hook in `App.jsx` sets `document.title` based on the current route.
-- **Accessibility**: Bottom nav uses `aria-label`, `aria-current`; quiz options use `aria-pressed`; Love Note Hunt grid uses `role="gridcell"` with keyboard support.
+- **Accessibility**: Bottom nav uses `aria-label`, `aria-current`; quiz options use `aria-pressed`; Love Note Hunt grid uses `role="gridcell"` with keyboard support. Interactive cards on VaultPage, HotTakesPage, VisionTab, StudyTogetherPage, and ResultsPage have `role="button"`, `tabIndex={0}`, `onKeyDown` (Enter/Space), and `aria-label` or `aria-expanded`. PageGuide uses `role="dialog"` with focus trap and Escape-to-close. AuthPage and WaitlistPage forms use `htmlFor`/`id` label associations.
 - **Waitlist**: `src/pages/WaitlistPage.jsx` — public standalone page at `/waitlist` (no auth required) for App Store email capture. Describes The Us Quiz, what the native app adds, and has an email form. Accepts `?src=` URL param for campaign attribution (e.g., `?src=reddit-longdistance`). Stored in `waitlist.source` column. Duplicate emails handled gracefully via Postgres unique constraint (23505 → show success). Submit logic in `src/utils/waitlist.js`.
 - **localStorage keys**: `sessionId`, `playerName`, `playerId`, `pageGuideSeen` (object tracking first-visit tooltips), `completedActivityCount`, `waitlistPromptDismissed`, plus feature-specific keys like movie vetoes
 
@@ -233,3 +232,11 @@ Required in `.env` (prefixed with `VITE_` for Vite):
 ### Post-v1.0 — Soft Launch Prep (2026-03-12)
 - **Onboarding tooltips**: `PageGuide` component with first-visit overlays on all 22 pages. Persistent (?) help button. Content in `src/data/pageGuides.js`. Tracks visits in localStorage.
 - **Email waitlist**: Supabase `waitlist` table (insert-only RLS). Post-activity prompt on 5 results pages (shows once after first completed activity). Standalone `/waitlist` public page for community sharing. `?src=` URL param for campaign attribution.
+
+### v1.1 — Audit Remediation (completed 2026-03-15)
+Independent Codex audit (2026-03-14) surfaced security vulnerabilities, bugs, and quality issues. All 16 findings addressed across 5 phases:
+- **Phase 5 (RLS Hardening)**: Per-operation write policies on all 9 feature tables enforce `player_id` matches auth user. Atomic player2 join via conditional UPDATE prevents race-condition double-joins. JoinPage rejects full sessions. Stale bootstrap SQL files marked SUPERSEDED. `finish_sentence`/`hot_takes` RLS type mismatch fixed.
+- **Phase 6 (Bug Fixes)**: Share URLs use real session IDs. VisionTab caption autosave uses `dataRef` pattern (no stale closures). PredictPartner post-save reads fresh DB data. All `select('*')` replaced with explicit columns across 17 query sites. CorkBoardSlot manages local caption state to prevent input glitchiness. Invite code persisted in `user_metadata` for cross-device join. Manual join recovery UI when no invite code found. Results waiting screens show LOVE-XXXX invite code or plain waiting message (session-aware two-state).
+- **Phase 7 (Accessibility)**: Keyboard button semantics (`role="button"`, `tabIndex={0}`, Enter/Space) on interactive cards across 5 pages. PageGuide dialog with `aria-modal`, focus trap, Escape-to-close. `htmlFor`/`id` label associations on AuthPage and WaitlistPage.
+- **Phase 8 (Quality)**: VisionTab hover uses CSS `.vision-pin` class instead of DOM `style.transform` mutations. Stale `/books` route tests fixed (route renamed to `/study`, moved from fun-stuff to us tab). Custom hooks extracted: `useRealtimeSync` (realtime + polling) and `useSessionSetup` (session sync + names + mountedRef). Adopted by 3 largest pages.
+- **Phase 9 (useCallback Compliance)**: `fetchResponses` (PredictPartnerPage) and `fetchData` (StudyTogetherPage) wrapped in `useCallback([sessionId])` so `useRealtimeSync` polling intervals stay stable.
