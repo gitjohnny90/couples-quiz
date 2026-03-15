@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 Polish & Security** - Phases 1-4 (shipped 2026-03-12)
-- 🚧 **v1.1 Audit Remediation** - Phases 5-8 (in progress)
+- 🚧 **v1.1 Audit Remediation** - Phases 5-9 (in progress)
 
 ## Phases
 
@@ -139,11 +139,25 @@ Plans:
 - [ ] 08-01-PLAN.md — Replace VisionTab DOM mutations with state-driven CSS; fix or remove stale /books route tests
 - [ ] 08-02-PLAN.md — Light-touch extraction of hooks/helpers from large page components
 
+#### Phase 9: useCallback Hook Compliance
+**Goal**: Fetch functions passed to useRealtimeSync are wrapped in useCallback so polling intervals run on a stable 5-second cadence
+**Depends on**: Phase 8
+**Requirements**: QUAL-03
+**Gap Closure**: Closes QUAL-02-partial from v1.1 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. PredictPartnerPage.fetchResponses is wrapped in useCallback with correct dependencies
+  2. StudyTogetherPage.fetchData is wrapped in useCallback with correct dependencies
+  3. useRealtimeSync effects do not re-run on every parent render (polling interval stays stable)
+**Plans**: 1 plan
+
+Plans:
+- [ ] 09-01-PLAN.md — Wrap fetchResponses and fetchData in useCallback for useRealtimeSync consumers
+
 ## Progress
 
 **Execution Order:**
 v1.0 Phases complete: 2, 4 (done) — 1, 3 in progress
-v1.1 Phases execute in order: 5 → 6 → 7 → 8
+v1.1 Phases execute in order: 5 → 6 → 7 → 8 → 9
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -155,3 +169,4 @@ v1.1 Phases execute in order: 5 → 6 → 7 → 8
 | 6. Bug Fixes | 5/5 | Complete   | 2026-03-15 | - |
 | 7. Accessibility | 2/2 | Complete   | 2026-03-15 | - |
 | 8. Quality | 2/2 | Complete   | 2026-03-15 | - |
+| 9. useCallback Hook Compliance | v1.1 | 0/1 | Pending | - |
