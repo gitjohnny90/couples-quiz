@@ -10,9 +10,9 @@ Requirements for audit remediation. Fixes security vulnerabilities, bugs, and qu
 ### Security
 
 - [x] **SEC-07**: User can only write rows with their own player_id (RLS enforces player_id matches auth user via sessions table lookup)
-- [ ] **SEC-08**: Stale bootstrap SQL files with open policies are removed or clearly marked as superseded
-- [ ] **SEC-09**: Player2 join is atomic — two simultaneous join attempts cannot both claim the slot (conditional UPDATE)
-- [ ] **SEC-10**: JoinPage rejects access when session is full (no "open notebook anyway" bypass)
+- [x] **SEC-08**: Stale bootstrap SQL files with open policies are removed or clearly marked as superseded
+- [x] **SEC-09**: Player2 join is atomic — two simultaneous join attempts cannot both claim the slot (conditional UPDATE)
+- [x] **SEC-10**: JoinPage rejects access when session is full (no "open notebook anyway" bypass)
 - [x] **SEC-11**: finish_sentence and hot_takes RLS policies use correct column types (no text/uuid mismatch)
 
 ### Bugs
@@ -82,9 +82,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SEC-07 | Phase 5 | Complete |
-| SEC-08 | Phase 5 | Pending |
-| SEC-09 | Phase 5 | Pending |
-| SEC-10 | Phase 5 | Pending |
+| SEC-08 | Phase 5 | Complete |
+| SEC-09 | Phase 5 | Complete |
+| SEC-10 | Phase 5 | Complete |
 | SEC-11 | Phase 5 | Complete |
 | BUG-01 | Phase 6 | Pending |
 | BUG-02 | Phase 6 | Pending |
