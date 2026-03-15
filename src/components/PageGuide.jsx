@@ -26,6 +26,8 @@ export default function PageGuide({ pageKey }) {
 
   const [showOverlay, setShowOverlay] = useState(false)
   const hasAutoShown = useRef(false)
+  const triggerRef = useRef(null)
+  const gotItRef = useRef(null)
 
   // Show overlay automatically on first visit
   useEffect(() => {
@@ -42,11 +44,33 @@ export default function PageGuide({ pageKey }) {
   const dismiss = () => {
     setShowOverlay(false)
     markSeen(pageKey)
+    // Restore focus to the (?) trigger button after closing
+    setTimeout(() => triggerRef.current?.focus(), 50)
   }
 
   const reopen = () => {
     setShowOverlay(true)
   }
+
+  // Escape key handler — close overlay when Escape is pressed
+  useEffect(() => {
+    if (!showOverlay) return
+    const handleKey = (e) => { if (e.key === 'Escape') dismiss() }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [showOverlay])
+
+  // Focus management — move focus into dialog on open, prevent body scroll
+  useEffect(() => {
+    if (!showOverlay) return
+    document.body.style.overflow = 'hidden'
+    // Small delay for framer-motion animation to start before focusing
+    const timer = setTimeout(() => gotItRef.current?.focus(), 100)
+    return () => {
+      clearTimeout(timer)
+      document.body.style.overflow = ''
+    }
+  }, [showOverlay])
 
   return (
     <>
@@ -54,6 +78,7 @@ export default function PageGuide({ pageKey }) {
       <AnimatePresence>
         {!showOverlay && (
           <motion.button
+            ref={triggerRef}
             initial={{ opacity: 0, scale: 0.5, rotate: -8 }}
             animate={{ opacity: 1, scale: 1, rotate: -2 }}
             exit={{ opacity: 0, scale: 0.5 }}
@@ -109,11 +134,21 @@ export default function PageGuide({ pageKey }) {
             }}
           >
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label={guide.title}
+              tabIndex={-1}
               initial={{ opacity: 0, y: -16, scale: 0.96, rotate: -1 }}
               animate={{ opacity: 1, y: 0, scale: 1, rotate: 0.5 }}
               exit={{ opacity: 0, y: -10, scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 380, damping: 26 }}
               onClick={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                if (e.key === 'Tab') {
+                  e.preventDefault()
+                  gotItRef.current?.focus()
+                }
+              }}
               className="glass"
               style={{
                 padding: '22px 22px 18px',
@@ -158,6 +193,7 @@ export default function PageGuide({ pageKey }) {
               ))}
 
               <button
+                ref={gotItRef}
                 onClick={dismiss}
                 style={{
                   marginTop: 18,
