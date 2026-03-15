@@ -21,6 +21,8 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [session, setSession] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [showJoinOption, setShowJoinOption] = useState(false);
+  const [manualCode, setManualCode] = useState('');
 
   const displayName = user?.user_metadata?.display_name || "Player";
 
@@ -134,13 +136,19 @@ export default function HomePage() {
       }
 
       // No existing session — auto-create or auto-join
-      const pendingCode = localStorage.getItem("pendingInviteCode");
+      const pendingCode = localStorage.getItem("pendingInviteCode")
+        || user?.user_metadata?.invite_code
+        || null;
 
       if (pendingCode) {
         localStorage.removeItem("pendingInviteCode");
+        // Clear from user metadata too (one-time use)
+        supabase.auth.updateUser({ data: { invite_code: null } }).catch(() => {})
         await autoJoin(pendingCode);
       } else {
-        await autoCreate();
+        // No invite code found — show manual join option instead of silently creating
+        setShowJoinOption(true);
+        setLoading(false);
       }
     } catch (err) {
       console.error("Session setup error:", err.message);
@@ -339,6 +347,83 @@ export default function HomePage() {
         </motion.div>
       </div>
     );
+  }
+
+  if (showJoinOption) {
+    return (
+      <div className="page" style={{ position: 'relative' }}>
+        <PageGuide pageKey="home" />
+        <PageDoodles seed={1} />
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ position: 'relative', zIndex: 1 }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <h1 style={{ fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700, marginBottom: 2 }}>
+              welcome, {displayName}
+            </h1>
+            <SquigglyUnderline width={110} color="#D4A843" opacity={0.4} style={{ margin: '0 auto 12px' }} />
+          </div>
+
+          <div className="glass" style={{ padding: 24, textAlign: 'center', maxWidth: 340, margin: '0 auto', marginBottom: 16 }}>
+            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.15rem', marginBottom: 10 }}>
+              got an invite code from your person?
+            </p>
+            <input
+              type="text"
+              value={manualCode}
+              onChange={(e) => setManualCode(e.target.value)}
+              placeholder="LOVE-1234"
+              maxLength={10}
+              style={{
+                width: '100%', padding: '12px 14px', fontSize: '1.2rem',
+                fontFamily: 'var(--font-hand)', textAlign: 'center',
+                border: 'none', borderBottom: '2px solid var(--border-pencil)',
+                background: '#fff', outline: 'none',
+                letterSpacing: '0.1em', color: 'var(--accent-coral)',
+                marginBottom: 14, boxSizing: 'border-box',
+              }}
+            />
+            <button
+              className="btn btn-primary"
+              style={{ width: '100%', marginBottom: 10 }}
+              disabled={!manualCode.trim()}
+              onClick={async () => {
+                setLoading(true)
+                setShowJoinOption(false)
+                await autoJoin(manualCode.trim())
+              }}
+            >
+              join their session
+            </button>
+          </div>
+
+          <div className="glass" style={{ padding: 20, textAlign: 'center', maxWidth: 340, margin: '0 auto' }}>
+            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: 10 }}>
+              or start fresh:
+            </p>
+            <button
+              className="btn btn-secondary"
+              style={{ width: '100%' }}
+              onClick={async () => {
+                setLoading(true)
+                setShowJoinOption(false)
+                await autoCreate()
+              }}
+            >
+              create my own session
+            </button>
+          </div>
+
+          {error && (
+            <p style={{ textAlign: 'center', marginTop: 16, fontFamily: 'var(--font-hand)', fontSize: '1rem', color: 'var(--accent-coral)' }}>
+              {error}
+            </p>
+          )}
+        </motion.div>
+      </div>
+    )
   }
 
   return (
