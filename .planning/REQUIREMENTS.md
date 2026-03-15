@@ -33,7 +33,7 @@ Requirements for audit remediation. Fixes security vulnerabilities, bugs, and qu
 - [x] **QUAL-01**: VisionTab DOM style mutations replaced with state-driven CSS
 - [x] **QUAL-02**: Large page components have clearer separation of concerns (light-touch extraction of hooks/helpers, not full rewrite)
 - [x] **TEST-01**: Stale /books route tests in sessionUtils.test.js are fixed or removed to match current routing
-- [ ] **QUAL-03**: Fetch functions passed to useRealtimeSync are wrapped in useCallback so polling intervals don't reset on every render
+- [x] **QUAL-03**: Fetch functions passed to useRealtimeSync are wrapped in useCallback so polling intervals don't reset on every render
 
 ## v1.0 Requirements (Completed)
 
@@ -97,7 +97,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUAL-01 | Phase 8 | Complete |
 | QUAL-02 | Phase 8 | Complete |
 | TEST-01 | Phase 8 | Complete |
-| QUAL-03 | Phase 9 | Pending |
+| QUAL-03 | Phase 9 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 16 total

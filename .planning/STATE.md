@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Audit Remediation
 status: planning
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-03-15T18:00:36.624Z"
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-15T19:41:26.297Z"
 last_activity: 2026-03-15 — Roadmap created, 15 requirements mapped across Phases 5-8
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 19
-  completed_plans: 19
+  total_phases: 9
+  completed_phases: 9
+  total_plans: 20
+  completed_plans: 20
   percent: 0
 ---
 
@@ -57,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 07-accessibility P02 | 6min | 2 tasks | 3 files |
 | Phase 08-quality P01 | 5min | 2 tasks | 4 files |
 | Phase 08-quality P02 | 3min | 2 tasks | 5 files |
+| Phase 09-usecallback-hook-compliance P01 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,7 @@ Recent decisions affecting current work:
 - [Phase 08-quality]: C:/Program Files/Git/study route belongs to us tab (/profiles) not fun-stuff tab — test suite and JSDoc updated to reflect actual isTabActive implementation
 - [Phase 08-quality]: LoveNoteHuntPage realtime callback wrapped in handleWaitingUpdate useCallback — original had phase-transition logic inline, extracted to named callback passed as onUpdate
 - [Phase 08-quality]: useRealtimeSync + useSessionSetup hooks established as standard pattern for new pages needing realtime sync and session context
+- [Phase 09-usecallback-hook-compliance]: useCallback dep array uses only [sessionId] for fetch functions passed to useRealtimeSync — supabase, mountedRef, and state setters are all stable refs/primitives
 
 ### Pending Todos
 
@@ -98,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T17:57:38.159Z
-Stopped at: Completed 08-02-PLAN.md
+Last session: 2026-03-15T19:41:26.293Z
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
