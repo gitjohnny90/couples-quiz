@@ -52,12 +52,15 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
   const captionTimeout = useRef(null)
   const fileInputRefs = useRef([])
   const mountedRef = useRef(true)
+  const dataRef = useRef(data)
   const channelId = useRef(`vision-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
 
   useEffect(() => {
     mountedRef.current = true
     return () => { mountedRef.current = false }
   }, [])
+
+  useEffect(() => { dataRef.current = data }, [data])
 
   // Fetch vision data
   const fetchData = async () => {
@@ -120,7 +123,7 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
     const updated = { ...data, northStar: text }
     setData(updated)
     clearTimeout(northStarTimeout.current)
-    northStarTimeout.current = setTimeout(() => saveData(updated), 800)
+    northStarTimeout.current = setTimeout(() => saveData({ ...dataRef.current, northStar: text }), 800)
   }
 
   // Goal handlers
@@ -163,7 +166,12 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
       board[idx] = { ...board[idx], caption }
       setData(prev => ({ ...prev, board }))
       clearTimeout(captionTimeout.current)
-      captionTimeout.current = setTimeout(() => saveData({ ...data, board }), 800)
+      captionTimeout.current = setTimeout(() => {
+        const currentBoard = [...(dataRef.current.board || [])]
+        const ci = currentBoard.findIndex(b => b.slot === slotIndex)
+        if (ci >= 0) currentBoard[ci] = { ...currentBoard[ci], caption }
+        saveData({ ...dataRef.current, board: currentBoard })
+      }, 800)
     }
   }
 

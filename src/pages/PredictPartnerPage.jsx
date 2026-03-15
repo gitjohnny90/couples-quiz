@@ -98,8 +98,10 @@ export default function PredictPartnerPage() {
         if (row.completed_at) pd.completedAt = row.completed_at
       })
       setAllResponses(mapped)
+      return mapped
     }
     setLoading(false)
+    return {}
   }
 
   useEffect(() => { fetchResponses() }, [sessionId])
@@ -217,10 +219,10 @@ export default function PredictPartnerPage() {
         return
       }
 
-      await fetchResponses()
+      const freshData = await fetchResponses()
 
-      // Check if partner already done
-      const partnerData = allResponses[activePack.id]?.[partnerId]
+      // Check if partner already done (use fresh data, not stale allResponses state)
+      const partnerData = freshData?.[activePack.id]?.[partnerId]
       if (partnerData?.responses?.length === 3) {
         setScreen('reveal')
       } else {
