@@ -90,8 +90,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Add player_id RLS policies to all 9 feature tables and fix finish_sentence/hot_takes type mismatch
-- [ ] 05-02-PLAN.md — Atomic player2 join (conditional UPDATE), JoinPage full-session rejection, archive stale SQL files
+- [x] 05-01-PLAN.md — Add player_id RLS policies to all 9 feature tables and fix finish_sentence/hot_takes type mismatch
+- [x] 05-02-PLAN.md — Atomic player2 join (conditional UPDATE), JoinPage full-session rejection, archive stale SQL files
 
 #### Phase 6: Bug Fixes
 **Goal**: Share URLs work correctly and no page reads stale closure data when auto-saving or evaluating results
@@ -102,11 +102,14 @@ Plans:
   2. Editing a vision board image caption and waiting for autosave writes the current caption text, not a stale previous value
   3. After saving answers in PredictPartnerPage, the completion check reads fresh data from the database
   4. Polling queries on pages with large JSONB or base64 columns request only the columns they need (no select('*') on those tables)
-**Plans**: 2 plans
+**Plans**: 5 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Fix fake join URLs in ResultsPage and DrawResultsPage
-- [ ] 06-02-PLAN.md — Fix stale closure in VisionTab autosave and PredictPartnerPage post-save check; optimize select queries
+- [x] 06-01-PLAN.md — Fix fake join URLs in ResultsPage and DrawResultsPage
+- [x] 06-02-PLAN.md — Fix stale closure in VisionTab autosave and PredictPartnerPage post-save check; optimize select queries
+- [ ] 06-03-PLAN.md — Replace share-link waiting screens with session-aware two-state display (gap closure)
+- [ ] 06-04-PLAN.md — Fix VisionTab caption input glitchiness with local state in CorkBoardSlot (gap closure)
+- [ ] 06-05-PLAN.md — Persist invite code in user metadata and add manual join recovery (gap closure)
 
 #### Phase 7: Accessibility
 **Goal**: Keyboard users and assistive technology users can operate all interactive elements and modal overlays
@@ -148,7 +151,7 @@ v1.1 Phases execute in order: 5 → 6 → 7 → 8
 | 2. PYP Data Migration & Cleanup | v1.0 | 1/1 | Complete | 2026-03-11 |
 | 3. Polling Fallback Standardization | v1.0 | 1/2 | In Progress | - |
 | 4. Quiz Bug Fixes & Code Cleanup | v1.0 | 3/3 | Complete | 2026-03-12 |
-| 5. RLS Hardening | 2/2 | Complete   | 2026-03-15 | - |
-| 6. Bug Fixes | 2/2 | Complete   | 2026-03-15 | - |
+| 5. RLS Hardening | v1.1 | 2/2 | Complete | 2026-03-15 |
+| 6. Bug Fixes | v1.1 | 2/5 | In Progress | - |
 | 7. Accessibility | v1.1 | 0/2 | Not started | - |
 | 8. Quality | v1.1 | 0/2 | Not started | - |
