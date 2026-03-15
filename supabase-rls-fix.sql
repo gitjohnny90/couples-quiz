@@ -1,3 +1,11 @@
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-- SUPERSEDED — DO NOT RUN
+-- This file has been superseded by supabase/migrations/05-player-id-rls.sql
+-- which adds player_id enforcement and fixes the finish_sentence/hot_takes
+-- type mismatch. The policies below are replaced by per-operation policies
+-- with player_id ownership checks.
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 -- ============================================================
 -- supabase-rls-fix.sql
 --
