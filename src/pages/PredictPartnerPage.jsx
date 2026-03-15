@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -38,7 +38,7 @@ export default function PredictPartnerPage() {
   const activityTrackedRef = useRef(false)
 
   // Fetch all predict responses from dedicated table
-  const fetchResponses = async () => {
+  const fetchResponses = useCallback(async () => {
     const { data } = await supabase
       .from('predict_partner')
       .select('pack_id, player_id, question_index, own_answer, prediction, prediction_correct, completed_at')
@@ -70,9 +70,9 @@ export default function PredictPartnerPage() {
     }
     setLoading(false)
     return {}
-  }
+  }, [sessionId])
 
-  useEffect(() => { fetchResponses() }, [sessionId])
+  useEffect(() => { fetchResponses() }, [fetchResponses])
 
   useRealtimeSync({
     table: 'predict_partner',

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { SquigglyUnderline, DoodleStar } from '../components/Doodles'
@@ -49,7 +49,7 @@ export default function StudyTogetherPage() {
   const [draftReflections, setDraftReflections] = useState({})
 
   // Fetch data
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const { data: row } = await supabase
       .from('responses')
       .select('answers')
@@ -83,9 +83,9 @@ export default function StudyTogetherPage() {
     }
     if (!mountedRef.current) return
     setLoading(false)
-  }
+  }, [sessionId])
 
-  useEffect(() => { fetchData() }, [sessionId])
+  useEffect(() => { fetchData() }, [fetchData])
 
   useRealtimeSync({
     table: 'responses',
