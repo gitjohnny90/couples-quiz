@@ -152,6 +152,6 @@ v1.1 Phases execute in order: 5 → 6 → 7 → 8
 | 3. Polling Fallback Standardization | v1.0 | 1/2 | In Progress | - |
 | 4. Quiz Bug Fixes & Code Cleanup | v1.0 | 3/3 | Complete | 2026-03-12 |
 | 5. RLS Hardening | v1.1 | 2/2 | Complete | 2026-03-15 |
-| 6. Bug Fixes | v1.1 | 2/5 | In Progress | - |
+| 6. Bug Fixes | 5/5 | Complete   | 2026-03-15 | - |
 | 7. Accessibility | v1.1 | 0/2 | Not started | - |
 | 8. Quality | v1.1 | 0/2 | Not started | - |
