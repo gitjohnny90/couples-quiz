@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Audit Remediation
 status: planning
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-03-15T17:21:49.142Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-15T17:22:20.125Z"
 last_activity: 2026-03-15 — Roadmap created, 15 requirements mapped across Phases 5-8
 progress:
   total_phases: 8
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 06-bug-fixes P05 | 2min | 2 tasks | 3 files |
 | Phase 06-bug-fixes P03 | 2min | 2 tasks | 2 files |
 | Phase 07-accessibility P01 | 2min | 2 tasks | 5 files |
+| Phase 07-accessibility P02 | 6min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ Recent decisions affecting current work:
 - [Phase 06-bug-fixes]: Manual join UI replaces silent autoCreate() when no invite code found — user explicitly chooses join or create
 - [Phase 06-bug-fixes]: Two sub-states on waiting screen: sub-state A shows invite code when player2_name and player2_user_id are both null; sub-state B shows plain waiting message when either is set
 - [Phase 07-01]: Interactive div accessibility pattern: role=button + tabIndex=0 + onKeyDown(Enter/Space) + aria-label or aria-expanded applied to all non-button interactive cards
+- [Phase 07-accessibility]: tabIndex=-1 on dialog content div with gotItRef button as sole tab stop — simple and correct for single-action dialog
+- [Phase 07-accessibility]: htmlFor/id association chosen over label-wrapping for AuthPage — inputs separated from labels by styling divs
 
 ### Pending Todos
 
@@ -89,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T17:21:49.138Z
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-03-15T17:22:20.122Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None

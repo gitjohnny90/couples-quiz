@@ -25,8 +25,8 @@ Requirements for audit remediation. Fixes security vulnerabilities, bugs, and qu
 ### Accessibility
 
 - [x] **A11Y-01**: Interactive cards on VaultPage, HotTakesPage, VisionTab, StudyTogetherPage, and ResultsPage have button semantics, focus handling, and keyboard activation
-- [ ] **A11Y-02**: PageGuide overlay has role="dialog", focus trap, Escape-to-close, and focus restoration
-- [ ] **A11Y-03**: Form controls on AuthPage and WaitlistPage have proper label associations
+- [x] **A11Y-02**: PageGuide overlay has role="dialog", focus trap, Escape-to-close, and focus restoration
+- [x] **A11Y-03**: Form controls on AuthPage and WaitlistPage have proper label associations
 
 ### Quality
 
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUG-03 | Phase 6 | Complete |
 | BUG-04 | Phase 6 | Complete |
 | A11Y-01 | Phase 7 | Complete |
-| A11Y-02 | Phase 7 | Pending |
-| A11Y-03 | Phase 7 | Pending |
+| A11Y-02 | Phase 7 | Complete |
+| A11Y-03 | Phase 7 | Complete |
 | QUAL-01 | Phase 8 | Pending |
 | QUAL-02 | Phase 8 | Pending |
 | TEST-01 | Phase 8 | Pending |
