@@ -183,16 +183,25 @@ export default function HomePage() {
         return;
       }
 
-      // Join the session
-      const { error: joinError } = await supabase
+      // Join the session — atomic guard ensures only one user can claim the slot
+      const { data: updatedRows, error: joinError } = await supabase
         .from("sessions")
         .update({
           player2_name: displayName,
           player2_user_id: user.id,
         })
-        .eq("id", session.id);
+        .eq("id", session.id)
+        .is("player2_user_id", null)  // atomic guard
+        .select();
 
       if (joinError) throw joinError;
+
+      // If no rows were updated, another user claimed the slot in a race
+      if (!updatedRows || updatedRows.length === 0) {
+        setError("that session was just claimed — we started a fresh one for you");
+        await autoCreate();
+        return;
+      }
 
       await supabase.from("user_sessions").insert({
         user_id: user.id,

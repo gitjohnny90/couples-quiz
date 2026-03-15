@@ -89,7 +89,7 @@ export function isTabActive(tabPath, pathname) {
 
 /**
  * Resolve the state the JoinPage should display, given the fetched session row.
- * @param {{ player1_name: string, player2_name: string|null }|null} data
+ * @param {{ player1_name: string, player2_name: string|null, player2_user_id: string|null }|null} data
  * @param {*} error - Supabase error object (truthy = error)
  * @returns {{ status: 'not_found'|'already_joined'|'ready', player1Name: string, player2Name: string }}
  */
@@ -97,8 +97,9 @@ export function resolveJoinState(data, error) {
   if (error || !data) {
     return { status: 'not_found', player1Name: '', player2Name: '' }
   }
-  if (data.player2_name) {
-    return { status: 'already_joined', player1Name: data.player1_name, player2Name: data.player2_name }
+  // A session is full if either player2_name or player2_user_id is set
+  if (data.player2_name || data.player2_user_id) {
+    return { status: 'already_joined', player1Name: data.player1_name, player2Name: data.player2_name || '' }
   }
   return { status: 'ready', player1Name: data.player1_name, player2Name: '' }
 }

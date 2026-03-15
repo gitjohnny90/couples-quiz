@@ -28,7 +28,7 @@ export default function JoinPage() {
       try {
         const { data, error } = await supabase
           .from("sessions")
-          .select("player1_name, player2_name")
+          .select("player1_name, player2_name, player2_user_id")
           .eq("id", sessionId)
           .single();
 
@@ -49,14 +49,22 @@ export default function JoinPage() {
     setJoining(true);
     setError("");
     try {
-      const { error: joinError } = await supabase
+      const { data, error: joinError } = await supabase
         .from("sessions")
         .update({
           player2_name: displayName,
           player2_user_id: user?.id || null,
         })
-        .eq("id", sessionId);
+        .eq("id", sessionId)
+        .is("player2_user_id", null)  // atomic guard — only update if slot is empty
+        .select();
       if (joinError) throw joinError;
+
+      // If no rows were updated, someone else claimed the slot first
+      if (!data || data.length === 0) {
+        setError("this session was just claimed by someone else — refresh to see the current state");
+        return;
+      }
 
       // Create user_sessions link if authenticated
       if (user) {
@@ -115,13 +123,8 @@ export default function JoinPage() {
           <div style={{ fontSize: "2.5rem", marginBottom: 12 }}>✌️</div>
           <h2 style={{ fontFamily: "var(--font-hand)", fontSize: "1.8rem", marginBottom: 8 }}>two's company!</h2>
           <p style={{ color: "var(--text-secondary)", marginBottom: 24 }}>this notebook already has two people writing in it</p>
-          <button className="btn btn-primary" onClick={() => {
-            setSessionId(sessionId);
-            setPlayerName(player2Name || "Player 2");
-            setPlayerId("player2");
-            navigate(`/vault/${sessionId}`);
-          }}>
-            open the notebook anyway
+          <button className="btn btn-primary" onClick={() => navigate("/")}>
+            go home
           </button>
         </motion.div>
       </div>
