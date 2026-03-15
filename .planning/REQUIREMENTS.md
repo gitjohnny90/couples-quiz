@@ -18,9 +18,9 @@ Requirements for audit remediation. Fixes security vulnerabilities, bugs, and qu
 ### Bugs
 
 - [x] **BUG-01**: ResultsPage and DrawResultsPage display the actual session ID in the share URL, not literal braces
-- [ ] **BUG-02**: VisionTab caption autosave uses current board state, not stale closure data
-- [ ] **BUG-03**: PredictPartnerPage post-save check uses fresh response data, not stale allResponses
-- [ ] **BUG-04**: Polling queries fetch only needed columns instead of select('*') for rows with large JSONB/base64
+- [x] **BUG-02**: VisionTab caption autosave uses current board state, not stale closure data
+- [x] **BUG-03**: PredictPartnerPage post-save check uses fresh response data, not stale allResponses
+- [x] **BUG-04**: Polling queries fetch only needed columns instead of select('*') for rows with large JSONB/base64
 
 ### Accessibility
 
@@ -87,9 +87,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SEC-10 | Phase 5 | Complete |
 | SEC-11 | Phase 5 | Complete |
 | BUG-01 | Phase 6 | Complete |
-| BUG-02 | Phase 6 | Pending |
-| BUG-03 | Phase 6 | Pending |
-| BUG-04 | Phase 6 | Pending |
+| BUG-02 | Phase 6 | Complete |
+| BUG-03 | Phase 6 | Complete |
+| BUG-04 | Phase 6 | Complete |
 | A11Y-01 | Phase 7 | Pending |
 | A11Y-02 | Phase 7 | Pending |
 | A11Y-03 | Phase 7 | Pending |

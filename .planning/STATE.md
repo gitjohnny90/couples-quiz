@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Audit Remediation
 status: planning
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-15T15:00:07.421Z"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-03-15T15:07:38.594Z"
 last_activity: 2026-03-15 — Roadmap created, 15 requirements mapped across Phases 5-8
 progress:
   total_phases: 8
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
   percent: 0
 ---
 
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05-rls-hardening P01 | 8 | 2 tasks | 2 files |
 | Phase 05-rls-hardening P02 | 15min | 2 tasks | 6 files |
 | Phase 06-bug-fixes P01 | 2min | 1 tasks | 2 files |
+| Phase 06-bug-fixes P02 | 10min | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,8 @@ Recent decisions affecting current work:
 - [Phase 05-02]: Atomic slot claim uses .select() + array length check instead of .single() — cleaner than try/catch for zero-row UPDATE
 - [Phase 05-02]: JoinPage alreadyJoined removes all access bypass — no session context set, only go-home button shown
 - [Phase 06-bug-fixes]: Single shareUrl variable replaces dual inline computations to eliminate display/copy mismatch on share links
+- [Phase 06-bug-fixes]: dataRef pattern chosen for VisionTab autosave — useRef synced via useEffect, setTimeout reads dataRef.current instead of stale closure
+- [Phase 06-bug-fixes]: fetchResponses returns mapped data so post-save code uses fresh values without async setState race
 
 ### Pending Todos
 
@@ -77,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T15:00:07.417Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-03-15T15:07:38.590Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
