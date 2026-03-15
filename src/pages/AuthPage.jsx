@@ -42,7 +42,7 @@ export default function AuthPage() {
         if (inviteCode.trim()) {
           localStorage.setItem("pendingInviteCode", inviteCode.trim())
         }
-        const data = await signUp(email.trim(), password, displayName.trim())
+        const data = await signUp(email.trim(), password, displayName.trim(), inviteCode.trim() || undefined)
         // If email confirmation is required, user won't be auto-signed in
         if (data.user && !data.session) {
           setError("check your email to confirm your account, then sign in!")

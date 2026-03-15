@@ -39,11 +39,13 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signUp = async (email, password, displayName) => {
+  const signUp = async (email, password, displayName, inviteCode) => {
+    const metadata = { display_name: displayName }
+    if (inviteCode) metadata.invite_code = inviteCode
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName } },
+      options: { data: metadata },
     })
     if (error) throw error
     return data
