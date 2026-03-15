@@ -319,6 +319,7 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
               {BOARD_SLOTS.map((slot, i) => (
                 <div
                   key={i}
+                  className="vision-pin"
                   onClick={() => fileInputRefs.current[i]?.click()}
                   style={{
                     position: 'absolute',
@@ -329,11 +330,8 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
                     background: `radial-gradient(circle at 40% 35%, ${PIN_COLORS[i]}, ${PIN_COLORS[i]}88)`,
                     boxShadow: '0 2px 3px rgba(0,0,0,0.3)',
                     cursor: 'pointer',
-                    transition: 'transform 0.15s',
                     zIndex: 2,
                   }}
-                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.3)'}
-                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                 />
               ))}
               {/* Hidden file inputs for empty state */}
@@ -873,6 +871,7 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, onRe
     }}>
       {/* Push pin */}
       <div
+        className={hasPhoto ? 'vision-pin vision-pin--disabled' : 'vision-pin'}
         onClick={() => !hasPhoto && openPicker()}
         style={{
           width: 14, height: 14,
@@ -883,10 +882,7 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, onRe
           position: 'relative',
           zIndex: 10,
           cursor: hasPhoto ? 'default' : 'pointer',
-          transition: 'transform 0.15s',
         }}
-        onMouseEnter={e => { if (!hasPhoto) e.currentTarget.style.transform = 'scale(1.3)' }}
-        onMouseLeave={e => { if (!hasPhoto) e.currentTarget.style.transform = 'scale(1)' }}
       />
 
       {/* Empty slot — clickable area */}
