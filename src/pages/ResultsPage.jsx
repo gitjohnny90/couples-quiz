@@ -27,6 +27,7 @@ export default function ResultsPage() {
   const { reactionMap, handleReact } = useReactions(sessionId, 'quiz')
 
   const [responses, setResponses] = useState([])
+  const [sessionInfo, setSessionInfo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [revealedQuestions, setRevealedQuestions] = useState(new Set())
   const [expandedNotes, setExpandedNotes] = useState(new Set())
@@ -65,6 +66,19 @@ export default function ResultsPage() {
     if (!error && data) setResponses(data)
     setLoading(false)
   }, [sessionId, packId])
+
+  // Fetch session info for two-state waiting screen
+  useEffect(() => {
+    const fetchSession = async () => {
+      const { data: sess } = await supabase
+        .from('sessions')
+        .select('player2_name, player2_user_id, invite_code')
+        .eq('id', sessionId)
+        .single()
+      if (mountedRef.current && sess) setSessionInfo(sess)
+    }
+    fetchSession()
+  }, [sessionId])
 
   // Initial load
   useEffect(() => { fetchResponses() }, [fetchResponses])
@@ -106,12 +120,12 @@ export default function ResultsPage() {
     setRevealedQuestions(new Set(pack.questions.map((q) => q.id)))
   }
 
-  const shareUrl = `${window.location.origin}/join/${sessionId}`
-
-  const copyLink = () => {
-    navigator.clipboard.writeText(shareUrl)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const copyCode = () => {
+    if (sessionInfo?.invite_code) {
+      navigator.clipboard.writeText(sessionInfo.invite_code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   if (!pack) {
@@ -137,6 +151,7 @@ export default function ResultsPage() {
 
   // Waiting for partner
   if (responses.length < 2) {
+    const partnerHasJoined = !!(sessionInfo?.player2_name || sessionInfo?.player2_user_id)
     return (
       <div className="page" style={{ position: 'relative' }}>
         <PageDoodles seed={10} />
@@ -146,24 +161,30 @@ export default function ResultsPage() {
             <h2 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.8rem', marginBottom: 6 }}>
               waiting for your person...
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-              they need to answer the same questions first!
-            </p>
+            {partnerHasJoined ? (
+              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                they need to answer the same questions first!
+              </p>
+            ) : (
+              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                share this code so they can join:
+              </p>
+            )}
           </div>
 
-          <div className="glass" style={{ padding: 22, textAlign: 'center', marginBottom: 14 }}>
-            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.15rem', marginBottom: 10 }}>send them this link:</p>
-            <div style={{
-              background: '#fff', borderBottom: '2px solid var(--border-pencil)',
-              padding: '10px 14px', fontSize: '0.85rem', wordBreak: 'break-all',
-              color: 'var(--accent-coral)', marginBottom: 14, fontFamily: 'var(--font-body)'
-            }}>
-              {shareUrl}
+          {!partnerHasJoined && (
+            <div className="glass" style={{ padding: 22, textAlign: 'center', marginBottom: 14 }}>
+              <div style={{
+                fontFamily: 'var(--font-hand)', fontSize: '2rem', fontWeight: 700,
+                color: 'var(--accent-coral)', letterSpacing: '0.05em', marginBottom: 14,
+              }}>
+                {sessionInfo?.invite_code || '...'}
+              </div>
+              <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyCode}>
+                {copied ? 'copied!' : 'copy code'}
+              </button>
             </div>
-            <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyLink}>
-              {copied ? 'copied!' : 'copy link'}
-            </button>
-          </div>
+          )}
 
           <button className="btn btn-secondary" style={{ width: '100%' }} onClick={() => { setLoading(true); fetchResponses() }}>
             check again
