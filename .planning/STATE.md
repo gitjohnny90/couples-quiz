@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Audit Remediation
 status: planning
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-15T06:34:43.301Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-15T15:00:07.421Z"
 last_activity: 2026-03-15 — Roadmap created, 15 requirements mapped across Phases 5-8
 progress:
   total_phases: 8
   completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 12
+  completed_plans: 11
   percent: 0
 ---
 
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 05-rls-hardening P01 | 8 | 2 tasks | 2 files |
 | Phase 05-rls-hardening P02 | 15min | 2 tasks | 6 files |
+| Phase 06-bug-fixes P01 | 2min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,7 @@ Recent decisions affecting current work:
 - [Phase 05-rls-hardening]: responses table allows player_id IN ('game','shared') so both partners write shared tic-tac-toe/study-together rows
 - [Phase 05-02]: Atomic slot claim uses .select() + array length check instead of .single() — cleaner than try/catch for zero-row UPDATE
 - [Phase 05-02]: JoinPage alreadyJoined removes all access bypass — no session context set, only go-home button shown
+- [Phase 06-bug-fixes]: Single shareUrl variable replaces dual inline computations to eliminate display/copy mismatch on share links
 
 ### Pending Todos
 
@@ -75,6 +77,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T06:30:21.240Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-03-15T15:00:07.417Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
