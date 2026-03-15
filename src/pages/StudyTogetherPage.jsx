@@ -478,6 +478,9 @@ function BookCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -6 }}
       className="glass"
+      role="button"
+      tabIndex={0}
+      aria-expanded={isExpanded}
       style={{
         marginBottom: 10,
         padding: isExpanded ? 16 : 14,
@@ -486,6 +489,7 @@ function BookCard({
         overflow: 'hidden',
       }}
       onClick={() => { if (!isExpanded) onToggle() }}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle() } }}
     >
       {/* Header row */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}

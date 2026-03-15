@@ -478,7 +478,11 @@ export default function VisionTab({ sessionId, playerName, playerId, visibleSect
               >
                 {/* Category header */}
                 <div
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isExpanded}
                   onClick={() => { setExpandedCat(isExpanded ? null : cat.id); setNewGoalText('') }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedCat(isExpanded ? null : cat.id); setNewGoalText('') } }}
                   style={{
                     padding: '14px 16px', cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
