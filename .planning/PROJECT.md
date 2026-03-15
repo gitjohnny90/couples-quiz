@@ -8,16 +8,20 @@ A couples quiz app where one partner creates a session and the other joins via a
 
 Partners can connect and learn about each other through shared interactive experiences that update live for both players.
 
-## Current Milestone: v1.0 Polish & Security
+## Current Milestone: v1.1 Audit Remediation
 
-**Goal:** Harden the existing app — fix quiz flow bugs, migrate Predict Your Partner data, add polling fallbacks alongside realtime, full RLS audit, and general code cleanup. No new features.
+**Goal:** Fix all security vulnerabilities, bugs, and quality issues surfaced by an independent code audit (OpenAI Codex, 2026-03-14). Prioritize security fixes, then bugs, then quality improvements.
 
 **Target features:**
-- Predict Your Partner table migration (responses → predict_partner)
-- Polling fallbacks everywhere (backup for realtime subscriptions)
-- RLS security audit (full coverage across all tables)
-- Quiz section bug fixes (buttons, progression, realtime, data integrity)
-- General code cleanup
+- RLS player_id enforcement (prevent partner impersonation)
+- Remove stale open-policy bootstrap SQL files
+- Join flow race condition fix (atomic player2 claim)
+- Remove JoinPage full-session privacy bypass
+- Fix finish_sentence/hot_takes RLS type mismatch
+- Fix fake join URLs and stale closure bugs
+- Optimize wasteful select('*') queries
+- Keyboard and modal accessibility improvements
+- Fix 2 stale book route test failures
 
 ## Requirements
 
@@ -49,17 +53,24 @@ Partners can connect and learn about each other through shared interactive exper
 
 <!-- Current scope. Building toward these. -->
 
-- [ ] Predict Your Partner data migration to dedicated table
-- [ ] Polling fallbacks alongside all realtime subscriptions
-- [ ] RLS policies on all Supabase tables
-- [ ] Quiz section bug fixes (buttons, progression, data integrity)
-- [ ] General code cleanup and hardening
+- [ ] RLS player_id write enforcement across all feature tables
+- [ ] Remove stale open-policy bootstrap SQL
+- [ ] Atomic player2 join (race condition fix)
+- [ ] Remove JoinPage full-session bypass
+- [ ] Fix finish_sentence/hot_takes RLS type mismatch
+- [ ] Fix fake join URL display on results pages
+- [ ] Fix stale closure bugs (VisionTab, PredictPartnerPage)
+- [ ] Optimize select('*') queries to fetch only needed columns
+- [ ] Keyboard accessibility for interactive cards
+- [ ] Modal/overlay accessibility (dialog role, focus trap, Escape)
+- [ ] Fix 2 stale book route tests
 
 ### Out of Scope
 
-- Native app (Capacitor wrap) — deferred to v1.1
-- New features or game modes — this milestone is polish only
+- Native app (Capacitor wrap) — deferred to v1.2+
+- New features or game modes — this milestone is audit remediation only
 - UI redesign — visual theme stays as-is
+- Full component refactoring — light touch only on maintainability (finding 11)
 
 ## Context
 
@@ -85,4 +96,4 @@ Partners can connect and learn about each other through shared interactive exper
 | Full RLS audit before native app milestone | Security must be solid before wider distribution | — Pending |
 
 ---
-*Last updated: 2026-03-10 after milestone v1.0 initialization*
+*Last updated: 2026-03-14 after milestone v1.1 initialization*
