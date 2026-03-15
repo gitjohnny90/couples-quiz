@@ -49,8 +49,8 @@ export function getDocumentTitle(pathname) {
  * Tab groupings:
  *  - "/" → exact match only
  *  - "/vault/:id" (quizzes) → /vault, /quiz, /results, /deep-dive, /quiz-packs
- *  - "/fun/:id" (fun stuff) → /fun, /draw, /movies, /books, /watch-guide, /tictactoe, /love-notes
- *  - "/profiles/:id" (us)   → /profiles, /journal
+ *  - "/fun/:id" (fun stuff) → /fun, /draw, /movies, /watch-guide, /tictactoe, /love-notes
+ *  - "/profiles/:id" (us)   → /profiles, /journal, /study, /personality, /vision
  *
  * @param {string} tabPath - the tab's target path, e.g. "/" or "/vault/abc"
  * @param {string} pathname - current location.pathname

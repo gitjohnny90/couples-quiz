@@ -54,7 +54,7 @@ describe('getDocumentTitle', () => {
     ['/fun/abc', 'Fun Stuff — The Us Quiz'],
     ['/draw/abc', 'Draw — The Us Quiz'],
     ['/movies/abc', 'Movies — The Us Quiz'],
-    ['/books/abc', 'Books — The Us Quiz'],
+    ['/study/abc', 'Study Together — The Us Quiz'],
     ['/tictactoe/abc', 'Tic-Tac-Toe — The Us Quiz'],
     ['/love-notes/abc', 'Love Note Hunt — The Us Quiz'],
     ['/profiles/abc', 'About Us — The Us Quiz'],
@@ -136,8 +136,8 @@ describe('isTabActive', () => {
       expect(isTabActive(tabPath, '/movies/abc')).toBe(true)
     })
 
-    it('is active on /books', () => {
-      expect(isTabActive(tabPath, '/books/abc')).toBe(true)
+    it('is NOT active on /study (study belongs to us tab)', () => {
+      expect(isTabActive(tabPath, '/study/abc')).toBe(false)
     })
 
     it('is active on /watch-guide', () => {
@@ -171,6 +171,10 @@ describe('isTabActive', () => {
 
     it('is active on /journal', () => {
       expect(isTabActive(tabPath, '/journal/abc')).toBe(true)
+    })
+
+    it('is active on /study', () => {
+      expect(isTabActive(tabPath, '/study/abc')).toBe(true)
     })
 
     it('is NOT active on quiz routes', () => {
