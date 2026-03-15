@@ -1,66 +1,79 @@
-# Requirements: The Us Quiz — v1.0 Polish & Security
+# Requirements: The Us Quiz — v1.1 Audit Remediation
 
-**Defined:** 2026-03-10
+**Defined:** 2026-03-14
 **Core Value:** Partners can connect and learn about each other through shared interactive experiences that update live for both players
 
-## v1.0 Requirements
+## v1.1 Requirements
 
-Requirements for this polish & security milestone. No new features — hardening only.
+Requirements for audit remediation. Fixes security vulnerabilities, bugs, and quality issues from independent Codex audit.
 
 ### Security
 
-- [x] **SEC-01**: User can only read/write data for sessions they belong to (RLS on all 12 tables)
-- [x] **SEC-02**: RLS policies use `(SELECT auth.uid())` optimization for performance
-- [x] **SEC-03**: Both partners can read shared session rows (sessions table policy allows player1 and player2)
-- [x] **SEC-04**: Supabase Storage buckets enforce access control for drawings
-- [x] **SEC-05**: RLS enable and policy deploy happen atomically (no window of empty results)
-- [ ] **SEC-06**: Realtime subscriptions continue working correctly after RLS is enabled
+- [ ] **SEC-07**: User can only write rows with their own player_id (RLS enforces player_id matches auth user via sessions table lookup)
+- [ ] **SEC-08**: Stale bootstrap SQL files with open policies are removed or clearly marked as superseded
+- [ ] **SEC-09**: Player2 join is atomic — two simultaneous join attempts cannot both claim the slot (conditional UPDATE)
+- [ ] **SEC-10**: JoinPage rejects access when session is full (no "open notebook anyway" bypass)
+- [ ] **SEC-11**: finish_sentence and hot_takes RLS policies use correct column types (no text/uuid mismatch)
 
-### Data Migration
+### Bugs
 
-- [ ] **MIG-01**: Legacy Predict Your Partner data is backfilled from responses to predict_partner table
-- [ ] **MIG-02**: Dead code paths referencing old PYP storage in responses table are removed
-- [ ] **MIG-03**: Migration uses ON CONFLICT DO NOTHING for idempotent reruns
+- [ ] **BUG-01**: ResultsPage and DrawResultsPage display the actual session ID in the share URL, not literal braces
+- [ ] **BUG-02**: VisionTab caption autosave uses current board state, not stale closure data
+- [ ] **BUG-03**: PredictPartnerPage post-save check uses fresh response data, not stale allResponses
+- [ ] **BUG-04**: Polling queries fetch only needed columns instead of select('*') for rows with large JSONB/base64
 
-### Realtime Reliability
+### Accessibility
 
-- [x] **RT-01**: All sync-dependent pages have polling fallbacks alongside realtime subscriptions
-- [x] **RT-02**: QuizPage has realtime subscriptions for partner answer updates
-- [x] **RT-03**: QuizPage has polling fallback for partner answer sync
-- [x] **RT-04**: All pages pair removeChannel with clearInterval in cleanup
-- [x] **RT-05**: Polling is gated behind "waiting for partner" conditions (not polling when unnecessary)
+- [ ] **A11Y-01**: Interactive cards on VaultPage, HotTakesPage, VisionTab, StudyTogetherPage, and ResultsPage have button semantics, focus handling, and keyboard activation
+- [ ] **A11Y-02**: PageGuide overlay has role="dialog", focus trap, Escape-to-close, and focus restoration
+- [ ] **A11Y-03**: Form controls on AuthPage and WaitlistPage have proper label associations
 
-### Quiz Bug Fixes
+### Quality
 
-- [x] **QUIZ-01**: Quiz buttons respond correctly to taps (no stuck/dead button states)
-- [x] **QUIZ-02**: Quiz pages progress to next question/results without manual reload
-- [x] **QUIZ-03**: ResultsPage realtime filter changed from INSERT to * (catches existing partner data)
-- [x] **QUIZ-04**: QuizPage syncs sessionId from URL params consistently
-- [x] **QUIZ-05**: Partner answers display correctly without data mix-ups
+- [ ] **QUAL-01**: VisionTab DOM style mutations replaced with state-driven CSS
+- [ ] **QUAL-02**: Large page components have clearer separation of concerns (light-touch extraction of hooks/helpers, not full rewrite)
+- [ ] **TEST-01**: Stale /books route tests in sessionUtils.test.js are fixed or removed to match current routing
 
-### Code Cleanup
+## v1.0 Requirements (Completed)
 
-- [x] **CLN-01**: Async state operations guarded with isMounted refs to prevent memory leaks
-- [x] **CLN-02**: Realtime channel names are unique per page instance (no collisions)
-- [x] **CLN-03**: General code cleanup pass across feature pages
+### Security (v1.0)
+- [x] **SEC-01**: RLS on all 12 tables — Complete
+- [x] **SEC-02**: Optimized auth.uid() subqueries — Complete
+- [x] **SEC-03**: Both partners can read shared sessions — Complete
+- [x] **SEC-04**: Storage access control — Complete
+- [x] **SEC-05**: Atomic RLS deploy — Complete
+- [ ] **SEC-06**: Realtime works after RLS — Pending
 
-## v1.1 Requirements (Deferred)
+### Data Migration (v1.0)
+- [ ] **MIG-01**: PYP data backfilled — Pending
+- [ ] **MIG-02**: Dead PYP code removed — Pending
+- [ ] **MIG-03**: Idempotent migration — Pending
+
+### Realtime (v1.0)
+- [x] **RT-01** through **RT-05**: All complete
+
+### Quiz Fixes (v1.0)
+- [x] **QUIZ-01** through **QUIZ-05**: All complete
+
+### Code Cleanup (v1.0)
+- [x] **CLN-01** through **CLN-03**: All complete
+
+## v1.2 Requirements (Deferred)
 
 ### Native App
-
-- **NAT-01**: App wrapped with Capacitor for iOS and Android
-- **NAT-02**: Push notifications via native APIs
-- **NAT-03**: App Store and Play Store submission
+- **APP-01**: Capacitor wrap for iOS/Android distribution
+- **APP-02**: Push notifications via native APIs
+- **APP-03**: App Store and Play Store submission
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Native app (Capacitor) | Deferred to v1.1 — security must be solid first |
-| New features or game modes | This milestone is polish only |
+| Full component rewrites | Light-touch only — extracting hooks/helpers, not rewriting page architecture |
+| New features or game modes | This milestone is audit remediation only |
 | UI redesign | Visual theme stays as-is |
+| Comprehensive test suite | Fix stale tests only; full coverage is a future milestone |
 | TypeScript migration | Out of scope for all milestones |
-| Push notifications | Requires native app, deferred |
 
 ## Traceability
 
@@ -68,34 +81,27 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SEC-01 | Phase 1 | Complete |
-| SEC-02 | Phase 1 | Complete |
-| SEC-03 | Phase 1 | Complete |
-| SEC-04 | Phase 1 | Complete |
-| SEC-05 | Phase 1 | Complete |
-| SEC-06 | Phase 1 | Pending |
-| MIG-01 | Phase 2 | Pending |
-| MIG-02 | Phase 2 | Pending |
-| MIG-03 | Phase 2 | Pending |
-| RT-01 | Phase 3 | Complete |
-| RT-02 | Phase 3 | Complete |
-| RT-03 | Phase 3 | Complete |
-| RT-04 | Phase 3 | Complete |
-| RT-05 | Phase 3 | Complete |
-| QUIZ-01 | Phase 4 | Complete |
-| QUIZ-02 | Phase 4 | Complete |
-| QUIZ-03 | Phase 4 | Complete |
-| QUIZ-04 | Phase 4 | Complete |
-| QUIZ-05 | Phase 4 | Complete |
-| CLN-01 | Phase 4 | Complete |
-| CLN-02 | Phase 4 | Complete |
-| CLN-03 | Phase 4 | Complete |
+| SEC-07 | — | Pending |
+| SEC-08 | — | Pending |
+| SEC-09 | — | Pending |
+| SEC-10 | — | Pending |
+| SEC-11 | — | Pending |
+| BUG-01 | — | Pending |
+| BUG-02 | — | Pending |
+| BUG-03 | — | Pending |
+| BUG-04 | — | Pending |
+| A11Y-01 | — | Pending |
+| A11Y-02 | — | Pending |
+| A11Y-03 | — | Pending |
+| QUAL-01 | — | Pending |
+| QUAL-02 | — | Pending |
+| TEST-01 | — | Pending |
 
 **Coverage:**
-- v1.0 requirements: 22 total
-- Mapped to phases: 22
-- Unmapped: 0
+- v1.1 requirements: 15 total
+- Mapped to phases: 0
+- Unmapped: 15
 
 ---
-*Requirements defined: 2026-03-10*
-*Last updated: 2026-03-10 after roadmap creation*
+*Requirements defined: 2026-03-14*
+*Last updated: 2026-03-14 after initial definition*
