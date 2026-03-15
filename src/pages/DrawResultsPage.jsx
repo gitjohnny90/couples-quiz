@@ -91,8 +91,10 @@ export default function DrawResultsPage() {
     }
   }, [revealed])
 
+  const shareUrl = `${window.location.origin}/join/${sessionId}`
+
   const copyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/join/${sessionId}`)
+    navigator.clipboard.writeText(shareUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -145,7 +147,7 @@ export default function DrawResultsPage() {
               marginBottom: 12,
               fontFamily: 'var(--font-body)',
             }}>
-              {window.location.origin}/join/{sessionId}
+              {shareUrl}
             </div>
             <button className="btn btn-primary" style={{ width: '100%' }} onClick={copyLink}>
               {copied ? 'copied!' : 'copy link'}
