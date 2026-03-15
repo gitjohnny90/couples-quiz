@@ -8,21 +8,6 @@ A couples quiz app where one partner creates a session and the other joins via a
 
 Partners can connect and learn about each other through shared interactive experiences that update live for both players.
 
-## Current Milestone: v1.1 Audit Remediation
-
-**Goal:** Fix all security vulnerabilities, bugs, and quality issues surfaced by an independent code audit (OpenAI Codex, 2026-03-14). Prioritize security fixes, then bugs, then quality improvements.
-
-**Target features:**
-- RLS player_id enforcement (prevent partner impersonation)
-- Remove stale open-policy bootstrap SQL files
-- Join flow race condition fix (atomic player2 claim)
-- Remove JoinPage full-session privacy bypass
-- Fix finish_sentence/hot_takes RLS type mismatch
-- Fix fake join URLs and stale closure bugs
-- Optimize wasteful select('*') queries
-- Keyboard and modal accessibility improvements
-- Fix 2 stale book route test failures
-
 ## Requirements
 
 ### Validated
@@ -48,37 +33,44 @@ Partners can connect and learn about each other through shared interactive exper
 - ✓ Miss You heart nudge — v0
 - ✓ Realtime subscriptions for live partner updates — v0
 - ✓ Password reset via email — v0
+- ✓ RLS player_id write enforcement on all feature tables — v1.1
+- ✓ Atomic player2 join (race condition eliminated) — v1.1
+- ✓ JoinPage full-session rejection — v1.1
+- ✓ Stale bootstrap SQL files marked as superseded — v1.1
+- ✓ finish_sentence/hot_takes RLS type fix — v1.1
+- ✓ Share URLs display real session IDs — v1.1
+- ✓ VisionTab and PredictPartner stale closure fixes — v1.1
+- ✓ Optimized queries (no select('*') on large JSONB) — v1.1
+- ✓ Keyboard accessibility for interactive cards (5 pages) — v1.1
+- ✓ PageGuide dialog accessibility (focus trap, Escape) — v1.1
+- ✓ Form label associations (AuthPage, WaitlistPage) — v1.1
+- ✓ VisionTab state-driven CSS (no DOM mutations) — v1.1
+- ✓ Custom hooks: useRealtimeSync, useSessionSetup — v1.1
+- ✓ useCallback compliance for all useRealtimeSync consumers — v1.1
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-- [ ] RLS player_id write enforcement across all feature tables
-- [ ] Remove stale open-policy bootstrap SQL
-- [ ] Atomic player2 join (race condition fix)
-- [ ] Remove JoinPage full-session bypass
-- [ ] Fix finish_sentence/hot_takes RLS type mismatch
-- [ ] Fix fake join URL display on results pages
-- [ ] Fix stale closure bugs (VisionTab, PredictPartnerPage)
-- [ ] Optimize select('*') queries to fetch only needed columns
-- [ ] Keyboard accessibility for interactive cards
-- [ ] Modal/overlay accessibility (dialog role, focus trap, Escape)
-- [ ] Fix 2 stale book route tests
+(None — next milestone not yet defined)
 
 ### Out of Scope
 
 - Native app (Capacitor wrap) — deferred to v1.2+
-- New features or game modes — this milestone is audit remediation only
+- New features or game modes — pending next milestone definition
 - UI redesign — visual theme stays as-is
-- Full component refactoring — light touch only on maintainability (finding 11)
+- Full component refactoring — light touch only
+- TypeScript migration — not planned
 
 ## Context
 
-- App is deployed on Vercel with SPA rewrites
-- Play testers actively using the app — changes must not break existing sessions
-- Most reported issues centered on the quiz section: buttons not working, pages not progressing, needing reloads to see partner answers, data mix-ups
-- RLS is partially configured — some tables have policies, others don't
-- Predict Your Partner currently stores data in the generic `responses` table but has a dedicated `predict_partner` table ready
+- **Codebase:** 16,575 LOC JavaScript (React 19 + Vite 7 + Supabase)
+- **Deployed:** Vercel with SPA rewrites
+- **Users:** Play testers actively using the app
+- **Security:** RLS fully enforced on all 12 tables with per-operation policies; player_id write enforcement prevents impersonation
+- **Quality:** Custom hooks (useRealtimeSync, useSessionSetup) established as standard patterns; all interactive pages use useCallback-wrapped fetch functions
+- **Accessibility:** Keyboard navigation on all interactive cards; PageGuide dialogs with focus trap; form labels on auth pages
+- **Known gaps:** Nyquist validation files missing for v1.1 phases (no VALIDATION.md); v1.0 phases 1 & 3 marked in-progress in roadmap (work was done outside GSD tracking)
 
 ## Constraints
 
@@ -91,9 +83,16 @@ Partners can connect and learn about each other through shared interactive exper
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Polling fallbacks alongside realtime (not replacing) | Realtime is primary, polling catches dropped connections | — Pending |
-| Migrate PYP data to dedicated table | Generic responses table doesn't fit the per-question data model | — Pending |
-| Full RLS audit before native app milestone | Security must be solid before wider distribution | — Pending |
+| Polling fallbacks alongside realtime (not replacing) | Realtime is primary, polling catches dropped connections | ✓ Good — all pages recover within 5s |
+| Migrate PYP data to dedicated table | Generic responses table doesn't fit the per-question data model | ✓ Good — clean separation |
+| Full RLS audit before native app milestone | Security must be solid before wider distribution | ✓ Good — 16/16 requirements satisfied |
+| Per-operation RLS policies (not FOR ALL) | Allows player_id enforcement on writes while keeping reads session-scoped | ✓ Good — prevents impersonation without breaking reads |
+| Atomic conditional UPDATE for player2 join | Eliminates race condition; cleaner than try/catch | ✓ Good — no double-joins possible |
+| dataRef pattern for VisionTab autosave | useRef synced via useEffect; setTimeout reads current, not stale closure | ✓ Good — caption input responsive |
+| Local useState in CorkBoardSlot | Shields caption input from parent re-renders; syncs on blur | ✓ Good — no more glitchy typing |
+| Belt-and-suspenders invite code (localStorage + user_metadata) | Covers same-device and cross-device email confirmation flows | ✓ Good — works on all paths |
+| useRealtimeSync + useSessionSetup as standard hooks | Reduces boilerplate; enforces consistent patterns across pages | ✓ Good — adopted by 3 largest pages |
+| CSS class hover instead of DOM mutations | React state drives styles; no direct .style access | ✓ Good — cleaner, more predictable |
 
 ---
-*Last updated: 2026-03-14 after milestone v1.1 initialization*
+*Last updated: 2026-03-15 after v1.1 milestone*

@@ -89,6 +89,14 @@ None - no external service configuration required.
 - Both files verified: `from('sessions')` query present, no `/join/` reference, `invite_code` referenced
 - Build passes clean
 
+## Self-Check: PASSED
+
+- FOUND: src/pages/ResultsPage.jsx
+- FOUND: src/pages/DrawResultsPage.jsx
+- FOUND: .planning/phases/06-bug-fixes/06-03-SUMMARY.md
+- FOUND: commit 3df4e3a (feat: session-aware waiting screen on ResultsPage)
+- FOUND: commit e94cd06 (feat: session-aware waiting screen on DrawResultsPage)
+
 ---
 *Phase: 06-bug-fixes*
 *Completed: 2026-03-15*

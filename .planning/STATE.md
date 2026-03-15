@@ -2,57 +2,53 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Audit Remediation
-status: planning
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-03-15T19:43:47.466Z"
-last_activity: 2026-03-15 — Roadmap created, 15 requirements mapped across Phases 5-8
+status: complete
+stopped_at: Milestone v1.1 shipped
+last_updated: "2026-03-15"
+last_activity: 2026-03-15 — v1.1 Audit Remediation milestone completed and archived
 progress:
   total_phases: 9
   completed_phases: 9
   total_plans: 20
   completed_plans: 20
-  percent: 0
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-14)
+See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** Partners can connect and learn about each other through shared interactive experiences that update live for both players
-**Current focus:** Phase 5 — RLS Hardening
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 5 of 8 (RLS Hardening)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-03-15 — Roadmap created, 15 requirements mapped across Phases 5-8
+Milestone: v1.1 Audit Remediation — SHIPPED 2026-03-15
+Status: Complete — ready for next milestone
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0 (v1.1)
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 20 (v1.0 + v1.1)
+- v1.1 plans: 12 plans, 22 tasks
+- v1.1 commits: 52
+- v1.1 timeline: 2026-03-15 (single day)
 
-**By Phase:**
+**By Phase (v1.1):**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
-
-*Updated after each plan completion*
-| Phase 05-rls-hardening P01 | 8 | 2 tasks | 2 files |
+| Phase | Duration | Tasks | Files |
+|-------|----------|-------|-------|
+| Phase 05-rls-hardening P01 | 8min | 2 tasks | 2 files |
 | Phase 05-rls-hardening P02 | 15min | 2 tasks | 6 files |
-| Phase 06-bug-fixes P01 | 2min | 1 tasks | 2 files |
+| Phase 06-bug-fixes P01 | 2min | 1 task | 2 files |
 | Phase 06-bug-fixes P02 | 10min | 2 tasks | 17 files |
-| Phase 06-bug-fixes P04 | 5min | 1 tasks | 1 files |
-| Phase 06-bug-fixes P05 | 2min | 2 tasks | 3 files |
 | Phase 06-bug-fixes P03 | 2min | 2 tasks | 2 files |
+| Phase 06-bug-fixes P04 | 5min | 1 task | 1 file |
+| Phase 06-bug-fixes P05 | 2min | 2 tasks | 3 files |
 | Phase 07-accessibility P01 | 2min | 2 tasks | 5 files |
 | Phase 07-accessibility P02 | 6min | 2 tasks | 3 files |
 | Phase 08-quality P01 | 5min | 2 tasks | 4 files |
@@ -64,42 +60,17 @@ Progress: [░░░░░░░░░░] 0%
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- [v1.0]: RLS policies deployed on all 12 tables with session-scoped access
-- [v1.0]: Polling fallbacks standardized; realtime is primary, polling catches dropped connections
-- [v1.1]: Security phases before bugs before accessibility before quality (audit priority order)
-- [Phase 05-rls-hardening]: Per-operation RLS policies replace FOR ALL to allow player_id enforcement on writes while keeping reads session-scoped only
-- [Phase 05-rls-hardening]: responses table allows player_id IN ('game','shared') so both partners write shared tic-tac-toe/study-together rows
-- [Phase 05-02]: Atomic slot claim uses .select() + array length check instead of .single() — cleaner than try/catch for zero-row UPDATE
-- [Phase 05-02]: JoinPage alreadyJoined removes all access bypass — no session context set, only go-home button shown
-- [Phase 06-bug-fixes]: Single shareUrl variable replaces dual inline computations to eliminate display/copy mismatch on share links
-- [Phase 06-bug-fixes]: dataRef pattern chosen for VisionTab autosave — useRef synced via useEffect, setTimeout reads dataRef.current instead of stale closure
-- [Phase 06-bug-fixes]: fetchResponses returns mapped data so post-save code uses fresh values without async setState race
-- [Phase 06-bug-fixes]: Local useState in CorkBoardSlot shields caption input from parent re-renders triggered by polling; syncs to parent only on blur
-- [Phase 06-bug-fixes]: Belt-and-suspenders invite code: localStorage for same-device + user_metadata for cross-device
-- [Phase 06-bug-fixes]: Manual join UI replaces silent autoCreate() when no invite code found — user explicitly chooses join or create
-- [Phase 06-bug-fixes]: Two sub-states on waiting screen: sub-state A shows invite code when player2_name and player2_user_id are both null; sub-state B shows plain waiting message when either is set
-- [Phase 07-01]: Interactive div accessibility pattern: role=button + tabIndex=0 + onKeyDown(Enter/Space) + aria-label or aria-expanded applied to all non-button interactive cards
-- [Phase 07-accessibility]: tabIndex=-1 on dialog content div with gotItRef button as sole tab stop — simple and correct for single-action dialog
-- [Phase 07-accessibility]: htmlFor/id association chosen over label-wrapping for AuthPage — inputs separated from labels by styling divs
-- [Phase 08-quality]: CSS .vision-pin class drives hover scale instead of onMouseEnter/Leave DOM mutations; disabled modifier class handles conditional no-hover
-- [Phase 08-quality]: C:/Program Files/Git/study route belongs to us tab (/profiles) not fun-stuff tab — test suite and JSDoc updated to reflect actual isTabActive implementation
-- [Phase 08-quality]: LoveNoteHuntPage realtime callback wrapped in handleWaitingUpdate useCallback — original had phase-transition logic inline, extracted to named callback passed as onUpdate
-- [Phase 08-quality]: useRealtimeSync + useSessionSetup hooks established as standard pattern for new pages needing realtime sync and session context
-- [Phase 09-usecallback-hook-compliance]: useCallback dep array uses only [sessionId] for fetch functions passed to useRealtimeSync — supabase, mountedRef, and state setters are all stable refs/primitives
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- Phase 5 SEC-09 (atomic join) touches the sessions table UPDATE flow — must test that existing partner join still works after the conditional UPDATE change
-- Phase 5 SEC-07 (player_id RLS) requires knowing the auth user's player_id from the sessions table at query time — policy SQL needs subquery join
+None — milestone complete.
 
 ## Session Continuity
 
-Last session: 2026-03-15T19:41:26.293Z
-Stopped at: Completed 09-01-PLAN.md
+Last session: 2026-03-15
+Stopped at: Milestone v1.1 shipped
 Resume file: None
