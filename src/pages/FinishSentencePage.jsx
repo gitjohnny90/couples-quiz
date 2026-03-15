@@ -65,14 +65,14 @@ export default function FinishSentencePage() {
     try {
       // Session info
       const { data: sessionData } = await supabase
-        .from('sessions').select('*').eq('id', sessionId).single()
+        .from('sessions').select('player1_name, player2_name').eq('id', sessionId).single()
       if (!mountedRef.current) return
       if (sessionData) setSession(sessionData)
 
       // All rows for this session, newest first
       const { data: rows, error: fetchErr } = await supabase
         .from('finish_sentence')
-        .select('*')
+        .select('round, player_id, sentence_starter, sentence_finish')
         .eq('session_id', sessionId)
         .order('round', { ascending: false })
         .order('created_at', { ascending: false })
@@ -210,7 +210,7 @@ export default function FinishSentencePage() {
         // Check if that round is complete (both finished)
         const { data: lastRows } = await supabase
           .from('finish_sentence')
-          .select('*')
+          .select('round, player_id, sentence_starter, sentence_finish')
           .eq('session_id', sessionId)
           .eq('round', lastRound)
 

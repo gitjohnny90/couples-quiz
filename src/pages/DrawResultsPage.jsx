@@ -55,7 +55,7 @@ export default function DrawResultsPage() {
   const fetchResponses = useCallback(async () => {
     const { data, error } = await supabase
       .from('responses')
-      .select('*')
+      .select('player_id, player_name, answers')
       .eq('session_id', sessionId)
       .eq('pack_id', targetPackId)
 

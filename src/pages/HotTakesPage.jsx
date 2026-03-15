@@ -71,12 +71,12 @@ export default function HotTakesPage() {
   const fetchAll = useCallback(async () => {
     try {
       const { data: sessionData } = await supabase
-        .from('sessions').select('*').eq('id', sessionId).single()
+        .from('sessions').select('player1_name, player2_name').eq('id', sessionId).single()
       if (!mountedRef.current) return
       if (sessionData) setSession(sessionData)
 
       const { data: votes, error: vErr } = await supabase
-        .from('hot_takes').select('*').eq('session_id', sessionId)
+        .from('hot_takes').select('player_id, statement_id, vote, defense').eq('session_id', sessionId)
       if (!mountedRef.current) return
       if (vErr) throw vErr
       setAllVotes(votes || [])

@@ -57,7 +57,7 @@ export default function TicTacToePage() {
   const fetchGame = useCallback(async () => {
     const { data, error } = await supabase
       .from('responses')
-      .select('*')
+      .select('player_id, answers')
       .eq('session_id', sessionId)
       .eq('pack_id', PACK_ID)
       .eq('player_id', GAME_PLAYER_ID)

@@ -80,7 +80,7 @@ export default function LoveNoteHuntPage() {
 
     // Find current round — latest round number for this session
     const { data: allNotes, error: notesErr } = await supabase
-      .from('love_notes').select('*')
+      .from('love_notes').select('round, player_id, notes, note_cells, grid_position, message')
       .eq('session_id', sessionId)
       .order('round', { ascending: false })
 
@@ -99,7 +99,7 @@ export default function LoveNoteHuntPage() {
 
     // Check guesses
     const { data: guessData } = await supabase
-      .from('responses').select('*')
+      .from('responses').select('player_id, answers')
       .eq('session_id', sessionId)
       .eq('pack_id', `love-notes-guesses-r${latestRound}`)
       .eq('player_id', playerId)
@@ -129,7 +129,7 @@ export default function LoveNoteHuntPage() {
   // Fetch partner notes (for hunting phase)
   const fetchPartnerNotes = async () => {
     const { data, error } = await supabase
-      .from('love_notes').select('*')
+      .from('love_notes').select('round, player_id, notes, note_cells, grid_position, message')
       .eq('session_id', sessionId)
       .eq('round', round)
       .neq('player_id', playerId)

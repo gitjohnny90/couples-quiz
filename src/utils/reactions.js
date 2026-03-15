@@ -9,7 +9,7 @@ export const REACTIONS = ['❤️', '😂', '🔥']
 export async function fetchReactions(sessionId, targetType) {
   const { data, error } = await supabase
     .from('reactions')
-    .select('*')
+    .select('id, player_id, target_id, reaction')
     .eq('session_id', sessionId)
     .eq('target_type', targetType)
   if (error) return []
@@ -22,7 +22,7 @@ export async function fetchReactions(sessionId, targetType) {
 export async function toggleReaction(sessionId, playerId, targetType, targetId, emoji) {
   const { data: existing } = await supabase
     .from('reactions')
-    .select('*')
+    .select('id, reaction')
     .eq('session_id', sessionId)
     .eq('player_id', playerId)
     .eq('target_type', targetType)

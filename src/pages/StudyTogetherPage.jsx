@@ -84,7 +84,7 @@ export default function StudyTogetherPage() {
   const fetchData = async () => {
     const { data: row } = await supabase
       .from('responses')
-      .select('*')
+      .select('answers')
       .eq('session_id', sessionId)
       .eq('pack_id', PACK_ID)
       .eq('player_id', PLAYER_ID)

@@ -73,7 +73,7 @@ export default function PredictPartnerPage() {
   const fetchResponses = async () => {
     const { data } = await supabase
       .from('predict_partner')
-      .select('*')
+      .select('pack_id, player_id, question_index, own_answer, prediction, prediction_correct, completed_at')
       .eq('session_id', sessionId)
 
     if (!mountedRef.current) return

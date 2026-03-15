@@ -20,7 +20,7 @@ export default function QuizPacksPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: responseData } = await supabase.from('responses').select('*').eq('session_id', sessionId)
+      const { data: responseData } = await supabase.from('responses').select('pack_id, player_id, answers').eq('session_id', sessionId)
       const packMap = {}
       if (responseData) responseData.forEach((r) => { if (!packMap[r.pack_id]) packMap[r.pack_id] = []; packMap[r.pack_id].push(r) })
 

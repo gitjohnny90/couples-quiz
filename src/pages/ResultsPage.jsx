@@ -59,7 +59,7 @@ export default function ResultsPage() {
 
   const fetchResponses = useCallback(async () => {
     const { data, error } = await supabase
-      .from('responses').select('*')
+      .from('responses').select('player_id, player_name, answers')
       .eq('session_id', sessionId).eq('pack_id', packId)
     if (!mountedRef.current) return
     if (!error && data) setResponses(data)

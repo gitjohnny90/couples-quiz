@@ -22,7 +22,7 @@ export default function DeepDivePage() {
   // Fetch all deep dive responses for this session
   const fetchResponses = async () => {
     const { data, error } = await supabase
-      .from('deep_dive_responses').select('*')
+      .from('deep_dive_responses').select('deck_id, question_id, player_id, answer')
       .eq('session_id', sessionId)
     if (!error && data) setResponses(data)
     setLoading(false)

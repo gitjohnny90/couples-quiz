@@ -53,9 +53,9 @@ export default function PersonalityPage() {
   }, [sessionId, partnerProfile])
 
   const fetchProfiles = async () => {
-    const { data: session } = await supabase.from('sessions').select('*').eq('id', sessionId).single()
+    const { data: session } = await supabase.from('sessions').select('player1_name, player2_name').eq('id', sessionId).single()
     if (session) setPartnerName(playerId === 'player1' ? session.player2_name : session.player1_name || '')
-    const { data: profiles } = await supabase.from('profiles').select('*').eq('session_id', sessionId)
+    const { data: profiles } = await supabase.from('profiles').select('player_id, profile_data').eq('session_id', sessionId)
     if (profiles) {
       const mine = profiles.find((p) => p.player_id === playerId)
       const theirs = profiles.find((p) => p.player_id !== playerId)

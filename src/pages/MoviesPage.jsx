@@ -80,8 +80,8 @@ export default function MoviesPage() {
 
   const fetchData = async () => {
     const [{ data: sessionData }, { data: itemData }] = await Promise.all([
-      supabase.from('sessions').select('*').eq('id', sessionId).single(),
-      supabase.from('shared_items').select('*').eq('session_id', sessionId).eq('type', 'movie').order('created_at', { ascending: false }),
+      supabase.from('sessions').select('player1_name, player2_name').eq('id', sessionId).single(),
+      supabase.from('shared_items').select('id, title, status, added_by, player1_rating, player2_rating, genre, source, created_at').eq('session_id', sessionId).eq('type', 'movie').order('created_at', { ascending: false }),
     ])
     if (!mountedRef.current) return
     setSession(sessionData)

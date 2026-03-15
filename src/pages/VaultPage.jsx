@@ -31,7 +31,7 @@ export default function VaultPage() {
   }, [sessionId])
 
   const fetchData = async () => {
-    let { data: sessionData } = await supabase.from('sessions').select('*').eq('id', sessionId).single()
+    let { data: sessionData } = await supabase.from('sessions').select('id, player1_name, player2_name, invite_code').eq('id', sessionId).single()
 
     // Backfill invite code for legacy sessions that don't have one
     if (sessionData && !sessionData.invite_code) {
@@ -48,7 +48,7 @@ export default function VaultPage() {
     setSession(sessionData)
 
     // Multiple choice completion count
-    const { data: responseData } = await supabase.from('responses').select('*').eq('session_id', sessionId)
+    const { data: responseData } = await supabase.from('responses').select('pack_id, player_id, answers').eq('session_id', sessionId)
     if (responseData) {
       const packMap = {}
       responseData.forEach((r) => { if (!packMap[r.pack_id]) packMap[r.pack_id] = []; packMap[r.pack_id].push(r) })
@@ -99,7 +99,7 @@ export default function VaultPage() {
     }
 
     // Deep Dive completion count
-    const { data: ddData } = await supabase.from('deep_dive_responses').select('*').eq('session_id', sessionId)
+    const { data: ddData } = await supabase.from('deep_dive_responses').select('deck_id, question_id, player_id, answer').eq('session_id', sessionId)
     if (ddData) {
       const ddDone = deepDiveDecks.filter((deck) =>
         deck.questions.every((q) => {

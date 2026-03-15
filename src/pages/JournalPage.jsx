@@ -101,8 +101,8 @@ export default function JournalPage() {
   useEffect(() => {
     const fetchAll = async () => {
       const [mcRes, ddRes] = await Promise.all([
-        supabase.from('responses').select('*').eq('session_id', sessionId),
-        supabase.from('deep_dive_responses').select('*').eq('session_id', sessionId),
+        supabase.from('responses').select('pack_id, player_id, player_name, answers').eq('session_id', sessionId),
+        supabase.from('deep_dive_responses').select('deck_id, question_id, player_id, player_name, answer').eq('session_id', sessionId),
       ])
       if (mcRes.data) {
         const allResponses = mcRes.data
