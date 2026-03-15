@@ -1,23 +1,14 @@
-# Roadmap: The Us Quiz — v1.0 Polish & Security
+# Roadmap: The Us Quiz
 
-## Overview
+## Milestones
 
-This milestone hardens an already-functional couples quiz app for active play testers. No new features. Four phases in strict dependency order: lock down data access with RLS policies across all 12 tables, clean up the Predict Your Partner data migration, standardize polling fallbacks alongside realtime subscriptions on every interactive page, then fix quiz section bugs and do a general code cleanup pass. Each phase builds on the stability established by the previous one, culminating in a secured, reliable app ready for wider distribution.
+- ✅ **v1.0 Polish & Security** - Phases 1-4 (shipped 2026-03-12)
+- 🚧 **v1.1 Audit Remediation** - Phases 5-8 (in progress)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
-
-Decimal phases appear between their surrounding integers in numeric order.
-
-- [ ] **Phase 1: RLS Audit & Policy Deployment** - Enable Row Level Security on all Supabase tables with correct policies for both partners
-- [x] **Phase 2: PYP Data Migration & Cleanup** - Backfill legacy Predict Your Partner data and remove dead code paths
-- [ ] **Phase 3: Polling Fallback Standardization** - Add 5s polling fallbacks alongside realtime on every interactive page
-- [x] **Phase 4: Quiz Bug Fixes & Code Cleanup** - Fix quiz submission/progression bugs and standardize code patterns (completed 2026-03-12)
-
-## Phase Details
+<details>
+<summary>✅ v1.0 Polish & Security (Phases 1-4) - SHIPPED 2026-03-12</summary>
 
 ### Phase 1: RLS Audit & Policy Deployment
 **Goal**: Users can only access data belonging to their own session — no cross-session data leakage via the Supabase REST API
@@ -80,14 +71,84 @@ Plans:
 - [ ] 04-02-PLAN.md — Add isMounted guards and unique channels to 5 polling pages
 - [ ] 04-03-PLAN.md — Add isMounted guards and unique channels to remaining pages + CLN-03 cleanup
 
+</details>
+
+### 🚧 v1.1 Audit Remediation (In Progress)
+
+**Milestone Goal:** Fix all security vulnerabilities, bugs, and quality issues surfaced by the independent Codex audit (2026-03-14). Prioritize security, then bugs, then accessibility, then quality.
+
+#### Phase 5: RLS Hardening
+**Goal**: The database rejects any attempt to write data as another player or to claim a session slot twice
+**Depends on**: Phase 4
+**Requirements**: SEC-07, SEC-08, SEC-09, SEC-10, SEC-11
+**Success Criteria** (what must be TRUE):
+  1. A logged-in user cannot insert a row with another player's player_id into any feature table (Supabase rejects the write)
+  2. Two simultaneous join attempts on the same session cannot both succeed — only one player2 slot is claimed
+  3. A user visiting a full session's JoinPage is shown a "session full" error, not given access to the session
+  4. finish_sentence and hot_takes RLS policies enforce session membership without type errors
+  5. No SQL files with open "allow all" policies remain active in the repo without clear superseded markers
+**Plans**: TBD
+
+Plans:
+- [ ] 05-01-PLAN.md — Add player_id RLS policies to all 9 feature tables and fix finish_sentence/hot_takes type mismatch
+- [ ] 05-02-PLAN.md — Atomic player2 join (conditional UPDATE), JoinPage full-session rejection, archive stale SQL files
+
+#### Phase 6: Bug Fixes
+**Goal**: Share URLs work correctly and no page reads stale closure data when auto-saving or evaluating results
+**Depends on**: Phase 5
+**Requirements**: BUG-01, BUG-02, BUG-03, BUG-04
+**Success Criteria** (what must be TRUE):
+  1. Copying the share URL from ResultsPage or DrawResultsPage produces a valid link containing the real session ID
+  2. Editing a vision board image caption and waiting for autosave writes the current caption text, not a stale previous value
+  3. After saving answers in PredictPartnerPage, the completion check reads fresh data from the database
+  4. Polling queries on pages with large JSONB or base64 columns request only the columns they need (no select('*') on those tables)
+**Plans**: TBD
+
+Plans:
+- [ ] 06-01-PLAN.md — Fix fake join URLs in ResultsPage and DrawResultsPage
+- [ ] 06-02-PLAN.md — Fix stale closure in VisionTab autosave and PredictPartnerPage post-save check; optimize select queries
+
+#### Phase 7: Accessibility
+**Goal**: Keyboard users and assistive technology users can operate all interactive elements and modal overlays
+**Depends on**: Phase 6
+**Requirements**: A11Y-01, A11Y-02, A11Y-03
+**Success Criteria** (what must be TRUE):
+  1. Interactive cards on VaultPage, HotTakesPage, VisionTab, StudyTogetherPage, and ResultsPage are reachable and activatable via keyboard Tab and Enter/Space
+  2. The PageGuide overlay announces itself as a dialog, traps focus while open, and closes on Escape with focus restored to the trigger button
+  3. Every form field on AuthPage and WaitlistPage has a visible label that screen readers associate with the input
+**Plans**: TBD
+
+Plans:
+- [ ] 07-01-PLAN.md — Add button semantics and keyboard handlers to interactive cards across 5 pages
+- [ ] 07-02-PLAN.md — Add dialog role, focus trap, and Escape handling to PageGuide; add label associations to AuthPage and WaitlistPage forms
+
+#### Phase 8: Quality
+**Goal**: VisionTab renders without direct DOM mutation and the test suite passes with no stale route references
+**Depends on**: Phase 7
+**Requirements**: QUAL-01, QUAL-02, TEST-01
+**Success Criteria** (what must be TRUE):
+  1. VisionTab caption styles are driven by React state, with no direct style mutations on DOM nodes
+  2. Large page components have at least one extracted custom hook or helper module that reduces their line count
+  3. The test suite runs with zero failures (stale /books route tests are fixed or removed)
+**Plans**: TBD
+
+Plans:
+- [ ] 08-01-PLAN.md — Replace VisionTab DOM mutations with state-driven CSS; fix or remove stale /books route tests
+- [ ] 08-02-PLAN.md — Light-touch extraction of hooks/helpers from large page components
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+v1.0 Phases complete: 2, 4 (done) — 1, 3 in progress
+v1.1 Phases execute in order: 5 → 6 → 7 → 8
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. RLS Audit & Policy Deployment | 1/2 | In Progress|  |
-| 2. PYP Data Migration & Cleanup | 1/1 | Complete | 2026-03-11 |
-| 3. Polling Fallback Standardization | 1/2 | In Progress|  |
-| 4. Quiz Bug Fixes & Code Cleanup | 3/3 | Complete   | 2026-03-12 |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. RLS Audit & Policy Deployment | v1.0 | 1/2 | In Progress | - |
+| 2. PYP Data Migration & Cleanup | v1.0 | 1/1 | Complete | 2026-03-11 |
+| 3. Polling Fallback Standardization | v1.0 | 1/2 | In Progress | - |
+| 4. Quiz Bug Fixes & Code Cleanup | v1.0 | 3/3 | Complete | 2026-03-12 |
+| 5. RLS Hardening | v1.1 | 0/2 | Not started | - |
+| 6. Bug Fixes | v1.1 | 0/2 | Not started | - |
+| 7. Accessibility | v1.1 | 0/2 | Not started | - |
+| 8. Quality | v1.1 | 0/2 | Not started | - |
