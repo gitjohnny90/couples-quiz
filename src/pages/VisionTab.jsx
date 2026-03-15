@@ -848,6 +848,14 @@ function ConstellationSVG({ goals }) {
 function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, onRemove }) {
   const hasPhoto = !!item?.dataUrl
   const inputRef = useRef(null)
+  const [localCaption, setLocalCaption] = useState(item?.caption || '')
+  const [isFocused, setIsFocused] = useState(false)
+
+  useEffect(() => {
+    if (!isFocused) {
+      setLocalCaption(item?.caption || '')
+    }
+  }, [item?.caption, isFocused])
 
   const openPicker = () => inputRef.current?.click()
 
@@ -932,8 +940,13 @@ function CorkBoardSlot({ index, slot, item, onImageUpload, onCaptionChange, onRe
           />
           <input
             type="text"
-            value={item.caption || ''}
-            onChange={(e) => onCaptionChange(e.target.value)}
+            value={localCaption}
+            onChange={(e) => setLocalCaption(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => {
+              setIsFocused(false)
+              onCaptionChange(localCaption)
+            }}
             placeholder="caption..."
             maxLength={60}
             style={{
