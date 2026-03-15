@@ -30,9 +30,9 @@ Requirements for audit remediation. Fixes security vulnerabilities, bugs, and qu
 
 ### Quality
 
-- [ ] **QUAL-01**: VisionTab DOM style mutations replaced with state-driven CSS
+- [x] **QUAL-01**: VisionTab DOM style mutations replaced with state-driven CSS
 - [ ] **QUAL-02**: Large page components have clearer separation of concerns (light-touch extraction of hooks/helpers, not full rewrite)
-- [ ] **TEST-01**: Stale /books route tests in sessionUtils.test.js are fixed or removed to match current routing
+- [x] **TEST-01**: Stale /books route tests in sessionUtils.test.js are fixed or removed to match current routing
 
 ## v1.0 Requirements (Completed)
 
@@ -93,9 +93,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | A11Y-01 | Phase 7 | Complete |
 | A11Y-02 | Phase 7 | Complete |
 | A11Y-03 | Phase 7 | Complete |
-| QUAL-01 | Phase 8 | Pending |
+| QUAL-01 | Phase 8 | Complete |
 | QUAL-02 | Phase 8 | Pending |
-| TEST-01 | Phase 8 | Pending |
+| TEST-01 | Phase 8 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 15 total
