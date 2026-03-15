@@ -1,3 +1,11 @@
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-- SUPERSEDED — DO NOT RUN
+-- This was the original shared_items table creation script.
+-- The "allow all" policy here is insecure. Current policies are
+-- in supabase-rls-fix.sql and supabase/migrations/05-player-id-rls.sql.
+-- Table definition is still accurate for reference.
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 -- ===========================================
 -- Shared Items Table (Movies & Books lists)
 -- Run this in Supabase SQL Editor (Dashboard > SQL Editor > New query)

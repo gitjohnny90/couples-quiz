@@ -1,3 +1,12 @@
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-- SUPERSEDED — DO NOT RUN
+-- This was the original bootstrap schema. RLS policies here use
+-- "allow all" (using (true)) which is insecure. Current policies
+-- are in supabase-rls-fix.sql (session-scoped) and
+-- supabase/migrations/05-player-id-rls.sql (player_id enforced).
+-- Table definitions are still accurate for reference.
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 -- ===========================================
 -- "Do We Even Know Each Other?" Database Schema
 -- Run this in Supabase SQL Editor (Dashboard > SQL Editor > New query)

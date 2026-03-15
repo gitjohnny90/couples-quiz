@@ -1,3 +1,11 @@
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+-- SUPERSEDED — DO NOT RUN
+-- This was the original deep_dive_responses table creation script.
+-- The "allow all" policy here is insecure. Current policies are
+-- in supabase-rls-fix.sql and supabase/migrations/05-player-id-rls.sql.
+-- Table definition is still accurate for reference.
+-- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 -- ===========================================
 -- Deep Dive Responses Table
 -- Run this in Supabase SQL Editor (Dashboard > SQL Editor > New query)
