@@ -336,11 +336,15 @@ export default function HotTakesPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: ci * 0.1 + gi * 0.05 }}
                         className="glass"
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`${group.label} — debate this group of hot takes`}
                         style={{
                           padding: '12px 16px', cursor: 'pointer',
                           transform: `rotate(${(gi % 3 - 1) * 0.3}deg)`,
                         }}
                         onClick={() => handleSelectGroup(group.id)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelectGroup(group.id) } }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', color: 'var(--text-primary)' }}>

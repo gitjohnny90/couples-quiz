@@ -283,8 +283,12 @@ export default function ResultsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.06 }}
                 className={`glass reveal-card ${revealed ? (matched ? 'matched' : 'unmatched') : ''}`}
+                role="button"
+                tabIndex={0}
+                aria-label={revealed ? `${q.text} — revealed` : `${q.text} — tap to reveal`}
                 style={{ transform: `rotate(${cardRotations[i] || 0}deg)` }}
                 onClick={() => toggleReveal(q.id)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleReveal(q.id) } }}
               >
                 <p style={{ fontFamily: 'var(--font-body)', fontWeight: 400, fontSize: '0.95rem', marginBottom: revealed ? 14 : 4 }}>
                   {q.text}

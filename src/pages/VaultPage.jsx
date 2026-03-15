@@ -155,8 +155,12 @@ export default function VaultPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="glass"
+            role="button"
+            tabIndex={0}
+            aria-label="Multiple Choice — pick the same answers and see how well you match"
             style={{ padding: 18, cursor: 'pointer', transform: 'rotate(-0.4deg)' }}
             onClick={() => navigate(`/quiz-packs/${sessionId}`)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/quiz-packs/${sessionId}`) } }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ fontSize: 28, flexShrink: 0 }}>🧠</div>
@@ -191,8 +195,12 @@ export default function VaultPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="glass"
+            role="button"
+            tabIndex={0}
+            aria-label="Deep Dive — open-ended questions you both write answers to, then reveal together"
             style={{ padding: 18, cursor: 'pointer', transform: 'rotate(0.3deg)' }}
             onClick={() => navigate(`/deep-dive/${sessionId}`)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/deep-dive/${sessionId}`) } }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ fontSize: 28, flexShrink: 0 }}>📖</div>
@@ -227,8 +235,12 @@ export default function VaultPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="glass"
+            role="button"
+            tabIndex={0}
+            aria-label="Predict Your Partner — answer for yourself, then guess what your person would say"
             style={{ padding: 18, cursor: 'pointer', transform: 'rotate(-0.2deg)' }}
             onClick={() => navigate(`/predict-partner/${sessionId}`)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/predict-partner/${sessionId}`) } }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ fontSize: 28, flexShrink: 0 }}>🔮</div>
@@ -263,8 +275,12 @@ export default function VaultPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             className="glass"
+            role="button"
+            tabIndex={0}
+            aria-label="Finish My Sentence — write a sentence for your person to finish, see how they complete your thoughts"
             style={{ padding: 18, cursor: 'pointer', transform: 'rotate(0.25deg)' }}
             onClick={() => navigate(`/finish-sentence/${sessionId}`)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/finish-sentence/${sessionId}`) } }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ fontSize: 28, flexShrink: 0 }}>✍️</div>
@@ -299,8 +315,12 @@ export default function VaultPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
             className="glass"
+            role="button"
+            tabIndex={0}
+            aria-label="Hot Takes — agree or disagree, then defend your take if you're brave enough"
             style={{ padding: 18, cursor: 'pointer', transform: 'rotate(-0.3deg)' }}
             onClick={() => navigate(`/hot-takes/${sessionId}`)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/hot-takes/${sessionId}`) } }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ fontSize: 28, flexShrink: 0 }}>🔥</div>
