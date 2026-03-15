@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 phase: 06-bug-fixes
 source: [06-01-SUMMARY.md, 06-02-SUMMARY.md]
 started: 2026-03-15T15:30:00Z
-updated: 2026-03-15T15:55:00Z
+updated: 2026-03-15T17:00:00Z
 ---
 
 ## Current Test
@@ -48,7 +48,7 @@ skipped: 0
 ## Gaps
 
 - truth: "Waiting screen shows appropriate content based on partner status — invite code if partner hasn't joined, 'waiting on partner' message if partner joined but hasn't completed the quiz"
-  status: failed
+  status: resolved
   reason: "User reported: why would there be a join link for a results page? instead of a join link it should be just the code if their partner hasnt joined and a waiting on your partner message if their partner did join but just needs to do the test"
   severity: major
   test: 1
@@ -61,7 +61,7 @@ skipped: 0
     - "Two waiting sub-states: no partner → show invite code (LOVE-XXXX); partner joined → show 'waiting on your partner' only"
   debug_session: ""
 - truth: "DrawResultsPage waiting screen shows appropriate content based on partner status — invite code if partner hasn't joined, 'waiting on partner' message if partner joined but hasn't completed the drawing"
-  status: failed
+  status: resolved
   reason: "User reported: Same issue as test 1 — waiting screen shows a /join/ URL instead of just the invite code or a waiting message depending on partner status"
   severity: major
   test: 2
@@ -73,7 +73,7 @@ skipped: 0
     - "Same fix as test 1 — fetch session, two waiting sub-states"
   debug_session: ""
 - truth: "VisionTab caption editing is smooth — typing in polaroid captions works without letters disappearing or dropping input"
-  status: failed
+  status: resolved
   reason: "User reported: it is glitchy you start to type and some letters disappear or dont type"
   severity: major
   test: 3
@@ -88,7 +88,7 @@ skipped: 0
     - "Sync parent→local only when input is not focused"
   debug_session: ""
 - truth: "Partners remain connected to the same session — both players see each other's data correctly"
-  status: failed
+  status: resolved
   reason: "User reported: some how my partners session intertwined with her login and its not connected to mine anymore. it shows two different play testers."
   severity: blocker
   test: 4
