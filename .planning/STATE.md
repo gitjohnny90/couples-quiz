@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Audit Remediation
-status: ready_to_plan
-stopped_at: null
-last_updated: "2026-03-15"
-last_activity: 2026-03-15 — Roadmap created for v1.1 (Phases 5-8)
+status: planning
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-15T06:30:21.243Z"
+last_activity: 2026-03-15 — Roadmap created, 15 requirements mapped across Phases 5-8
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 8
-  completed_plans: 0
+  total_phases: 8
+  completed_phases: 5
+  total_plans: 10
+  completed_plans: 10
   percent: 0
 ---
 
@@ -46,6 +46,8 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 *Updated after each plan completion*
+| Phase 05-rls-hardening P01 | 8 | 2 tasks | 2 files |
+| Phase 05-rls-hardening P02 | 15min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -57,6 +59,10 @@ Recent decisions affecting current work:
 - [v1.0]: RLS policies deployed on all 12 tables with session-scoped access
 - [v1.0]: Polling fallbacks standardized; realtime is primary, polling catches dropped connections
 - [v1.1]: Security phases before bugs before accessibility before quality (audit priority order)
+- [Phase 05-rls-hardening]: Per-operation RLS policies replace FOR ALL to allow player_id enforcement on writes while keeping reads session-scoped only
+- [Phase 05-rls-hardening]: responses table allows player_id IN ('game','shared') so both partners write shared tic-tac-toe/study-together rows
+- [Phase 05-02]: Atomic slot claim uses .select() + array length check instead of .single() — cleaner than try/catch for zero-row UPDATE
+- [Phase 05-02]: JoinPage alreadyJoined removes all access bypass — no session context set, only go-home button shown
 
 ### Pending Todos
 
@@ -69,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15
-Stopped at: Roadmap created for v1.1, files written, ready to plan Phase 5
+Last session: 2026-03-15T06:30:21.240Z
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
