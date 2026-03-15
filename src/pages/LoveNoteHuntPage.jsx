@@ -1,6 +1,5 @@
-import { useContext, useState, useEffect, useRef, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { SessionContext } from '../App'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import loveNoteSuggestions from '../data/loveNoteSuggestions'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -11,6 +10,8 @@ import ReactionPopup from '../components/ReactionPopup'
 import ReactionBadge from '../components/ReactionBadge'
 import useLongPress from '../hooks/useLongPress'
 import PageGuide from '../components/PageGuide'
+import useSessionSetup from '../hooks/useSessionSetup'
+import useRealtimeSync from '../hooks/useRealtimeSync'
 
 const PHASE = { SETUP: 'setup', WAITING: 'waiting', HUNTING: 'hunting', REVEAL: 'reveal' }
 const GRID_SIZE = 6
@@ -18,11 +19,9 @@ const TOTAL_CELLS = GRID_SIZE * GRID_SIZE
 const NOTES_REQUIRED = 3
 
 export default function LoveNoteHuntPage() {
-  const { sessionId } = useParams()
+  const { sessionId, playerId, playerName, partnerId, partnerName, mountedRef } = useSessionSetup()
   const navigate = useNavigate()
-  const { playerName, playerId, setSessionId } = useContext(SessionContext)
 
-  const partnerId = playerId === 'player1' ? 'player2' : 'player1'
   const { reactionMap, handleReact } = useReactions(sessionId, 'love_note')
 
   const [activeReaction, setActiveReaction] = useState(null)
@@ -50,29 +49,12 @@ export default function LoveNoteHuntPage() {
 
   // Waiting state
   const [copied, setCopied] = useState(false)
-  const [partnerName, setPartnerName] = useState(null)
 
   const textareaRef = useRef(null)
-  const mountedRef = useRef(true)
 
   useEffect(() => {
-    mountedRef.current = true
-    return () => { mountedRef.current = false }
-  }, [])
-
-  useEffect(() => {
-    if (sessionId) setSessionId(sessionId)
     resumeGame()
-    fetchPartnerName()
   }, [sessionId])
-
-  const fetchPartnerName = async () => {
-    const { data } = await supabase.from('sessions').select('player1_name, player2_name').eq('id', sessionId).single()
-    if (!data || !mountedRef.current) return
-    const myKey = playerId === 'player1' ? 'player1_name' : 'player2_name'
-    const partnerKey = playerId === 'player1' ? 'player2_name' : 'player1_name'
-    if (data[partnerKey]) setPartnerName(data[partnerKey])
-  }
 
   // Resume from existing DB state
   const resumeGame = async () => {
@@ -142,39 +124,21 @@ export default function LoveNoteHuntPage() {
     return []
   }
 
-  // Realtime + polling for waiting phase
-  useEffect(() => {
-    if (phase !== PHASE.WAITING) return
-
-    const channelName = `love-notes-${sessionId}-r${round}-${Math.random().toString(36).slice(2, 8)}`
-    const channel = supabase
-      .channel(channelName)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'love_notes',
-        filter: `session_id=eq.${sessionId}`,
-      }, async () => {
-        const notes = await fetchPartnerNotes()
-        if (notes.length >= NOTES_REQUIRED) {
-          setPhase(PHASE.HUNTING)
-        }
-      })
-      .subscribe()
-
-    // Polling fallback
-    const interval = setInterval(async () => {
-      const notes = await fetchPartnerNotes()
-      if (notes.length >= NOTES_REQUIRED) {
-        setPhase(PHASE.HUNTING)
-      }
-    }, 5000)
-
-    return () => {
-      supabase.removeChannel(channel)
-      clearInterval(interval)
+  // Check for partner notes during waiting phase and transition to hunting
+  const handleWaitingUpdate = useCallback(async () => {
+    const notes = await fetchPartnerNotes()
+    if (notes.length >= NOTES_REQUIRED) {
+      setPhase(PHASE.HUNTING)
     }
-  }, [phase, sessionId, round])
+  }, [sessionId, round, playerId])
+
+  useRealtimeSync({
+    table: 'love_notes',
+    sessionId,
+    onUpdate: handleWaitingUpdate,
+    channelPrefix: 'lovenotes',
+    pollingEnabled: phase === PHASE.WAITING,
+  })
 
   // --- SETUP HANDLERS ---
 

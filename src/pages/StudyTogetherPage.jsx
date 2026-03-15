@@ -1,10 +1,10 @@
-import { useState, useEffect, useContext, useRef } from 'react'
-import { useParams } from 'react-router-dom'
-import { SessionContext } from '../App'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageDoodles, { SquigglyUnderline, DoodleStar } from '../components/Doodles'
 import PageGuide from '../components/PageGuide'
+import useSessionSetup from '../hooks/useSessionSetup'
+import useRealtimeSync from '../hooks/useRealtimeSync'
 
 const PACK_ID = 'study-together'
 const PLAYER_ID = 'shared'
@@ -38,9 +38,7 @@ const PLAYER_COLORS = {
 const DEFAULT_DATA = { books: [] }
 
 export default function StudyTogetherPage() {
-  const { sessionId } = useParams()
-  const { setSessionId, playerName, playerId } = useContext(SessionContext)
-  const partnerId = playerId === 'player1' ? 'player2' : 'player1'
+  const { sessionId, playerId, playerName, partnerId, partnerName, mountedRef } = useSessionSetup()
 
   const [data, setData] = useState(DEFAULT_DATA)
   const [loading, setLoading] = useState(true)
@@ -49,36 +47,6 @@ export default function StudyTogetherPage() {
   const [newBookTitles, setNewBookTitles] = useState({ growth: '', couples: '', faith: '' })
   // Per-book draft reflections so user can type before saving
   const [draftReflections, setDraftReflections] = useState({})
-  const [partnerName, setPartnerName] = useState(null)
-  const mountedRef = useRef(true)
-  const channelId = useRef(`study-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
-
-  useEffect(() => {
-    mountedRef.current = true
-    return () => { mountedRef.current = false }
-  }, [])
-
-  useEffect(() => {
-    if (sessionId) setSessionId(sessionId)
-  }, [sessionId])
-
-  // Fetch partner name from sessions table
-  useEffect(() => {
-    if (!sessionId || !playerId) return
-    const fetchPartner = async () => {
-      const { data: session } = await supabase
-        .from('sessions')
-        .select('player1_name, player2_name')
-        .eq('id', sessionId)
-        .maybeSingle()
-      if (session) {
-        setPartnerName(
-          playerId === 'player1' ? session.player2_name : session.player1_name
-        )
-      }
-    }
-    fetchPartner()
-  }, [sessionId, playerId])
 
   // Fetch data
   const fetchData = async () => {
@@ -119,24 +87,13 @@ export default function StudyTogetherPage() {
 
   useEffect(() => { fetchData() }, [sessionId])
 
-  // Realtime + polling
-  useEffect(() => {
-    const channel = supabase
-      .channel(channelId.current)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'responses',
-        filter: `session_id=eq.${sessionId}`,
-      }, (payload) => {
-        if (payload.new && payload.new.pack_id === PACK_ID) {
-          fetchData()
-        }
-      })
-      .subscribe()
-    const interval = setInterval(fetchData, 5000)
-    return () => { supabase.removeChannel(channel); clearInterval(interval) }
-  }, [sessionId])
+  useRealtimeSync({
+    table: 'responses',
+    sessionId,
+    onUpdate: fetchData,
+    channelPrefix: 'study',
+    pollingEnabled: true,
+  })
 
   // Save helper
   const saveData = async (updatedData) => {

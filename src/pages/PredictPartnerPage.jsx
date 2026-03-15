@@ -1,12 +1,13 @@
-import { useState, useEffect, useContext, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { SessionContext } from '../App'
+import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
 import predictPartnerSeries, { allPredictPacks, getPredictPack, getSeriesForPack } from '../data/predictPartnerQuestions'
 import PageDoodles, { SquigglyUnderline, DoodleStar } from '../components/Doodles'
 import PageGuide from '../components/PageGuide'
 import AppWaitlistPrompt, { trackActivityCompletion } from '../components/AppWaitlistPrompt'
+import useSessionSetup from '../hooks/useSessionSetup'
+import useRealtimeSync from '../hooks/useRealtimeSync'
 
 const SCORE_LABELS = [
   'Start over. From the beginning. Of the relationship.',
@@ -21,10 +22,8 @@ const SCORE_LABELS = [
 const PLAYER_COLORS = { player1: '#E88D7A', player2: '#7EB8D8' }
 
 export default function PredictPartnerPage() {
-  const { sessionId } = useParams()
+  const { sessionId, playerId, playerName, partnerId, partnerName, sessionMyName, mountedRef } = useSessionSetup()
   const navigate = useNavigate()
-  const { setSessionId, playerName, playerId } = useContext(SessionContext)
-  const partnerId = playerId === 'player1' ? 'player2' : 'player1'
 
   const [screen, setScreen] = useState('packs') // packs | question | waiting | reveal
   const [activePack, setActivePack] = useState(null)
@@ -33,41 +32,10 @@ export default function PredictPartnerPage() {
   const [prediction, setPrediction] = useState('')
   const [submittedAnswers, setSubmittedAnswers] = useState([]) // answers during current session
   const [allResponses, setAllResponses] = useState({}) // { packId: { player1: {...}, player2: {...} } }
-  const [partnerName, setPartnerName] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const activityTrackedRef = useRef(false)
-  const mountedRef = useRef(true)
-  const channelId = useRef(`predict-${sessionId}-${Math.random().toString(36).slice(2, 8)}`)
-
-  useEffect(() => {
-    mountedRef.current = true
-    return () => { mountedRef.current = false }
-  }, [])
-
-  useEffect(() => {
-    if (sessionId) setSessionId(sessionId)
-  }, [sessionId])
-
-  const [sessionMyName, setSessionMyName] = useState(null)
-
-  // Fetch player names from session (authoritative source)
-  useEffect(() => {
-    if (!sessionId || !playerId) return
-    const fetchNames = async () => {
-      const { data: session } = await supabase
-        .from('sessions')
-        .select('player1_name, player2_name')
-        .eq('id', sessionId)
-        .maybeSingle()
-      if (session) {
-        setPartnerName(playerId === 'player1' ? session.player2_name : session.player1_name)
-        setSessionMyName(playerId === 'player1' ? session.player1_name : session.player2_name)
-      }
-    }
-    fetchNames()
-  }, [sessionId, playerId])
 
   // Fetch all predict responses from dedicated table
   const fetchResponses = async () => {
@@ -106,22 +74,13 @@ export default function PredictPartnerPage() {
 
   useEffect(() => { fetchResponses() }, [sessionId])
 
-  // Realtime + polling
-  useEffect(() => {
-    const channel = supabase
-      .channel(channelId.current)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'predict_partner',
-        filter: `session_id=eq.${sessionId}`,
-      }, () => {
-        fetchResponses()
-      })
-      .subscribe()
-    const interval = setInterval(fetchResponses, 5000)
-    return () => { supabase.removeChannel(channel); clearInterval(interval) }
-  }, [sessionId])
+  useRealtimeSync({
+    table: 'predict_partner',
+    sessionId,
+    onUpdate: fetchResponses,
+    channelPrefix: 'predict',
+    pollingEnabled: screen !== 'reveal',
+  })
 
   // Auto-transition from waiting to reveal when partner finishes
   useEffect(() => {
