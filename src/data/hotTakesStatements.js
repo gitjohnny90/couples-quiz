@@ -25,7 +25,7 @@ const hotTakesCategories = [
         label: 'Dating Rules',
         statements: [
           { id: 'takes-6', text: 'Planning a date should be 50/50 — it\'s not always one person\'s job' },
-          { id: 'takes-7', text: 'It\'s fine to check your partner\'s phone if they leave it unlocked next to you' },
+          { id: 'takes-7', text: 'It\'s a bigger flex to leave your phone unlocked around your partner than to say "I love you"' },
           { id: 'takes-8', text: 'You should still go on dates even after years together' },
           { id: 'takes-9', text: 'Matching outfits as a couple is cute not cringe' },
           { id: 'takes-10', text: 'A handwritten note means more than an expensive gift' },
@@ -42,6 +42,17 @@ const hotTakesCategories = [
           { id: 'takes-15', text: 'The first year of a relationship is the hardest, not the easiest' },
         ],
       },
+      {
+        id: 'rel-4',
+        label: 'Long Distance Edition',
+        statements: [
+          { id: 'ht-new-1', text: 'FaceTime dates count as real dates' },
+          { id: 'ht-new-2', text: 'You should tell your partner when something bothers you, even if it\'s small and you know you\'ll get over it' },
+          { id: 'ht-new-3', text: 'Sending memes IS a love language' },
+          { id: 'ht-new-5', text: 'Your partner should be the first person you tell good news to — before anyone else' },
+          { id: 'ht-new-6', text: 'Falling asleep on FaceTime together is one of the most intimate things you can do long distance' },
+        ],
+      },
     ],
   },
   {
@@ -55,7 +66,7 @@ const hotTakesCategories = [
         label: 'Social Media & Modern Dating',
         statements: [
           { id: 'takes-16', text: 'It\'s a yellow flag if your partner never posts you on social media' },
-          { id: 'takes-17', text: 'Liking someone\'s thirst trap while in a relationship is disrespectful' },
+          { id: 'takes-17', text: 'Liking your ex\'s posts while in a relationship is always disrespectful, no matter how innocent it seems' },
           { id: 'takes-18', text: 'Double texting is perfectly fine and people need to get over it' },
           { id: 'takes-19', text: 'You can be friends with an ex without it being weird' },
           { id: 'takes-20', text: 'Social media has made relationships harder, not easier' },
@@ -76,11 +87,22 @@ const hotTakesCategories = [
         id: 'spicy-3',
         label: 'Hot Button',
         statements: [
-          { id: 'takes-26', text: 'Flirty banter with other people is harmless as long as your partner knows about it' },
+          { id: 'takes-26', text: 'Being naturally charming and friendly isn\'t the same as flirting, and your partner shouldn\'t have to worry about it' },
           { id: 'takes-27', text: 'If your best friend and your partner don\'t get along, that\'s a real problem' },
           { id: 'takes-28', text: 'The "talking stage" has gotten way too long — people need to commit or leave' },
           { id: 'takes-29', text: 'Apologizing first doesn\'t mean you were wrong, it means you value the relationship more' },
           { id: 'takes-30', text: 'Being jealous sometimes is normal and healthy' },
+        ],
+      },
+      {
+        id: 'spicy-4',
+        label: 'Modern Love',
+        statements: [
+          { id: 'ht-new-4', text: 'If you can\'t be happy alone, you\'re not ready to be in a relationship' },
+          { id: 'ht-new-7', text: 'You should never have to wonder where you stand with someone who loves you' },
+          { id: 'ht-new-8', text: 'The strongest couples are the ones who can sit in silence and it\'s not awkward' },
+          { id: 'ht-new-9', text: 'Sending voice notes is more personal than texting and everyone should do it more' },
+          { id: 'ht-new-10', text: 'It\'s okay to miss your partner even when you just talked to them' },
         ],
       },
     ],
@@ -98,7 +120,7 @@ const hotTakesCategories = [
           { id: 'takes-31', text: 'Pineapple on pizza is elite and haters are wrong' },
           { id: 'takes-32', text: 'Cereal is technically soup and you can\'t convince me otherwise' },
           { id: 'takes-33', text: 'Ketchup on eggs is perfectly normal' },
-          { id: 'takes-34', text: 'Water is wet — and this is worth arguing about' },
+          { id: 'takes-34', text: 'The person who cares less in a relationship has more power — and that\'s a problem' },
           { id: 'takes-35', text: 'A hot dog IS a sandwich' },
         ],
       },

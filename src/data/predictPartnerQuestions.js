@@ -10,7 +10,7 @@ const predictPartnerSeries = [
         title: 'The Basics',
         vibe: 'easy start',
         questions: [
-          'What emoji do you use the most?',
+          'What\'s the last thing you do before you fall asleep?',
           "What's the one food you could eat every single day and never get tired of?",
           "What's your go-to karaoke song even if you'd never actually do karaoke?",
         ],
@@ -32,7 +32,7 @@ const predictPartnerSeries = [
         questions: [
           "What are you most likely doing if you don't text back for 3 hours?",
           "What's your most controversial food opinion?",
-          'If you could only watch one movie for the rest of your life what is it?',
+          'What movie do you quote the most without realizing it?',
         ],
       },
       {
@@ -93,6 +93,16 @@ const predictPartnerSeries = [
           "What's your comfort movie that you watch when everything feels heavy?",
         ],
       },
+      {
+        id: 'predict-pack-ln',
+        title: 'Late Night Edition',
+        vibe: 'after midnight',
+        questions: [
+          'What thought keeps you up at night that has nothing to do with us?',
+          "What's the version of your future that scares you the most?",
+          "What's a promise you've made to yourself that you haven't told anyone about?",
+        ],
+      },
     ],
   },
   {
@@ -141,6 +151,16 @@ const predictPartnerSeries = [
           'What would you name our pet? (and what kind of animal)',
         ],
       },
+      {
+        id: 'predict-pack-dc',
+        title: 'The Deep Cuts',
+        vibe: 'the ones that matter',
+        questions: [
+          "What's the one text from me you've screenshot and kept?",
+          'If you could only keep one photo of us, which one would it be?',
+          "What's something about your family that you want me to understand before I meet them?",
+        ],
+      },
     ],
   },
   {
@@ -187,6 +207,16 @@ const predictPartnerSeries = [
           'If we started a business together that was guaranteed to fail spectacularly, what would it be?',
           "What conspiracy theory would you be most likely to fall for?",
           'If we were both cartoon characters in the same show, what show is it and who are we?',
+        ],
+      },
+      {
+        id: 'predict-pack-so',
+        title: 'The Silly Ones',
+        vibe: 'pure vibes',
+        questions: [
+          "What's the most expensive thing you've broken and did you tell anyone?",
+          "What's a skill you're secretly convinced you'd be amazing at but have never tried?",
+          'If you had to teach a class on anything, what would the subject be?',
         ],
       },
     ],

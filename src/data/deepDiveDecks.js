@@ -46,7 +46,7 @@ const deepDiveDecks = [
     questions: [
       { id: 'dd-rm-1', text: "What's my biggest ick and do I know about it yet?", moodTag: 'spicy' },
       { id: 'dd-rm-2', text: 'If we had a couples reality show, what would the dramatic narrator say about us?', moodTag: 'chaotic' },
-      { id: 'dd-rm-3', text: 'If you had to describe our relationship as a sandwich, what kind and why?', moodTag: 'chaotic' },
+      { id: 'dd-rm-3', text: "What's my signature move that I pull out when I'm trying to impress someone?", moodTag: 'chaotic' },
     ],
   },
   {
@@ -58,6 +58,18 @@ const deepDiveDecks = [
       { id: 'dd-cog-1', text: "What's a moment with me that felt like slow motion?", moodTag: 'vulnerable' },
       { id: 'dd-cog-2', text: "What would you guess I journal about when you're not around?", moodTag: 'deep' },
       { id: 'dd-cog-3', text: "What's something I do that you find attractive that I definitely don't do on purpose?", moodTag: 'spicy' },
+    ],
+  },
+
+  {
+    id: 'dd-small-things',
+    title: 'Small Things',
+    series: 'opener',
+    moodTags: ['deep', 'deep', 'chaotic'],
+    questions: [
+      { id: 'dd-st-1', text: "What's a tiny habit of mine that you've quietly memorized?", moodTag: 'deep' },
+      { id: 'dd-st-2', text: "What's something I do for you that feels small to me but means a lot to you?", moodTag: 'deep' },
+      { id: 'dd-st-3', text: "What's a completely normal thing I do that you find unreasonably endearing?", moodTag: 'chaotic' },
     ],
   },
 
@@ -102,8 +114,20 @@ const deepDiveDecks = [
     moodTags: ['chaotic', 'vulnerable', 'future'],
     questions: [
       { id: 'dd-fw-1', text: 'Describe your dream Sunday morning with me using only five words.', moodTag: 'vulnerable' },
-      { id: 'dd-fw-2', text: 'Describe our future in exactly five words.', moodTag: 'future' },
+      { id: 'dd-fw-2', text: 'Describe what last week felt like for us in exactly five words.', moodTag: 'vulnerable' },
       { id: 'dd-fw-3', text: 'What would your best friend say about us in five words?', moodTag: 'chaotic' },
+    ],
+  },
+
+  {
+    id: 'dd-permission-slip',
+    title: 'Permission Slip',
+    series: 'no-filter',
+    moodTags: ['vulnerable', 'deep', 'vulnerable'],
+    questions: [
+      { id: 'dd-ps-1', text: "What's something you need permission to feel? I'm giving it to you right now.", moodTag: 'vulnerable' },
+      { id: 'dd-ps-2', text: "What's a question you've been wanting to ask me but you're not sure I'm ready to answer?", moodTag: 'deep' },
+      { id: 'dd-ps-3', text: "If you could take back one thing you said to me — not because it was wrong, but because of how you said it — what would it be?", moodTag: 'vulnerable' },
     ],
   },
 
@@ -115,7 +139,7 @@ const deepDiveDecks = [
     moodTags: ['future', 'chaotic', 'deep'],
     questions: [
       { id: 'dd-ph-1', text: "Our future home has a junk drawer. What's in it?", moodTag: 'future' },
-      { id: 'dd-ph-2', text: "What's the first meal I'm cooking you when we live together? Be delusional or realistic, your choice.", moodTag: 'chaotic' },
+      { id: 'dd-ph-2', text: "Next time I'm in your kitchen, what's the first meal I'm making you? Be delusional or realistic, your choice.", moodTag: 'chaotic' },
       { id: 'dd-ph-3', text: 'How many pets and what kinds? This is a dealbreaker question.', moodTag: 'deep' },
     ],
   },
@@ -173,7 +197,7 @@ const deepDiveDecks = [
     questions: [
       { id: 'dd-ic-1', text: "Describe me using only characters from shows we've both watched.", moodTag: 'chaotic' },
       { id: 'dd-ic-2', text: 'Write my dating profile bio but make it accurate and unhinged.', moodTag: 'spicy' },
-      { id: 'dd-ic-3', text: 'If I were a candle, what would I smell like? Think hard.', moodTag: 'deep' },
+      { id: 'dd-ic-3', text: 'If I had a warning label, what would it say?', moodTag: 'spicy' },
     ],
   },
   {
@@ -196,6 +220,18 @@ const deepDiveDecks = [
       { id: 'dd-pt-1', text: "You find out I've been secretly training for something for 6 months. What is it?", moodTag: 'chaotic' },
       { id: 'dd-pt-2', text: 'We accidentally start a viral trend as a couple. What is it?', moodTag: 'chaotic' },
       { id: 'dd-pt-3', text: "A movie is being made about us. What's the title, the genre, and who plays us?", moodTag: 'deep' },
+    ],
+  },
+
+  {
+    id: 'dd-parallel-universe',
+    title: 'Parallel Universe',
+    series: 'chaos',
+    moodTags: ['chaotic', 'chaotic', 'deep'],
+    questions: [
+      { id: 'dd-pu-1', text: "In a universe where we never met, what do you think you'd be doing right now?", moodTag: 'chaotic' },
+      { id: 'dd-pu-2', text: "If we met in a completely different way — like bumped into each other in a grocery store — how does that version of us play out?", moodTag: 'chaotic' },
+      { id: 'dd-pu-3', text: "In the version of our story where everything goes exactly right from here, what does next year look like?", moodTag: 'deep' },
     ],
   },
 
@@ -242,6 +278,17 @@ const deepDiveDecks = [
       { id: 'dd-de-1', text: 'If I asked you "are we going to make it?" right now, what would you honestly say and why?', moodTag: 'vulnerable' },
       { id: 'dd-de-2', text: "What do you need from me that you've never directly asked for?", moodTag: 'deep' },
       { id: 'dd-de-3', text: "What's something about us that makes you proud?", moodTag: 'vulnerable' },
+    ],
+  },
+  {
+    id: 'dd-phone-call',
+    title: 'The Phone Call',
+    series: 'after-dark',
+    moodTags: ['vulnerable', 'deep', 'deep'],
+    questions: [
+      { id: 'dd-pc-1', text: "What's something you've wanted to bring up on a call but kept pushing to 'next time'?", moodTag: 'vulnerable' },
+      { id: 'dd-pc-2', text: "If I could hear the version of you that exists right after we hang up, what would I learn?", moodTag: 'deep' },
+      { id: 'dd-pc-3', text: "What's a conversation we had on the phone that changed something for you — even if I don't know it did?", moodTag: 'deep' },
     ],
   },
 ]
