@@ -103,6 +103,15 @@ export default function FunStuffPage() {
       onClick: () => navigate(`/tictactoe/${sessionId}`),
     },
     {
+      emoji: '💗',
+      title: 'Heart Line',
+      description: 'connect four with hearts — drop them in and get 4 in a row',
+      rotation: 0.2,
+      statusText: 'play →',
+      statusColor: 'var(--text-light)',
+      onClick: () => navigate(`/heartline/${sessionId}`),
+    },
+    {
       emoji: '💌',
       title: 'Love Note Hunt',
       description: "hide love notes on a grid — then hunt for each other's",

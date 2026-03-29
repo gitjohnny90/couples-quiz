@@ -53,7 +53,7 @@ Keep it concise — the CEO session reads these for a quick briefing, not a nove
 All routes defined in `App.jsx`. `/auth`, `/reset-password`, and `/waitlist` are public; all others require authentication. Four nav tabs map to route groups:
 - **home** → `/` (HomePage — auto-setup redirector, sends to vault)
 - **quizzes** → `/vault/:id`, `/quiz/:id/:packId`, `/results/:id/:packId`, `/deep-dive/:id`, `/deep-dive/:id/:deckId`, `/predict-partner/:id`, `/quiz-packs/:id`, `/finish-sentence/:id`, `/hot-takes/:id`
-- **fun stuff** → `/fun/:id`, `/draw/:id`, `/draw-results/:id/:promptId`, `/movies/:id`, `/tictactoe/:id`, `/love-notes/:id`, `/watch-guide/:id`
+- **fun stuff** → `/fun/:id`, `/draw/:id`, `/draw-results/:id/:promptId`, `/movies/:id`, `/tictactoe/:id`, `/heartline/:id`, `/love-notes/:id`, `/watch-guide/:id`
 - **us** → `/profiles/:id` (hub page with links to sub-pages), `/personality/:id` (edit/compare personality tests), `/vision/:id` (north star + vision board tab, dreams + sky + milestones tab), `/journal/:id` (four tabs: quizzes, deep dive, drawings, books), `/study/:id` (Study Together — shared reading + reflections)
 
 ### Data Flow
@@ -188,6 +188,7 @@ useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 - **Supabase queries**: `useEffect` with `supabase.from(table).select()` / `.upsert()` / `.insert()`
 - **Reactions**: `useReactions(sessionId, targetType)` hook in `src/utils/reactions.js` manages fetch, toggle, and realtime subscription for emoji reactions. Target types: `'quiz'`, `'drawing'`, `'love_note'`, `'deep_dive'`. Each individual answer/drawing is its own reaction target — long-press on a specific answer box opens `ReactionPopup`, and `ReactionBadge` displays at that answer's bottom-right edge. TargetId formats: `${packId}:${questionId}:player1` (quiz), `${packId}:player1` (drawing). Toggle behavior: same emoji = remove, different emoji = switch, none = create.
 - **Tic-Tac-Toe**: Multiplayer via Supabase — game state stored in `responses` table with `pack_id: 'tictactoe'` and `player_id: 'game'`. Each player can only place their own color heart (`player1` = coral, `player2` = blue) and must wait for partner's turn. Uses realtime subscription + 3s polling fallback for sync.
+- **Heart Line**: `src/pages/HeartLinePage.jsx` — couples Connect Four on a 7×6 grid. Hearts drop with gravity animation into the lowest available row. Player1 gets filled hearts (coral), player2 gets filled hearts (blue). Game state stored in `responses` table with `pack_id: 'heartline'`, `player_id: 'game'`. Win detection checks horizontal, vertical, and both diagonals for 4-in-a-row. Winning cells get a glow animation. Same realtime + 3s polling pattern as Tic-Tac-Toe.
 - **Study Together**: `src/pages/StudyTogetherPage.jsx` — three shelves (Personal Growth, Marriage & Couples, Christian). Books stored in `responses` table with `pack_id: 'study-together'`, `player_id: 'shared'`, JSONB `answers.books` array. Four status stages: want → reading → finished → reflected. Each partner writes guided reflections (4 prompts + freeform) when a book is finished; status auto-sets to `reflected` when both partners have saved reflections. Reflections are shown as a unified questionnaire with color-coded inputs per player (coral/blue). `handleSaveReflection` does a fresh DB fetch before merging to prevent race conditions when both partners save close together. Auto-fix in `fetchData` corrects stale "finished" books that have both reflections to "reflected". Finished books also appear in the Journal's "books" tab (`JournalPage.jsx`).
 - **Predict Your Partner**: `src/pages/PredictPartnerPage.jsx` — 4 series x 4 packs x 3 questions (48 total). Each player answers for themselves AND predicts partner's answer. Data stored in `predict_partner` table with one row per question (3 per pack per player). Columns: `own_answer`, `prediction`, `prediction_correct` (nullable boolean, marked during reveal), `completed_at`. Unique on `(session_id, pack_id, player_id, question_index)`. During reveal, each player marks whether partner's predictions about them were correct (checkmark/X) via single-row updates. Score summary shows progressively as marks come in (not hidden until all marked). Score labels from 0/6 to 6/6. Questions in `src/data/predictPartnerQuestions.js`. Uses realtime + 5s polling. Player names sourced from session table (not context) via `sessionMyName` state.
 - **Finish My Sentence**: `src/pages/FinishSentencePage.jsx` — each player writes a sentence starter for their partner to finish. Flow: write → wait-for-partner-starter → finish → wait-for-partner-finish → reveal. Data stored in `finish_sentence` table with round-based grouping (2 rows per round, one per player's starter). 15 suggestion chips in `src/data/sentenceStarters.js`. Character limits: 80 for starters, 150 for finishes. Auto-appends "..." to starters. Color-coded reveal (starter in writer's color, finish in finisher's color). Archive section shows past completed rounds. Uses realtime + 5s polling.
@@ -199,6 +200,30 @@ useEffect(() => { if (sessionId) setSessionId(sessionId) }, [sessionId])
 - **Accessibility**: Bottom nav uses `aria-label`, `aria-current`; quiz options use `aria-pressed`; Love Note Hunt grid uses `role="gridcell"` with keyboard support. Interactive cards on VaultPage, HotTakesPage, VisionTab, StudyTogetherPage, and ResultsPage have `role="button"`, `tabIndex={0}`, `onKeyDown` (Enter/Space), and `aria-label` or `aria-expanded`. PageGuide uses `role="dialog"` with focus trap and Escape-to-close. AuthPage and WaitlistPage forms use `htmlFor`/`id` label associations.
 - **Waitlist**: `src/pages/WaitlistPage.jsx` — public standalone page at `/waitlist` (no auth required) for App Store email capture. Describes The Us Quiz, what the native app adds, and has an email form. Accepts `?src=` URL param for campaign attribution (e.g., `?src=reddit-longdistance`). Stored in `waitlist.source` column. Duplicate emails handled gracefully via Postgres unique constraint (23505 → show success). Submit logic in `src/utils/waitlist.js`.
 - **localStorage keys**: `sessionId`, `playerName`, `playerId`, `pageGuideSeen` (object tracking first-visit tooltips), `completedActivityCount`, `waitlistPromptDismissed`, plus feature-specific keys like movie vetoes
+
+## Google Workspace CLI (`gws`)
+
+The `gws` command-line tool is installed and authenticated (johnallen982429@gmail.com). Use it for any Google Workspace tasks — creating docs, reading/writing sheets, etc. No browser needed.
+
+**Common commands:**
+- `gws drive files list --params '{"pageSize": 10}'`
+- `gws docs documents get --params '{"documentId": "ID"}'`
+- `gws sheets spreadsheets values get --params '{"spreadsheetId": "ID", "range": "Sheet1"}'`
+- `gws schema <service.resource.method>` — discover any API method's parameters
+
+## MCP Servers (Global — available automatically)
+
+- **Vercel MCP** — Manage deployments, check logs, search Vercel docs. First use requires browser OAuth.
+- **Supabase MCP** — Query database, manage tables, generate migrations directly. First use requires browser OAuth. For dev/testing only, not production data.
+- **Playwright MCP** — Browser automation via accessibility tree. Test user flows, verify UI, debug pages. No auth needed.
+
+## Skills (Global — available automatically)
+
+- **`/frontend-design`** — Forces deliberate design choices before writing UI code. Bans generic fonts (Inter, Roboto, Arial), enforces a specific visual direction. Use when building or polishing UI.
+- **`/skill-creator`** — Build, test, and iterate on custom Claude Code skills. Four modes: Create, Eval, Improve, Benchmark.
+- **`/de-ai-ify`** — Remove AI-generated jargon and restore human voice to text.
+- **`/voice-extractor`** — Extract and document someone's authentic writing voice from samples.
+- 100+ business, marketing, and engineering skills also installed (see skills-and-cli-inventory.md in us-quiz-CEO)
 
 ## Dev Preview Bypass
 

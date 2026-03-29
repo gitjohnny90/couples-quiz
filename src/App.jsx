@@ -24,6 +24,7 @@ import DeepDiveDeckPage from "./pages/DeepDiveDeckPage";
 import JournalPage from "./pages/JournalPage";
 import QuizPacksPage from "./pages/QuizPacksPage";
 import TicTacToePage from "./pages/TicTacToePage";
+import HeartLinePage from "./pages/HeartLinePage";
 import LoveNoteHuntPage from "./pages/LoveNoteHuntPage";
 import PredictPartnerPage from "./pages/PredictPartnerPage";
 import FinishSentencePage from "./pages/FinishSentencePage";
@@ -175,6 +176,7 @@ export default function App() {
           <Route path="/watch-guide/:sessionId" element={<RequireAuth><WatchGuidePage /></RequireAuth>} />
           <Route path="/study/:sessionId" element={<RequireAuth><StudyTogetherPage /></RequireAuth>} />
           <Route path="/tictactoe/:sessionId" element={<RequireAuth><TicTacToePage /></RequireAuth>} />
+          <Route path="/heartline/:sessionId" element={<RequireAuth><HeartLinePage /></RequireAuth>} />
           <Route path="/love-notes/:sessionId" element={<RequireAuth><LoveNoteHuntPage /></RequireAuth>} />
           <Route path="/predict-partner/:sessionId" element={<RequireAuth><PredictPartnerPage /></RequireAuth>} />
           <Route path="/finish-sentence/:sessionId" element={<RequireAuth><FinishSentencePage /></RequireAuth>} />

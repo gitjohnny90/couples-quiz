@@ -87,6 +87,14 @@ const pageGuides = {
       'Your hearts are one color, theirs are another. Three in a row wins!'
     ]
   },
+  heartLine: {
+    title: 'Heart Line',
+    lines: [
+      'It\'s like Connect Four — but with hearts! Tap a column to drop your heart in. It falls to the lowest open spot.',
+      'Get 4 hearts in a row to win — horizontal, vertical, or diagonal all count.',
+      'Your hearts are one color, your partner\'s are another — same as tic-tac-toe. You take turns in real time, so plan your moves!'
+    ]
+  },
   loveNotes: {
     title: 'Love Note Hunt',
     lines: [
