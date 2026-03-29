@@ -1,36 +1,39 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, lazy, Suspense } from "react";
 import { Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { getDocumentTitle, isTabActive } from "./utils/sessionUtils";
 import { AuthContext } from "./contexts/AuthContext";
 
+// Eager imports — critical path (auth, home, vault)
 import AuthPage from "./pages/AuthPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
 import HomePage from "./pages/HomePage";
-import JoinPage from "./pages/JoinPage";
-import QuizPage from "./pages/QuizPage";
-import ResultsPage from "./pages/ResultsPage";
 import VaultPage from "./pages/VaultPage";
-import ProfilesPage from "./pages/ProfilesPage";
-import PersonalityPage from "./pages/PersonalityPage";
-import VisionPage from "./pages/VisionPage";
-import DrawPage from "./pages/DrawPage";
-import DrawResultsPage from "./pages/DrawResultsPage";
-import FunStuffPage from "./pages/FunStuffPage";
-import MoviesPage from "./pages/MoviesPage";
-import StudyTogetherPage from "./pages/StudyTogetherPage";
-import WatchGuidePage from "./pages/WatchGuidePage";
-import DeepDivePage from "./pages/DeepDivePage";
-import DeepDiveDeckPage from "./pages/DeepDiveDeckPage";
-import JournalPage from "./pages/JournalPage";
-import QuizPacksPage from "./pages/QuizPacksPage";
-import TicTacToePage from "./pages/TicTacToePage";
-import HeartLinePage from "./pages/HeartLinePage";
-import LoveNoteHuntPage from "./pages/LoveNoteHuntPage";
-import PredictPartnerPage from "./pages/PredictPartnerPage";
-import FinishSentencePage from "./pages/FinishSentencePage";
-import HotTakesPage from "./pages/HotTakesPage";
-import WaitlistPage from "./pages/WaitlistPage";
 import MissYouHeart from "./components/MissYouHeart";
+
+// Lazy imports — loaded on navigation
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const JoinPage = lazy(() => import("./pages/JoinPage"));
+const QuizPage = lazy(() => import("./pages/QuizPage"));
+const ResultsPage = lazy(() => import("./pages/ResultsPage"));
+const ProfilesPage = lazy(() => import("./pages/ProfilesPage"));
+const PersonalityPage = lazy(() => import("./pages/PersonalityPage"));
+const VisionPage = lazy(() => import("./pages/VisionPage"));
+const DrawPage = lazy(() => import("./pages/DrawPage"));
+const DrawResultsPage = lazy(() => import("./pages/DrawResultsPage"));
+const FunStuffPage = lazy(() => import("./pages/FunStuffPage"));
+const MoviesPage = lazy(() => import("./pages/MoviesPage"));
+const StudyTogetherPage = lazy(() => import("./pages/StudyTogetherPage"));
+const WatchGuidePage = lazy(() => import("./pages/WatchGuidePage"));
+const DeepDivePage = lazy(() => import("./pages/DeepDivePage"));
+const DeepDiveDeckPage = lazy(() => import("./pages/DeepDiveDeckPage"));
+const JournalPage = lazy(() => import("./pages/JournalPage"));
+const QuizPacksPage = lazy(() => import("./pages/QuizPacksPage"));
+const TicTacToePage = lazy(() => import("./pages/TicTacToePage"));
+const HeartLinePage = lazy(() => import("./pages/HeartLinePage"));
+const LoveNoteHuntPage = lazy(() => import("./pages/LoveNoteHuntPage"));
+const PredictPartnerPage = lazy(() => import("./pages/PredictPartnerPage"));
+const FinishSentencePage = lazy(() => import("./pages/FinishSentencePage"));
+const HotTakesPage = lazy(() => import("./pages/HotTakesPage"));
+const WaitlistPage = lazy(() => import("./pages/WaitlistPage"));
 
 // Dev-only auth bypass for preview testing (double-safe: requires DEV mode AND env var)
 const DEV_BYPASS_AUTH = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true';
@@ -160,6 +163,13 @@ export default function App() {
   return (
     <SessionContext.Provider value={{ sessionId, setSessionId, playerName, setPlayerName, playerId, setPlayerId }}>
       <div className="app" style={{ position: 'relative' }}>
+        <Suspense fallback={
+          <div className="page" style={{ textAlign: "center", paddingTop: 60 }}>
+            <p style={{ fontFamily: "var(--font-hand)", fontSize: "1.4rem", color: "var(--text-secondary)" }}>
+              flipping to that page...
+            </p>
+          </div>
+        }>
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -190,6 +200,7 @@ export default function App() {
           <Route path="/personality/:sessionId" element={<RequireAuth><PersonalityPage /></RequireAuth>} />
           <Route path="/vision/:sessionId" element={<RequireAuth><VisionPage /></RequireAuth>} />
         </Routes>
+        </Suspense>
         <BottomNav />
         <MissYouHeart />
       </div>

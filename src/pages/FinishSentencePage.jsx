@@ -64,19 +64,21 @@ export default function FinishSentencePage() {
 
   const fetchAll = useCallback(async () => {
     try {
-      // Session info
-      const { data: sessionData } = await supabase
-        .from('sessions').select('player1_name, player2_name').eq('id', sessionId).single()
-      if (!mountedRef.current) return
-      if (sessionData) setSession(sessionData)
+      // Fetch session info and sentence rows in parallel
+      const [sessionResult, rowsResult] = await Promise.all([
+        supabase.from('sessions').select('player1_name, player2_name').eq('id', sessionId).single(),
+        supabase.from('finish_sentence')
+          .select('round, player_id, sentence_starter, sentence_finish')
+          .eq('session_id', sessionId)
+          .order('round', { ascending: false })
+          .order('created_at', { ascending: false })
+      ])
 
-      // All rows for this session, newest first
-      const { data: rows, error: fetchErr } = await supabase
-        .from('finish_sentence')
-        .select('round, player_id, sentence_starter, sentence_finish')
-        .eq('session_id', sessionId)
-        .order('round', { ascending: false })
-        .order('created_at', { ascending: false })
+      if (!mountedRef.current) return
+      if (sessionResult.data) setSession(sessionResult.data)
+
+      const rows = rowsResult.data
+      const fetchErr = rowsResult.error
 
       if (!mountedRef.current) return
       if (fetchErr) throw fetchErr
@@ -197,27 +199,11 @@ export default function FinishSentencePage() {
         text = text.replace(/\.+$/, '') + '...'
       }
 
-      // Figure out round number
-      const { data: existing } = await supabase
-        .from('finish_sentence')
-        .select('round')
-        .eq('session_id', sessionId)
-        .order('round', { ascending: false })
-        .limit(1)
-
-      let round = 1
-      if (existing && existing.length > 0) {
-        const lastRound = existing[0].round
-        // Check if that round is complete (both finished)
-        const { data: lastRows } = await supabase
-          .from('finish_sentence')
-          .select('round, player_id, sentence_starter, sentence_finish')
-          .eq('session_id', sessionId)
-          .eq('round', lastRound)
-
-        const allDone = lastRows && lastRows.length === 2 && lastRows.every(r => r.sentence_finish)
-        round = allDone ? lastRound + 1 : lastRound
-      }
+      // Use local state to determine round — no extra DB queries needed
+      // If we already have a completed round at currentRound (both finished),
+      // start a new round; otherwise use currentRound
+      const bothDone = myStarter?.sentence_finish && partnerStarter?.sentence_finish
+      const round = bothDone ? (currentRound || 0) + 1 : (currentRound || 1)
 
       const { error: insertErr } = await supabase
         .from('finish_sentence')
