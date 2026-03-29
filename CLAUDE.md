@@ -18,7 +18,7 @@ No test runner or linter is configured.
 - **Supabase** for database, realtime subscriptions, storage, and auth (email/password)
 - **Framer Motion** for animations
 - **Pure JavaScript** — no TypeScript
-- Deployed on **Vercel** with SPA rewrites (`vercel.json`)
+- Deployed on **Vercel** at **theusquiz.com** with SPA rewrites and domain redirect (`vercel.json`)
 
 ## Architecture
 
@@ -50,7 +50,7 @@ Keep it concise — the CEO session reads these for a quick briefing, not a nove
 
 ### Routing
 
-All routes defined in `App.jsx`. `/auth`, `/reset-password`, and `/waitlist` are public; all others require authentication. Four nav tabs map to route groups:
+All routes defined in `App.jsx`. `/auth`, `/reset-password`, and `/waitlist` are public; all others require authentication. **Code splitting**: Only 3 critical-path pages (AuthPage, HomePage, VaultPage) are eagerly imported; all other 22 pages use `React.lazy()` with a `<Suspense>` fallback ("flipping to that page..."). This produces ~32 JS chunks instead of one monolithic bundle. Four nav tabs map to route groups:
 - **home** → `/` (HomePage — auto-setup redirector, sends to vault)
 - **quizzes** → `/vault/:id`, `/quiz/:id/:packId`, `/results/:id/:packId`, `/deep-dive/:id`, `/deep-dive/:id/:deckId`, `/predict-partner/:id`, `/quiz-packs/:id`, `/finish-sentence/:id`, `/hot-takes/:id`
 - **fun stuff** → `/fun/:id`, `/draw/:id`, `/draw-results/:id/:promptId`, `/movies/:id`, `/tictactoe/:id`, `/heartline/:id`, `/love-notes/:id`, `/watch-guide/:id`
@@ -225,6 +225,12 @@ The `gws` command-line tool is installed and authenticated (johnallen982429@gmai
 - **`/voice-extractor`** — Extract and document someone's authentic writing voice from samples.
 - 100+ business, marketing, and engineering skills also installed (see skills-and-cli-inventory.md in us-quiz-CEO)
 
+## Deployment & Domain
+
+Production domain is **theusquiz.com** (via Vercel). `vercel.json` contains:
+- **Domain redirect**: All `couples-quiz*.vercel.app` URLs permanently redirect (301) to `www.theusquiz.com`
+- **SPA rewrite**: `/(.*) → /` so client-side routing works on all paths
+
 ## Dev Preview Bypass
 
 Set `VITE_DEV_BYPASS_AUTH=true` in `.env` to bypass Supabase auth during local dev/preview. This is double-gated: requires both `import.meta.env.DEV` (Vite dev mode only) and the env var, so it's dead code in production builds. When active:
@@ -265,3 +271,10 @@ Independent Codex audit (2026-03-14) surfaced security vulnerabilities, bugs, an
 - **Phase 7 (Accessibility)**: Keyboard button semantics (`role="button"`, `tabIndex={0}`, Enter/Space) on interactive cards across 5 pages. PageGuide dialog with `aria-modal`, focus trap, Escape-to-close. `htmlFor`/`id` label associations on AuthPage and WaitlistPage.
 - **Phase 8 (Quality)**: VisionTab hover uses CSS `.vision-pin` class instead of DOM `style.transform` mutations. Stale `/books` route tests fixed (route renamed to `/study`, moved from fun-stuff to us tab). Custom hooks extracted: `useRealtimeSync` (realtime + polling) and `useSessionSetup` (session sync + names + mountedRef). Adopted by 3 largest pages.
 - **Phase 9 (useCallback Compliance)**: `fetchResponses` (PredictPartnerPage) and `fetchData` (StudyTogetherPage) wrapped in `useCallback([sessionId])` so `useRealtimeSync` polling intervals stay stable.
+
+### Post-v1.1 — Features & Performance (2026-03-28)
+- **Content overhaul**: 19 rewrites, 10 cuts, 60 new pieces across all content types (quiz packs, deep dive decks, predict partner, hot takes, sentence starters, drawing prompts, love notes). Two new quiz packs (Long Distance Round, Money Talks), four new deep dive decks, three new predict partner packs, two new hot takes groups.
+- **Heart Line**: Couples Connect Four game (`HeartLinePage.jsx`). 7×6 grid, gravity drop animation, 4-in-a-row win detection (horizontal/vertical/diagonal), glow on winning cells. Multiplayer via Supabase realtime + 3s polling. Game state in `responses` table (`pack_id: 'heartline'`, `player_id: 'game'`).
+- **Code splitting**: 22 pages lazy-loaded via `React.lazy()` + `<Suspense>`. Only AuthPage, HomePage, VaultPage eagerly imported. Produces ~32 JS chunks.
+- **Domain redirect**: Old `couples-quiz*.vercel.app` URLs permanently redirect to `www.theusquiz.com` via `vercel.json`.
+- **FinishSentencePage perf**: Parallelized `fetchAll` queries with `Promise.all`. Eliminated 2 extra DB queries in `handleSubmitStarter` by using local state for round determination (4-query waterfall → 1 insert + 1 refresh).
