@@ -49,7 +49,10 @@
   2. User can tap a button to select a photo from their device gallery to answer a prompt
   3. User can type a short caption below their photo in a torn-paper style display without the page scrolling
   4. Submitted photos are stored in a Supabase Storage bucket scoped to the user's session (not accessible to other sessions)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 10-01-PLAN.md — Supabase Storage bucket, RLS policies, and photoUtils.js utility module
+- [ ] 10-02-PLAN.md — PhotoCaptureInput and TornPaperCaption UI components
 
 ### Phase 11: Content, Section Hub & Time-Gating
 **Goal**: Users can browse all 15 themed sections, see each section's lock/unlock state, and the app enforces one-section-per-day time-gating
@@ -98,7 +101,7 @@
 | 7. Accessibility | v1.1 | 2/2 | Complete | 2026-03-15 |
 | 8. Quality | v1.1 | 2/2 | Complete | 2026-03-15 |
 | 9. useCallback Hook Compliance | v1.1 | 1/1 | Complete | 2026-03-15 |
-| 10. Storage & Photo Capture | v1.2 | 0/? | Not started | - |
+| 10. Storage & Photo Capture | v1.2 | 0/2 | Planning | - |
 | 11. Content, Section Hub & Time-Gating | v1.2 | 0/? | Not started | - |
 | 12. Prompt Flow & Cork Board Reveal | v1.2 | 0/? | Not started | - |
 | 13. Journal Integration | v1.2 | 0/? | Not started | - |
