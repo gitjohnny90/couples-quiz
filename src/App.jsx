@@ -35,6 +35,34 @@ const FinishSentencePage = lazy(() => import("./pages/FinishSentencePage"));
 const HotTakesPage = lazy(() => import("./pages/HotTakesPage"));
 const WaitlistPage = lazy(() => import("./pages/WaitlistPage"));
 
+// Error boundary catches chunk load failures from React.lazy
+class LazyErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false } }
+  static getDerivedStateFromError() { return { hasError: true } }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="page" style={{ textAlign: "center", paddingTop: 60 }}>
+          <p style={{ fontFamily: "var(--font-hand)", fontSize: "1.4rem", color: "var(--text-secondary)", marginBottom: 16 }}>
+            oops — that page didn't load right
+          </p>
+          <button
+            onClick={() => { this.setState({ hasError: false }); window.location.reload() }}
+            style={{
+              fontFamily: "var(--font-hand)", fontSize: "1.2rem", padding: "10px 24px",
+              background: "var(--accent-coral)", color: "white", border: "none",
+              borderRadius: 8, cursor: "pointer"
+            }}
+          >
+            try again
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 // Dev-only auth bypass for preview testing (double-safe: requires DEV mode AND env var)
 const DEV_BYPASS_AUTH = import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true';
 
@@ -163,6 +191,7 @@ export default function App() {
   return (
     <SessionContext.Provider value={{ sessionId, setSessionId, playerName, setPlayerName, playerId, setPlayerId }}>
       <div className="app" style={{ position: 'relative' }}>
+        <LazyErrorBoundary>
         <Suspense fallback={
           <div className="page" style={{ textAlign: "center", paddingTop: 60 }}>
             <p style={{ fontFamily: "var(--font-hand)", fontSize: "1.4rem", color: "var(--text-secondary)" }}>
@@ -201,6 +230,7 @@ export default function App() {
           <Route path="/vision/:sessionId" element={<RequireAuth><VisionPage /></RequireAuth>} />
         </Routes>
         </Suspense>
+        </LazyErrorBoundary>
         <BottomNav />
         <MissYouHeart />
       </div>

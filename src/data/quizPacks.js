@@ -136,7 +136,7 @@ const quizPacks = [
       },
       {
         id: 'td2',
-        text: "What's your biggest ick that you'd never recover from?",
+        text: "What's your biggest ick that I'd never recover from?",
         options: [
           "Chewing with your mouth open aggressively",
           "Being rude to service workers",

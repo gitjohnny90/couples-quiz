@@ -1,12 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [{ "type": "host", "value": "couples-quiz(-[a-z0-9]+)?(-gitjohnny90s-projects)?\\.vercel\\.app" }],
-      "destination": "https://www.theusquiz.com/$1",
-      "permanent": true
-    }
-  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]

@@ -68,7 +68,7 @@ export default function FinishSentencePage() {
       const [sessionResult, rowsResult] = await Promise.all([
         supabase.from('sessions').select('player1_name, player2_name').eq('id', sessionId).single(),
         supabase.from('finish_sentence')
-          .select('round, player_id, sentence_starter, sentence_finish')
+          .select('id, round, player_id, sentence_starter, sentence_finish')
           .eq('session_id', sessionId)
           .order('round', { ascending: false })
           .order('created_at', { ascending: false })
@@ -199,11 +199,26 @@ export default function FinishSentencePage() {
         text = text.replace(/\.+$/, '') + '...'
       }
 
-      // Use local state to determine round — no extra DB queries needed
-      // If we already have a completed round at currentRound (both finished),
-      // start a new round; otherwise use currentRound
-      const bothDone = myStarter?.sentence_finish && partnerStarter?.sentence_finish
-      const round = bothDone ? (currentRound || 0) + 1 : (currentRound || 1)
+      // Fetch the latest round from DB to avoid stale local state
+      const { data: existing } = await supabase
+        .from('finish_sentence')
+        .select('round')
+        .eq('session_id', sessionId)
+        .order('round', { ascending: false })
+        .limit(1)
+
+      let round = 1
+      if (existing && existing.length > 0) {
+        const lastRound = existing[0].round
+        const { data: lastRows } = await supabase
+          .from('finish_sentence')
+          .select('player_id, sentence_finish')
+          .eq('session_id', sessionId)
+          .eq('round', lastRound)
+
+        const allDone = lastRows && lastRows.length === 2 && lastRows.every(r => r.sentence_finish)
+        round = allDone ? lastRound + 1 : lastRound
+      }
 
       const { error: insertErr } = await supabase
         .from('finish_sentence')
