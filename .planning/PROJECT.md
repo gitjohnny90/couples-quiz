@@ -52,7 +52,17 @@ Partners can connect and learn about each other through shared interactive exper
 
 <!-- Current scope. Building toward these. -->
 
-(None — next milestone not yet defined)
+**Current Milestone: v1.2 Daily Photo Challenge**
+
+**Goal:** A time-gated photo challenge where couples answer 3 daily prompts with photos and captions, unlocking one section per day across 15 themed days.
+
+**Target features:**
+- Daily photo prompt sections (15 themes × 3 questions each)
+- Photo capture with small torn-paper caption (no scrolling)
+- Time-gating: complete a section → frozen until 6am next day → pick any remaining
+- Per-section cork board reveal showing both partners' photos side by side
+- Supabase Storage for photo uploads
+- Journal integration with dedicated photo section
 
 ### Out of Scope
 
@@ -95,4 +105,4 @@ Partners can connect and learn about each other through shared interactive exper
 | CSS class hover instead of DOM mutations | React state drives styles; no direct .style access | ✓ Good — cleaner, more predictable |
 
 ---
-*Last updated: 2026-03-15 after v1.1 milestone*
+*Last updated: 2026-03-30 after v1.2 milestone start*
