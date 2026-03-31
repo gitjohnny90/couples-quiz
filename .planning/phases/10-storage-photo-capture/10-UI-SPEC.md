@@ -122,7 +122,7 @@ A caption input styled as a torn-paper strip below a photo.
 - Font: Caveat 13px, centered, color var(--text-secondary)
 - Placeholder: "add a caption..." in italic
 - Focus: bottom border transitions to var(--accent-coral) (matches .input pattern)
-- Character count shown at bottom-right in Patrick Hand 11px, var(--text-light)
+- Character count shown at bottom-right in Patrick Hand 14px (Label role), var(--text-light)
 
 **Sizing:**
 - Width: 100% of photo width
@@ -150,7 +150,7 @@ A caption input styled as a torn-paper strip below a photo.
   - `boxShadow: 2px 3px 8px rgba(0,0,0,0.18)`
   - `borderRadius: 1px`
 - Image fills width, height auto
-- A small "✕ remove" button sits at top-right corner of the polaroid (18×18px, 50% radius, rgba(0,0,0,0.5) background) — tapping clears photo and returns to idle state
+- A small "✕ remove" button sits at top-right corner of the polaroid (18×18px, 50% radius, rgba(0,0,0,0.5) background, `aria-label="Remove photo"`) — tapping clears photo and returns to idle state
 
 ### Caption Input Focus Behavior
 
@@ -173,6 +173,7 @@ A caption input styled as a torn-paper strip below a photo.
 - Photo preview `<img>` has `alt` set to caption text if present, else "your photo"
 - Caption input has `<label>` with `htmlFor`/`id` association and visible label "Caption (optional)"
 - Submit button is `<button type="button">` — never `<div>` or `<span>`
+- Remove photo button has `aria-label="Remove photo"` (icon-only circle button — no visible text)
 - All interactive elements receive focus ring (browser default — do not suppress outline)
 
 ---
