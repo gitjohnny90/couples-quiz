@@ -67,6 +67,7 @@ export default function PredictPartnerPage() {
         if (row.completed_at) pd.completedAt = row.completed_at
       })
       setAllResponses(mapped)
+      setLoading(false)
       return mapped
     }
     setLoading(false)
