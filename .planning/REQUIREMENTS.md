@@ -66,30 +66,30 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PHOTO-01 | — | Pending |
-| PHOTO-02 | — | Pending |
-| PHOTO-03 | — | Pending |
-| PHOTO-04 | — | Pending |
-| CONT-01 | — | Pending |
-| CONT-02 | — | Pending |
-| CONT-03 | — | Pending |
-| CONT-04 | — | Pending |
-| GATE-01 | — | Pending |
-| GATE-02 | — | Pending |
-| GATE-03 | — | Pending |
-| GATE-04 | — | Pending |
-| DISP-01 | — | Pending |
-| DISP-02 | — | Pending |
-| DISP-03 | — | Pending |
-| JRNL-01 | — | Pending |
-| JRNL-02 | — | Pending |
-| NAV-01 | — | Pending |
+| PHOTO-01 | Phase 10 | Pending |
+| PHOTO-02 | Phase 10 | Pending |
+| PHOTO-03 | Phase 10 | Pending |
+| PHOTO-04 | Phase 10 | Pending |
+| CONT-01 | Phase 11 | Pending |
+| CONT-02 | Phase 11 | Pending |
+| CONT-03 | Phase 11 | Pending |
+| CONT-04 | Phase 11 | Pending |
+| GATE-01 | Phase 11 | Pending |
+| GATE-02 | Phase 11 | Pending |
+| GATE-03 | Phase 11 | Pending |
+| GATE-04 | Phase 12 | Pending |
+| DISP-01 | Phase 12 | Pending |
+| DISP-02 | Phase 12 | Pending |
+| DISP-03 | Phase 11 | Pending |
+| JRNL-01 | Phase 13 | Pending |
+| JRNL-02 | Phase 13 | Pending |
+| NAV-01 | Phase 11 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-30*
-*Last updated: 2026-03-30 after initial definition*
+*Last updated: 2026-03-30 after roadmap creation — all 18 requirements mapped*
