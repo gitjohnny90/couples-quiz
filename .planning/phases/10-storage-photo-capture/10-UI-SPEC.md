@@ -43,8 +43,8 @@ Declared values (multiples of 4):
 
 Exceptions:
 - Touch targets for camera/gallery trigger buttons: minimum 44px tall (iOS HIG requirement — finger-sized tap area)
-- Page bottom padding: 110px (fixed bottom nav clearance, established pattern in .page)
-- Page left padding: 68px (margin-line offset, established pattern in .page)
+
+Note: `.page` layout constants (`padding-bottom: 110px`, `padding-left: 68px`) are inherited from `src/index.css` and are not part of this phase's spacing contract — PhotoCaptureInput is placed inside `.page` without modification.
 
 ---
 
@@ -83,7 +83,7 @@ Accent (--accent-coral) reserved for:
 
 Secondary semantic:
 - --accent-sage (#7CAE7A) — not used in Phase 10 (no match/success states in this phase)
-- Destructive (#E07A68) — used only on "Remove photo" / "Retake" action
+- Destructive (#E07A68) — used only on "Remove Photo" / "Retake Photo" action
 
 ---
 
@@ -102,7 +102,7 @@ A reusable component that accepts a `prompt` string and an `onPhotoSubmit(file, 
 4. Photo preview — polaroid frame: white background, 6px top/side padding, 22px bottom padding (matches VisionTab CorkBoardSlot polaroid exactly)
 5. Caption input — torn-paper style area below photo preview (see TornPaperCaption section)
 6. Submit button — `.btn .btn-primary` "Add this photo" — disabled until photo selected
-7. Retake / Remove — small secondary action below photo preview, destructive color
+7. Retake Photo / Remove Photo — small secondary action below photo preview, destructive color
 
 **States:**
 - `idle` — no photo, prompt + trigger buttons visible
@@ -191,8 +191,8 @@ A caption input styled as a torn-paper strip below a photo.
 | Upload error — generic | "Something went wrong. Please try again." |
 | Upload error — file too large | "That photo is too large. Try a smaller one." |
 | Upload error — storage full | "Couldn't save your photo. Please try again later." |
-| Remove photo label | "Remove" |
-| Retake photo label | "Retake" |
+| Remove photo label | "Remove Photo" |
+| Retake photo label | "Retake Photo" |
 | Remove confirmation | None — removing only clears local selection (not from DB at this stage); no destructive DB delete in Phase 10 |
 
 Source: Requirements PHOTO-01 through PHOTO-04. No upstream CONTEXT.md existed for Phase 10 — all copy is first-draft from researcher.
