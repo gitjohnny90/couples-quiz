@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Daily Photo Challenge
 status: in-progress
-stopped_at: "Completed 10-01-PLAN.md"
-last_updated: "2026-04-02T02:08:12Z"
-last_activity: 2026-04-02 — Plan 10-01 executed (storage bucket + photoUtils.js)
+stopped_at: "Completed 10-02-PLAN.md (checkpoint:human-verify pending)"
+last_updated: "2026-04-02T02:12:00Z"
+last_activity: 2026-04-02 — Plan 10-02 executed (TornPaperCaption + PhotoCaptureInput components)
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 2
-  completed_plans: 1
-  percent: 12
+  completed_plans: 2
+  percent: 25
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-30)
 ## Current Position
 
 Phase: 10 of 13 (Storage & Photo Capture)
-Plan: 1 of 2 complete in current phase
-Status: In progress — ready for 10-02-PLAN.md
-Last activity: 2026-04-02 — Plan 10-01 complete (storage bucket SQL + photoUtils.js)
+Plan: 2 of 2 complete in current phase
+Status: In progress — Phase 10 plans complete, human visual verification pending (Task 3)
+Last activity: 2026-04-02 — Plan 10-02 complete (TornPaperCaption + PhotoCaptureInput components)
 
-Progress: [█░░░░░░░░░] 12% (v1.2 milestone — 0/4 phases, 1/2 plans in Phase 10)
+Progress: [██░░░░░░░░] 25% (v1.2 milestone — 0/4 phases, 2/2 plans in Phase 10)
 
 ## Accumulated Context
 
@@ -43,6 +43,9 @@ Recent decisions affecting current work:
 - uploadPhoto uses upsert: true so retake/replace works without a separate delete step
 - compressImage returns Blob (not base64 data URL) — required for Supabase Storage upload API
 - maxWidth 800 in compressImage (not 400 like VisionTab) per UI-SPEC requirement
+- Idle/selected states rendered as two separate return branches for clarity in PhotoCaptureInput
+- Both file inputs get refs so handleRemove can reset them via .value='' (allows re-selection of same file)
+- Component is fully controlled — parent page handles post-submit navigation (no internal routing)
 
 ### Pending Todos
 
@@ -55,6 +58,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T02:08:12Z
-Stopped at: Completed 10-01-PLAN.md
-Resume file: .planning/phases/10-storage-photo-capture/10-02-PLAN.md
+Last session: 2026-04-02T02:12:00Z
+Stopped at: Completed 10-02-PLAN.md (Task 3 checkpoint:human-verify pending)
+Resume file: .planning/phases/10-storage-photo-capture/10-02-PLAN.md (Task 3 continuation)

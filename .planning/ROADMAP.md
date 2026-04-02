@@ -52,7 +52,7 @@
 **Plans**: 2 plans
 Plans:
 - [x] 10-01-PLAN.md — Supabase Storage bucket, RLS policies, and photoUtils.js utility module
-- [ ] 10-02-PLAN.md — PhotoCaptureInput and TornPaperCaption UI components
+- [x] 10-02-PLAN.md — PhotoCaptureInput and TornPaperCaption UI components
 
 ### Phase 11: Content, Section Hub & Time-Gating
 **Goal**: Users can browse all 15 themed sections, see each section's lock/unlock state, and the app enforces one-section-per-day time-gating
@@ -101,7 +101,7 @@ Plans:
 | 7. Accessibility | v1.1 | 2/2 | Complete | 2026-03-15 |
 | 8. Quality | v1.1 | 2/2 | Complete | 2026-03-15 |
 | 9. useCallback Hook Compliance | v1.1 | 1/1 | Complete | 2026-03-15 |
-| 10. Storage & Photo Capture | v1.2 | 1/2 | In Progress | - |
+| 10. Storage & Photo Capture | v1.2 | 2/2 | Complete (human verify pending) | 2026-04-02 |
 | 11. Content, Section Hub & Time-Gating | v1.2 | 0/? | Not started | - |
 | 12. Prompt Flow & Cork Board Reveal | v1.2 | 0/? | Not started | - |
 | 13. Journal Integration | v1.2 | 0/? | Not started | - |
