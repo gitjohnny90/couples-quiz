@@ -20,6 +20,7 @@ export function validatePlayerName(raw) {
  */
 export function getDocumentTitle(pathname) {
   if (pathname.startsWith('/vault')) return 'Quizzes — The Us Quiz'
+  if (pathname.startsWith('/daily-photos') || pathname.startsWith('/daily-photo-section') || pathname.startsWith('/daily-photo-reveal')) return 'Daily Photo Challenge — The Us Quiz'
   if (pathname.startsWith('/quiz-packs')) return 'Quiz Packs — The Us Quiz'
   if (pathname.startsWith('/quiz/')) return 'Quiz — The Us Quiz'
   if (pathname.startsWith('/results')) return 'Results — The Us Quiz'
@@ -77,7 +78,10 @@ export function isTabActive(tabPath, pathname) {
            pathname.startsWith('/predict-partner') ||
            pathname.startsWith('/finish-sentence') ||
            pathname.startsWith('/hot-takes') ||
-           pathname.startsWith('/quiz-packs')
+           pathname.startsWith('/quiz-packs') ||
+           pathname.startsWith('/daily-photos') ||
+           pathname.startsWith('/daily-photo-section') ||
+           pathname.startsWith('/daily-photo-reveal')
   }
   if (base === '/profiles') {
     return pathname.startsWith('/profiles') ||

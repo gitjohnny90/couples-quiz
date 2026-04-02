@@ -164,6 +164,14 @@ const pageGuides = {
       'This is The Us Quiz — a place for you and your partner to learn about each other through quizzes, games, and conversations.',
       'Share your invite code with your partner so they can join your session. Once they\'re in, you\'re all set to start exploring together!'
     ]
+  },
+  dailyPhotos: {
+    title: 'Daily Photos',
+    lines: [
+      'Pick a theme and take 3 photos together — one for each prompt.',
+      'You can only do one section per day. After you finish, the rest unlock again at 6am tomorrow.',
+      "Once you pick a theme, it locks in until you're done — no switching mid-section!"
+    ]
   }
 }
 
