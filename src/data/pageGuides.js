@@ -172,7 +172,22 @@ const pageGuides = {
       'You can only do one section per day. After you finish, the rest unlock again at 6am tomorrow.',
       "Once you pick a theme, it locks in until you're done — no switching mid-section!"
     ]
-  }
+  },
+  dailyPhotoSection: {
+    title: 'Your Photo Prompts',
+    lines: [
+      'Answer each prompt with a photo — one at a time.',
+      'Add a caption if you want, then tap Add this photo to move to the next one.',
+      "After you finish all 3, wait for your partner — then you'll see your photos side by side!"
+    ]
+  },
+  dailyPhotoReveal: {
+    title: 'Your Photo Board',
+    lines: [
+      'Both of you finished — here are your photos together!',
+      'Each cork board shows one prompt with both of your photos side by side.'
+    ]
+  },
 }
 
 export default pageGuides

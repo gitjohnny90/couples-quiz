@@ -34,6 +34,8 @@ const PredictPartnerPage = lazy(() => import("./pages/PredictPartnerPage"));
 const FinishSentencePage = lazy(() => import("./pages/FinishSentencePage"));
 const HotTakesPage = lazy(() => import("./pages/HotTakesPage"));
 const DailyPhotosHubPage = lazy(() => import("./pages/DailyPhotosHubPage"));
+const DailyPhotoSectionPage = lazy(() => import("./pages/DailyPhotoSectionPage"));
+const DailyPhotoRevealPage = lazy(() => import("./pages/DailyPhotoRevealPage"));
 const WaitlistPage = lazy(() => import("./pages/WaitlistPage"));
 
 // Error boundary catches chunk load failures from React.lazy
@@ -222,6 +224,8 @@ export default function App() {
           <Route path="/finish-sentence/:sessionId" element={<RequireAuth><FinishSentencePage /></RequireAuth>} />
           <Route path="/hot-takes/:sessionId" element={<RequireAuth><HotTakesPage /></RequireAuth>} />
           <Route path="/daily-photos/:sessionId" element={<RequireAuth><DailyPhotosHubPage /></RequireAuth>} />
+          <Route path="/daily-photo-section/:sessionId/:sectionId" element={<RequireAuth><DailyPhotoSectionPage /></RequireAuth>} />
+          <Route path="/daily-photo-reveal/:sessionId/:sectionId" element={<RequireAuth><DailyPhotoRevealPage /></RequireAuth>} />
           <Route path="/deep-dive/:sessionId" element={<RequireAuth><DeepDivePage /></RequireAuth>} />
           <Route path="/deep-dive/:sessionId/:deckId" element={<RequireAuth><DeepDiveDeckPage /></RequireAuth>} />
           <Route path="/journal/:sessionId" element={<RequireAuth><JournalPage /></RequireAuth>} />
