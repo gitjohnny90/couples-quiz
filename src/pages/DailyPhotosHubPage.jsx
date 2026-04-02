@@ -43,7 +43,7 @@ export default function DailyPhotosHubPage() {
       .eq('player_id', 'shared')
       .maybeSingle()
     if (!mountedRef.current) return
-    if (fetchErr) { setError('Could not load photo challenge data'); return }
+    if (fetchErr) { setError('Could not load photo challenge data'); setState(DEFAULT_STATE); return }
     setState(data?.answers ?? DEFAULT_STATE)
   }, [sessionId])
 
