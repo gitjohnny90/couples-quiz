@@ -66,7 +66,7 @@ Plans:
   5. After the 6am unlock, all remaining sections are selectable; once the user picks one, all others lock until it is finished
 **Plans**: 2 plans
 Plans:
-- [ ] 11-01-PLAN.md — Static data (15 sections) + time-gating utility functions with TDD
+- [x] 11-01-PLAN.md — Static data (15 sections) + time-gating utility functions with TDD
 - [ ] 11-02-PLAN.md — DailyPhotosHubPage, VaultPage entry card, App.jsx route wiring
 
 ### Phase 12: Prompt Flow & Cork Board Reveal
@@ -105,6 +105,6 @@ Plans:
 | 8. Quality | v1.1 | 2/2 | Complete | 2026-03-15 |
 | 9. useCallback Hook Compliance | v1.1 | 1/1 | Complete | 2026-03-15 |
 | 10. Storage & Photo Capture | v1.2 | 2/2 | Complete (human verify pending) | 2026-04-02 |
-| 11. Content, Section Hub & Time-Gating | v1.2 | 0/2 | Not started | - |
+| 11. Content, Section Hub & Time-Gating | v1.2 | 1/2 | In progress | - |
 | 12. Prompt Flow & Cork Board Reveal | v1.2 | 0/? | Not started | - |
 | 13. Journal Integration | v1.2 | 0/? | Not started | - |

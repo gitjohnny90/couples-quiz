@@ -16,16 +16,16 @@ Requirements for Daily Photo Challenge milestone. Each maps to roadmap phases.
 
 ### Content
 
-- [ ] **CONT-01**: 15 themed sections exist with 3 photo prompts each (45 total)
-- [ ] **CONT-02**: First prompt in every section is "What are you up to?"
-- [ ] **CONT-03**: Last prompt in each section is a funny/unhinged question matching the theme
-- [ ] **CONT-04**: Themed prompts cover a variety of subjects (food, travel, date night, etc.)
+- [x] **CONT-01**: 15 themed sections exist with 3 photo prompts each (45 total)
+- [x] **CONT-02**: First prompt in every section is "What are you up to?"
+- [x] **CONT-03**: Last prompt in each section is a funny/unhinged question matching the theme
+- [x] **CONT-04**: Themed prompts cover a variety of subjects (food, travel, date night, etc.)
 
 ### Time Gating
 
-- [ ] **GATE-01**: Completing a section freezes all sections until 6am the next day
-- [ ] **GATE-02**: After 6am unlock, all remaining sections are available to choose from
-- [ ] **GATE-03**: Once a user picks a section, all other sections lock until that section is completed
+- [x] **GATE-01**: Completing a section freezes all sections until 6am the next day
+- [x] **GATE-02**: After 6am unlock, all remaining sections are available to choose from
+- [x] **GATE-03**: Once a user picks a section, all other sections lock until that section is completed
 - [ ] **GATE-04**: Both partners must complete a section before the cork board reveals
 
 ### Display
@@ -70,13 +70,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PHOTO-02 | Phase 10 | Complete |
 | PHOTO-03 | Phase 10 | Complete |
 | PHOTO-04 | Phase 10 | Complete |
-| CONT-01 | Phase 11 | Pending |
-| CONT-02 | Phase 11 | Pending |
-| CONT-03 | Phase 11 | Pending |
-| CONT-04 | Phase 11 | Pending |
-| GATE-01 | Phase 11 | Pending |
-| GATE-02 | Phase 11 | Pending |
-| GATE-03 | Phase 11 | Pending |
+| CONT-01 | Phase 11 | Complete |
+| CONT-02 | Phase 11 | Complete |
+| CONT-03 | Phase 11 | Complete |
+| CONT-04 | Phase 11 | Complete |
+| GATE-01 | Phase 11 | Complete |
+| GATE-02 | Phase 11 | Complete |
+| GATE-03 | Phase 11 | Complete |
 | GATE-04 | Phase 12 | Pending |
 | DISP-01 | Phase 12 | Pending |
 | DISP-02 | Phase 12 | Pending |
@@ -92,4 +92,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-30*
-*Last updated: 2026-04-02 — PHOTO-01, PHOTO-02, PHOTO-03 marked complete (Phase 10 Plan 02)*
+*Last updated: 2026-04-02 — CONT-01 through CONT-04, GATE-01 through GATE-03 marked complete (Phase 11 Plan 01)*

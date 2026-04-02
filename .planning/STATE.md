@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Daily Photo Challenge
 status: in-progress
-stopped_at: "Completed 10-02-PLAN.md (checkpoint:human-verify pending)"
-last_updated: "2026-04-02T02:12:00Z"
-last_activity: 2026-04-02 — Plan 10-02 executed (TornPaperCaption + PhotoCaptureInput components)
+stopped_at: "Completed 11-01-PLAN.md"
+last_updated: "2026-04-02T03:34:38Z"
+last_activity: 2026-04-02 — Plan 11-01 complete (photoSections data + photoGating utility with TDD)
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 2
-  completed_plans: 2
-  percent: 25
+  total_plans: 3
+  completed_plans: 3
+  percent: 38
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-30)
 
 **Core value:** Partners can connect and learn about each other through shared interactive experiences that update live for both players
-**Current focus:** Phase 10 — Storage & Photo Capture
+**Current focus:** Phase 11 — Content, Section Hub & Time-Gating
 
 ## Current Position
 
-Phase: 10 of 13 (Storage & Photo Capture)
-Plan: 2 of 2 complete in current phase
-Status: In progress — Phase 10 plans complete, human visual verification pending (Task 3)
-Last activity: 2026-04-02 — Plan 10-02 complete (TornPaperCaption + PhotoCaptureInput components)
+Phase: 11 of 13 (Content, Section Hub & Time-Gating)
+Plan: 1 of 2 complete in current phase
+Status: In progress — Plan 11-01 complete, Plan 11-02 (hub page + VaultPage card) pending
+Last activity: 2026-04-02 — Plan 11-01 complete (photoSections data + photoGating utility with TDD, 34 tests)
 
-Progress: [██░░░░░░░░] 25% (v1.2 milestone — 0/4 phases, 2/2 plans in Phase 10)
+Progress: [███░░░░░░░] 38% (v1.2 milestone — 0/4 phases, 3/8 plans complete)
 
 ## Accumulated Context
 
@@ -39,6 +39,10 @@ Progress: [██░░░░░░░░] 25% (v1.2 milestone — 0/4 phases, 2
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- UI-SPEC table used as authoritative source for 15 section IDs and prompt texts (overrides RESEARCH.md catalog)
+- next6amAfter always advances to NEXT calendar day (d+1 setHours 6am) — correct for all completion times
+- 6am unlock is local device time (setHours operates on local Date) — not UTC
+- Section IDs are permanent Storage path keys — warning comment added to photoSections.js
 - supabase client passed as parameter to photoUtils functions (not imported) for testability and no circular deps
 - uploadPhoto uses upsert: true so retake/replace works without a separate delete step
 - compressImage returns Blob (not base64 data URL) — required for Supabase Storage upload API
@@ -58,6 +62,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T02:12:00Z
-Stopped at: Completed 10-02-PLAN.md (Task 3 checkpoint:human-verify pending)
-Resume file: .planning/phases/10-storage-photo-capture/10-02-PLAN.md (Task 3 continuation)
+Last session: 2026-04-02T03:34:38Z
+Stopped at: Completed 11-01-PLAN.md
+Resume file: .planning/phases/11-content-section-hub-time-gating/11-02-PLAN.md
