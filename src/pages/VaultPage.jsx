@@ -24,6 +24,7 @@ export default function VaultPage() {
   const [ppCompletedCount, setPpCompletedCount] = useState(0)
   const [fsCount, setFsCount] = useState(0)
   const [htCompletedGroups, setHtCompletedGroups] = useState(0)
+  const [photoCompletedCount, setPhotoCompletedCount] = useState(0)
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     if (sessionId) setSessionId(sessionId)
@@ -110,6 +111,18 @@ export default function VaultPage() {
       ).length
       setDdCompletedCount(ddDone)
     }
+
+    // Daily Photo Challenge completion count
+    const { data: photoData } = await supabase
+      .from('responses')
+      .select('answers')
+      .eq('session_id', sessionId)
+      .eq('pack_id', 'daily-photo-challenge')
+      .eq('player_id', 'shared')
+      .maybeSingle()
+    const photoState = photoData?.answers ?? null
+    const photoCompleted = photoState?.completedSections ? Object.keys(photoState.completedSections).length : 0
+    setPhotoCompletedCount(photoCompleted)
 
     setLoading(false)
   }
@@ -343,6 +356,53 @@ export default function VaultPage() {
                 ) : (
                   <div style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--text-light)' }}>
                     debate →
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Daily Photos card */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="glass"
+            role="button"
+            tabIndex={0}
+            aria-label="Daily Photos — answer 3 photo prompts together, once a day"
+            style={{ padding: 16, cursor: 'pointer', transform: 'rotate(0.2deg)' }}
+            onClick={() => navigate(`/daily-photos/${sessionId}`)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/daily-photos/${sessionId}`) } }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ fontSize: 28, flexShrink: 0 }}>📷</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.25rem', fontWeight: 600, marginBottom: 1, color: 'var(--text-primary)' }}>
+                  Daily Photos
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  answer 3 photo prompts together — once a day
+                </p>
+              </div>
+              <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                {photoCompletedCount === 0 ? (
+                  <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', color: 'var(--text-light)' }}>
+                    start photos →
+                  </div>
+                ) : photoCompletedCount < 15 ? (
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.25rem', fontWeight: 700, color: 'var(--accent-coral)' }}>
+                      {photoCompletedCount}/15
+                    </div>
+                    <div style={{ fontSize: '0.875rem', color: 'var(--text-light)' }}>sections</div>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-hand)', fontSize: '1.25rem', fontWeight: 700, color: 'var(--accent-sage)' }}>
+                      15/15
+                    </div>
+                    <div style={{ fontSize: '0.875rem', color: 'var(--text-light)' }}>done</div>
                   </div>
                 )}
               </div>
