@@ -51,7 +51,7 @@
   4. Submitted photos are stored in a Supabase Storage bucket scoped to the user's session (not accessible to other sessions)
 **Plans**: 2 plans
 Plans:
-- [ ] 10-01-PLAN.md — Supabase Storage bucket, RLS policies, and photoUtils.js utility module
+- [x] 10-01-PLAN.md — Supabase Storage bucket, RLS policies, and photoUtils.js utility module
 - [ ] 10-02-PLAN.md — PhotoCaptureInput and TornPaperCaption UI components
 
 ### Phase 11: Content, Section Hub & Time-Gating
@@ -101,7 +101,7 @@ Plans:
 | 7. Accessibility | v1.1 | 2/2 | Complete | 2026-03-15 |
 | 8. Quality | v1.1 | 2/2 | Complete | 2026-03-15 |
 | 9. useCallback Hook Compliance | v1.1 | 1/1 | Complete | 2026-03-15 |
-| 10. Storage & Photo Capture | v1.2 | 0/2 | Planning | - |
+| 10. Storage & Photo Capture | v1.2 | 1/2 | In Progress | - |
 | 11. Content, Section Hub & Time-Gating | v1.2 | 0/? | Not started | - |
 | 12. Prompt Flow & Cork Board Reveal | v1.2 | 0/? | Not started | - |
 | 13. Journal Integration | v1.2 | 0/? | Not started | - |

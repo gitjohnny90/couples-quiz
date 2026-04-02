@@ -12,7 +12,7 @@ Requirements for Daily Photo Challenge milestone. Each maps to roadmap phases.
 - [ ] **PHOTO-01**: User can take a photo with their device camera to answer a prompt
 - [ ] **PHOTO-02**: User can upload a photo from their device gallery to answer a prompt
 - [ ] **PHOTO-03**: User can add a short text caption below their photo (torn-paper style, no scrolling required)
-- [ ] **PHOTO-04**: Photos are uploaded to Supabase Storage bucket with session-scoped access
+- [x] **PHOTO-04**: Photos are uploaded to Supabase Storage bucket with session-scoped access
 
 ### Content
 
@@ -69,7 +69,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PHOTO-01 | Phase 10 | Pending |
 | PHOTO-02 | Phase 10 | Pending |
 | PHOTO-03 | Phase 10 | Pending |
-| PHOTO-04 | Phase 10 | Pending |
+| PHOTO-04 | Phase 10 | Complete |
 | CONT-01 | Phase 11 | Pending |
 | CONT-02 | Phase 11 | Pending |
 | CONT-03 | Phase 11 | Pending |
