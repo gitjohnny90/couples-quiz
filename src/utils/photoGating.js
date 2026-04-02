@@ -58,6 +58,20 @@ export function frozenUntil(state, now = new Date()) {
  * @param {Date} [now] - Injectable "now" for testing (default: new Date())
  * @returns {'completed'|'in-progress'|'available'|'locked-in-progress'|'locked-frozen'}
  */
+/**
+ * Returns true if a player has submitted all 3 photos for a given section.
+ * Each entry must be non-null with a truthy .path property.
+ *
+ * @param {object|null} playerAnswers - The JSONB answers object from the per-player responses row
+ * @param {string} sectionId - The section to check
+ * @returns {boolean}
+ */
+export function isSectionCompleteForPlayer(playerAnswers, sectionId) {
+  const photos = playerAnswers?.[sectionId]
+  if (!Array.isArray(photos) || photos.length < 3) return false
+  return photos.every(p => p !== null && p?.path)
+}
+
 export function getSectionStatus(sectionId, state, now = new Date()) {
   const completed = state?.completedSections ?? {}
   const inProgress = state?.inProgressSectionId ?? null

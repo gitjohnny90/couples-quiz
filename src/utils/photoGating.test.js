@@ -153,6 +153,52 @@ describe('frozenUntil', () => {
   })
 })
 
+// ─── isSectionCompleteForPlayer ──────────────────────────────
+
+import { isSectionCompleteForPlayer } from './photoGating'
+
+describe('isSectionCompleteForPlayer', () => {
+  it('returns false when playerAnswers is null', () => {
+    expect(isSectionCompleteForPlayer(null, 'morning-routine')).toBe(false)
+  })
+
+  it('returns false when playerAnswers is empty object', () => {
+    expect(isSectionCompleteForPlayer({}, 'morning-routine')).toBe(false)
+  })
+
+  it('returns false when all 3 entries are null', () => {
+    expect(isSectionCompleteForPlayer({ 'morning-routine': [null, null, null] }, 'morning-routine')).toBe(false)
+  })
+
+  it('returns false when one entry is null (missing path)', () => {
+    expect(isSectionCompleteForPlayer(
+      { 'morning-routine': [{ path: 'a' }, null, { path: 'c' }] },
+      'morning-routine'
+    )).toBe(false)
+  })
+
+  it('returns true when all 3 entries have a truthy path (caption can be empty string)', () => {
+    expect(isSectionCompleteForPlayer(
+      { 'morning-routine': [{ path: 'a', caption: '' }, { path: 'b', caption: 'x' }, { path: 'c', caption: '' }] },
+      'morning-routine'
+    )).toBe(true)
+  })
+
+  it('returns false when sectionId is not present in playerAnswers', () => {
+    expect(isSectionCompleteForPlayer(
+      { 'other-section': [{ path: 'a' }, { path: 'b' }, { path: 'c' }] },
+      'morning-routine'
+    )).toBe(false)
+  })
+
+  it('returns false when array has only 1 element (not 3)', () => {
+    expect(isSectionCompleteForPlayer(
+      { 'morning-routine': [{ path: 'a' }] },
+      'morning-routine'
+    )).toBe(false)
+  })
+})
+
 // ─── getSectionStatus ────────────────────────────────────────
 
 describe('getSectionStatus', () => {
