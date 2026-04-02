@@ -32,7 +32,7 @@ Requirements for Daily Photo Challenge milestone. Each maps to roadmap phases.
 
 - [ ] **DISP-01**: Per-section cork board shows both partners' 3 photos side by side after completion
 - [ ] **DISP-02**: Cork board uses the same visual style as the Us tab vision board
-- [ ] **DISP-03**: Section hub page shows all 15 sections with completion status and lock state
+- [x] **DISP-03**: Section hub page shows all 15 sections with completion status and lock state
 
 ### Journal
 
@@ -41,7 +41,7 @@ Requirements for Daily Photo Challenge milestone. Each maps to roadmap phases.
 
 ### Navigation
 
-- [ ] **NAV-01**: Daily Photo Challenge is accessible from the quizzes tab in bottom nav
+- [x] **NAV-01**: Daily Photo Challenge is accessible from the quizzes tab in bottom nav
 
 ## Future Requirements
 
