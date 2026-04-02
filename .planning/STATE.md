@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Daily Photo Challenge
-status: in-progress
-stopped_at: "Completed 11-02-PLAN.md (checkpoint:human-verify pending)"
-last_updated: "2026-04-02T05:00:00Z"
-last_activity: 2026-04-02 — Plan 11-02 complete (DailyPhotosHubPage, VaultPage entry card, App.jsx route)
+status: executing
+stopped_at: Completed 12-01-PLAN.md
+last_updated: "2026-04-02T04:27:16.187Z"
+last_activity: 2026-04-02 — Plan 11-02 complete (DailyPhotosHubPage, VaultPage entry card, /daily-photos route)
 progress:
   total_phases: 4
-  completed_phases: 0
-  total_plans: 3
-  completed_plans: 4
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 5
   percent: 50
 ---
 
@@ -50,6 +50,8 @@ Recent decisions affecting current work:
 - Idle/selected states rendered as two separate return branches for clarity in PhotoCaptureInput
 - Both file inputs get refs so handleRemove can reset them via .value='' (allows re-selection of same file)
 - Component is fully controlled — parent page handles post-submit navigation (no internal routing)
+- [Phase 12-prompt-flow-cork-board-reveal]: Used pack_id='daily-photo-section' per UI-SPEC (not 'daily-photo-challenge' from plan interfaces block)
+- [Phase 12-prompt-flow-cork-board-reveal]: buildPlayerAnswersShape helper bridges UI-SPEC photo shape to isSectionCompleteForPlayer array shape
 
 ### Pending Todos
 
@@ -62,6 +64,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T05:00:00Z
-Stopped at: Completed 11-02-PLAN.md (checkpoint:human-verify pending)
-Resume file: .planning/phases/11-content-section-hub-time-gating/11-02-PLAN.md (Task 2 checkpoint)
+Last session: 2026-04-02T04:27:16.184Z
+Stopped at: Completed 12-01-PLAN.md
+Resume file: None

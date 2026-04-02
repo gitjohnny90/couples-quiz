@@ -109,5 +109,5 @@ Plans:
 | 9. useCallback Hook Compliance | v1.1 | 1/1 | Complete | 2026-03-15 |
 | 10. Storage & Photo Capture | v1.2 | 2/2 | Complete (human verify pending) | 2026-04-02 |
 | 11. Content, Section Hub & Time-Gating | v1.2 | 1/2 | In progress | - |
-| 12. Prompt Flow & Cork Board Reveal | v1.2 | 0/2 | Not started | - |
+| 12. Prompt Flow & Cork Board Reveal | 1/2 | In Progress|  | - |
 | 13. Journal Integration | v1.2 | 0/? | Not started | - |

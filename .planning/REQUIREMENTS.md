@@ -26,7 +26,7 @@ Requirements for Daily Photo Challenge milestone. Each maps to roadmap phases.
 - [x] **GATE-01**: Completing a section freezes all sections until 6am the next day
 - [x] **GATE-02**: After 6am unlock, all remaining sections are available to choose from
 - [x] **GATE-03**: Once a user picks a section, all other sections lock until that section is completed
-- [ ] **GATE-04**: Both partners must complete a section before the cork board reveals
+- [x] **GATE-04**: Both partners must complete a section before the cork board reveals
 
 ### Display
 
@@ -77,7 +77,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GATE-01 | Phase 11 | Complete |
 | GATE-02 | Phase 11 | Complete |
 | GATE-03 | Phase 11 | Complete |
-| GATE-04 | Phase 12 | Pending |
+| GATE-04 | Phase 12 | Complete |
 | DISP-01 | Phase 12 | Pending |
 | DISP-02 | Phase 12 | Pending |
 | DISP-03 | Phase 11 | Pending |
