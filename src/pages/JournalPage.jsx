@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import quizPacks from '../data/quizPacks'
 import deepDiveDecks, { MOOD_TAGS, SERIES } from '../data/deepDiveDecks'
 import drawingPrompts, { DRAW_PACK_PREFIX } from '../data/drawingPrompts'
+import photoSections from '../data/photoSections'
 import { useReactions } from '../utils/reactions'
 import ReactionPopup from '../components/ReactionPopup'
 import ReactionBadge from '../components/ReactionBadge'
@@ -94,6 +95,7 @@ export default function JournalPage() {
   const [ddResponses, setDdResponses] = useState([])
   const [drawResponses, setDrawResponses] = useState([])
   const [bookEntries, setBookEntries] = useState([])
+  const [completedPhotoSections, setCompletedPhotoSections] = useState({})
   const [partnerName, setPartnerName] = useState(null)
   const [loading, setLoading] = useState(true)
   const [expandedItem, setExpandedItem] = useState(null)
@@ -107,9 +109,16 @@ export default function JournalPage() {
       if (mcRes.data) {
         const allResponses = mcRes.data
         setDrawResponses(allResponses.filter(r => r.pack_id?.startsWith(DRAW_PACK_PREFIX + 'dp')))
-        setMcResponses(allResponses.filter(r => !r.pack_id?.startsWith(DRAW_PACK_PREFIX) && r.pack_id !== 'study-together'))
+        setMcResponses(allResponses.filter(r =>
+          !r.pack_id?.startsWith(DRAW_PACK_PREFIX)
+          && r.pack_id !== 'study-together'
+          && r.pack_id !== 'daily-photo-challenge'
+          && r.pack_id !== 'daily-photo-section'
+        ))
         const studyRow = allResponses.find(r => r.pack_id === 'study-together' && r.player_id === 'shared')
         setBookEntries(studyRow?.answers?.books?.filter(b => b.status === 'finished' || b.status === 'reflected') || [])
+        const photoChallengeRow = allResponses.find(r => r.pack_id === 'daily-photo-challenge' && r.player_id === 'shared')
+        setCompletedPhotoSections(photoChallengeRow?.answers?.completedSections ?? {})
       }
       if (ddRes.data) setDdResponses(ddRes.data)
       setLoading(false)
