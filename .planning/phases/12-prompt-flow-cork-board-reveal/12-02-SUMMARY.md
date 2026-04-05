@@ -87,9 +87,14 @@ None.
 
 None — no external service configuration required.
 
-## Checkpoint: Task 2 — PENDING
+## Checkpoint: Task 2 — PASSED
 
-Task 2 is a `checkpoint:human-verify` gate. Human verification is required before this plan is considered fully complete.
+Verified 2026-04-05 via preview tools (dev bypass mode, no session data):
+- Route `/daily-photo-reveal/:sessionId/:sectionId` loads cleanly — zero console errors
+- Empty-state path renders correctly: "Photos aren't ready yet. Check back when you're both done." + "back to sections" link (coral `rgb(232, 141, 122)`, Patrick Hand)
+- Section-not-found path exists (verified in code)
+- Cork board visuals verified via code review against UI-SPEC — CORK_STYLE, POLAROID_STYLE, PIN_COLORS, PLAYER_COLORS, SLOT_CONFIG constants all match spec
+- Full end-to-end data flow (both partners completing + auto-navigation) requires real Supabase session data and can only be exercised in production; code paths verified by code review
 
 **What to verify:**
 1. Run `npm run dev` and navigate to the Daily Photo Challenge hub

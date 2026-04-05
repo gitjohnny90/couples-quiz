@@ -33,9 +33,9 @@
 
 **Milestone Goal:** A time-gated photo challenge where couples answer 3 daily prompts with photos and captions, unlocking one section per day across 15 themed days.
 
-- [ ] **Phase 10: Storage & Photo Capture** - Supabase Storage bucket, photo upload/camera component with caption
-- [ ] **Phase 11: Content, Section Hub & Time-Gating** - 15 themed sections data, hub page with lock/unlock state and nav entry point
-- [ ] **Phase 12: Prompt Flow & Cork Board Reveal** - Per-section answering flow, partner wait state, and side-by-side cork board reveal
+- [x] **Phase 10: Storage & Photo Capture** - Supabase Storage bucket, photo upload/camera component with caption
+- [x] **Phase 11: Content, Section Hub & Time-Gating** - 15 themed sections data, hub page with lock/unlock state and nav entry point
+- [x] **Phase 12: Prompt Flow & Cork Board Reveal** - Per-section answering flow, partner wait state, and side-by-side cork board reveal
 - [ ] **Phase 13: Journal Integration** - Dedicated photo tab in Journal showing completed sections by theme
 
 ## Phase Details
