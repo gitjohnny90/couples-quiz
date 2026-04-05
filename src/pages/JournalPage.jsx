@@ -196,9 +196,27 @@ export default function JournalPage() {
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   }
 
+  // ── Photo Sections helpers ──
+  const getCompletedPhotoSections = () => {
+    return Object.entries(completedPhotoSections)
+      .map(([sectionId, completedAt]) => {
+        const section = photoSections.find(s => s.id === sectionId)
+        if (!section) return null // defensive: section removed from data
+        return {
+          id: sectionId,
+          title: section.title,
+          emoji: section.emoji,
+          completedAt,
+        }
+      })
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+  }
+
   const completedPacks = loading ? [] : getCompletedPacks()
   const completedDecks = loading ? [] : getCompletedDecks()
   const completedDrawings = loading ? [] : getCompletedDrawings()
+  const completedPhotoCards = loading ? [] : getCompletedPhotoSections()
   const totalDdReactions = Object.values(ddReactions).reduce((sum, playerMap) => sum + Object.keys(playerMap).length, 0)
 
   // Stats
@@ -228,7 +246,7 @@ export default function JournalPage() {
 
         {/* Tab switcher */}
         <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
-          {[['mc', 'quizzes'], ['dd', 'deep dive'], ['drawings', 'drawings'], ['books', 'books']].map(([key, label]) => (
+          {[['mc', 'quizzes'], ['dd', 'deep dive'], ['drawings', 'drawings'], ['books', 'books'], ['photos', 'photos']].map(([key, label]) => (
             <button
               key={key}
               onClick={() => { setActiveTab(key); setExpandedItem(null) }}
@@ -838,6 +856,94 @@ export default function JournalPage() {
                         </motion.div>
                       )
                     })}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ══ PHOTOS TAB ══ */}
+            {activeTab === 'photos' && (
+              <motion.div key="photos" initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 15 }}>
+                {completedPhotoCards.length === 0 ? (
+                  <div className="glass" style={{ padding: 24, textAlign: 'center', transform: 'rotate(0.3deg)' }}>
+                    <p style={{ fontSize: '1.25rem', marginBottom: 8, margin: 0 }}>📸</p>
+                    <p style={{
+                      fontFamily: 'var(--font-hand)',
+                      fontSize: '1.25rem',
+                      fontWeight: 700,
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.2,
+                      margin: '8px 0 0',
+                    }}>
+                      no photo sections completed yet
+                    </p>
+                    <p style={{
+                      fontFamily: 'var(--font-hand)',
+                      fontSize: '0.875rem',
+                      color: 'var(--text-light)',
+                      fontStyle: 'italic',
+                      marginTop: 4,
+                      lineHeight: 1.5,
+                    }}>
+                      finish a photo section together to see it here
+                    </p>
+                    <button
+                      className="btn btn-primary"
+                      style={{ marginTop: 16 }}
+                      onClick={() => navigate(`/daily-photos/${sessionId}`)}
+                    >
+                      take photos →
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {completedPhotoCards.map((card, i) => (
+                      <motion.div
+                        key={card.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="glass"
+                        style={{ transform: `rotate(${i % 2 === 0 ? -0.3 : 0.3}deg)`, cursor: 'pointer' }}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => navigate(`/daily-photo-reveal/${sessionId}/${card.id}`)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            navigate(`/daily-photo-reveal/${sessionId}/${card.id}`)
+                          }
+                        }}
+                        aria-label={`View photos from ${card.title}`}
+                      >
+                        <div style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>{card.emoji}</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <h3 style={{
+                              fontFamily: 'var(--font-hand)',
+                              fontSize: '1.25rem',
+                              fontWeight: 600,
+                              color: 'var(--text-primary)',
+                              lineHeight: 1.2,
+                              margin: 0,
+                              marginBottom: 4,
+                            }}>
+                              {card.title}
+                            </h3>
+                            <p style={{
+                              fontFamily: 'var(--font-hand)',
+                              fontSize: '0.875rem',
+                              color: 'var(--accent-sage)',
+                              lineHeight: 1.5,
+                              margin: 0,
+                            }}>
+                              completed {new Date(card.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </p>
+                          </div>
+                          <span aria-hidden="true" style={{ fontSize: '1rem', color: 'var(--text-light)', flexShrink: 0 }}>→</span>
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
                 )}
               </motion.div>
