@@ -77,13 +77,14 @@ export default function DailyPhotoRevealPage() {
       const p1Answers = p1Result.data?.answers ?? null
       const p2Answers = p2Result.data?.answers ?? null
 
-      // Build per-player photo arrays using buildPlayerAnswersShape bridge
-      // UI-SPEC stores answers as: { sectionId, photos: [{promptIndex, path, caption}], completedAt }
+      // Build per-player photo arrays using buildBridgeShape bridge
+      // Stored shape: answers = { [sectionId]: { photos: [{promptIndex, path, caption}], completedAt } }
       // isSectionCompleteForPlayer expects: { [sectionId]: [{path, caption}, ...] }
       const buildBridgeShape = (answers) => {
-        if (!answers?.photos) return null
+        const sectionData = answers?.[sectionId]
+        if (!sectionData?.photos) return null
         const byIndex = [null, null, null]
-        for (const photo of answers.photos) {
+        for (const photo of sectionData.photos) {
           if (photo.promptIndex >= 0 && photo.promptIndex <= 2) {
             byIndex[photo.promptIndex] = { path: photo.path, caption: photo.caption ?? '' }
           }

@@ -36,16 +36,17 @@ export default function DailyPhotoSectionPage() {
         .maybeSingle()
       if (!mountedRef.current) return
       const answers = data?.answers
-      // answers shape: { sectionId, photos: [...], completedAt? }
-      if (answers?.sectionId === sectionId && Array.isArray(answers.photos)) {
-        if (answers.completedAt) {
+      // answers shape: { [sectionId]: { photos: [...], completedAt? }, ... }
+      const sectionData = answers?.[sectionId]
+      if (sectionData && Array.isArray(sectionData.photos)) {
+        if (sectionData.completedAt) {
           // Player already completed this section — go to waiting
           setScreen('waiting')
           return
         }
         // Find first prompt not yet submitted
         const firstMissing = [0, 1, 2].find(i =>
-          !answers.photos.find(p => p.promptIndex === i && p.path)
+          !sectionData.photos.find(p => p.promptIndex === i && p.path)
         )
         if (firstMissing === undefined) {
           // All 3 present but no completedAt — treat as waiting
@@ -72,19 +73,24 @@ export default function DailyPhotoSectionPage() {
       .eq('player_id', playerId)
       .maybeSingle()
 
-    const existing = current?.answers
+    const existing = current?.answers ?? {}
+    const existingSection = existing?.[sectionId]
     let photos = []
-    if (existing?.sectionId === sectionId && Array.isArray(existing.photos)) {
+    if (existingSection && Array.isArray(existingSection.photos)) {
       // Keep all existing entries except the one we're replacing
-      photos = existing.photos.filter(p => p.promptIndex !== promptIndex)
+      photos = existingSection.photos.filter(p => p.promptIndex !== promptIndex)
     }
     photos.push({ promptIndex, path, caption })
 
     const isLastPrompt = promptIndex === 2
-    const updatedAnswers = {
-      sectionId,
+    const updatedSection = {
       photos,
-      ...(isLastPrompt ? { completedAt: new Date().toISOString() } : {}),
+      ...(isLastPrompt ? { completedAt: new Date().toISOString() } : existingSection?.completedAt ? { completedAt: existingSection.completedAt } : {}),
+    }
+    // Preserve all other sections — only update this sectionId key
+    const updatedAnswers = {
+      ...existing,
+      [sectionId]: updatedSection,
     }
 
     await supabase
@@ -162,16 +168,16 @@ export default function DailyPhotoSectionPage() {
     ])
     if (!mountedRef.current) return
 
-    const myAnswers = myRow?.answers
-    const partnerAnswers = partnerRow?.answers
+    const mySection = myRow?.answers?.[sectionId]
+    const partnerSection = partnerRow?.answers?.[sectionId]
 
     // Check completedAt (more reliable) or fall back to photos array
-    const myDone = myAnswers?.sectionId === sectionId && !!myAnswers?.completedAt
-    const partnerDone = partnerAnswers?.sectionId === sectionId && !!partnerAnswers?.completedAt
+    const myDone = !!mySection?.completedAt
+    const partnerDone = !!partnerSection?.completedAt
 
     // Also support the isSectionCompleteForPlayer shape for flexibility
-    const myDoneFallback = isSectionCompleteForPlayer(buildPlayerAnswersShape(myAnswers?.photos), sectionId)
-    const partnerDoneFallback = isSectionCompleteForPlayer(buildPlayerAnswersShape(partnerAnswers?.photos), sectionId)
+    const myDoneFallback = isSectionCompleteForPlayer(buildPlayerAnswersShape(mySection?.photos), sectionId)
+    const partnerDoneFallback = isSectionCompleteForPlayer(buildPlayerAnswersShape(partnerSection?.photos), sectionId)
 
     if ((myDone || myDoneFallback) && (partnerDone || partnerDoneFallback)) {
       await markSectionCompleteInSharedState()
