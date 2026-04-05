@@ -92,7 +92,9 @@ Plans:
   1. The Journal page has a new tab labeled for Daily Photo Challenge that is visible alongside existing tabs
   2. The journal tab displays every completed section with its photos organized by theme name
   3. Tapping a completed section in the journal opens or shows that section's photos (does not allow re-answering)
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 13-01-PLAN.md — Extend JournalPage with photos tab (fetch, filter, empty state, card list, navigation)
 
 ## Progress
 
