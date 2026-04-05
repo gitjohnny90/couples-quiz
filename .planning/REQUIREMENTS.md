@@ -30,8 +30,8 @@ Requirements for Daily Photo Challenge milestone. Each maps to roadmap phases.
 
 ### Display
 
-- [ ] **DISP-01**: Per-section cork board shows both partners' 3 photos side by side after completion
-- [ ] **DISP-02**: Cork board uses the same visual style as the Us tab vision board
+- [x] **DISP-01**: Per-section cork board shows both partners' 3 photos side by side after completion
+- [x] **DISP-02**: Cork board uses the same visual style as the Us tab vision board
 - [x] **DISP-03**: Section hub page shows all 15 sections with completion status and lock state
 
 ### Journal
@@ -78,8 +78,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GATE-02 | Phase 11 | Complete |
 | GATE-03 | Phase 11 | Complete |
 | GATE-04 | Phase 12 | Complete |
-| DISP-01 | Phase 12 | Pending |
-| DISP-02 | Phase 12 | Pending |
+| DISP-01 | Phase 12 | Complete |
+| DISP-02 | Phase 12 | Complete |
 | DISP-03 | Phase 11 | Pending |
 | JRNL-01 | Phase 13 | Pending |
 | JRNL-02 | Phase 13 | Pending |
@@ -92,4 +92,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-30*
-*Last updated: 2026-04-02 — CONT-01 through CONT-04, GATE-01 through GATE-03 marked complete (Phase 11 Plan 01)*
+*Last updated: 2026-04-05 — DISP-01, DISP-02 marked complete (Phase 12 Plan 02)*

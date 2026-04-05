@@ -81,8 +81,8 @@ Plans:
   5. The cork boards use the same visual treatment (pinned cards, paper style) as the vision board in the Us tab
 **Plans**: 2 plans
 Plans:
-- [ ] 12-01-PLAN.md — Gating helper, route wiring, pageGuides, and DailyPhotoSectionPage (prompt flow + waiting)
-- [ ] 12-02-PLAN.md — DailyPhotoRevealPage (cork board reveal with polaroids and captions)
+- [x] 12-01-PLAN.md — Gating helper, route wiring, pageGuides, and DailyPhotoSectionPage (prompt flow + waiting)
+- [x] 12-02-PLAN.md — DailyPhotoRevealPage (cork board reveal with polaroids and captions)
 
 ### Phase 13: Journal Integration
 **Goal**: Users can review all completed Daily Photo Challenge sections from the Journal page, organized by theme
@@ -109,5 +109,5 @@ Plans:
 | 9. useCallback Hook Compliance | v1.1 | 1/1 | Complete | 2026-03-15 |
 | 10. Storage & Photo Capture | v1.2 | 2/2 | Complete (human verify pending) | 2026-04-02 |
 | 11. Content, Section Hub & Time-Gating | v1.2 | 1/2 | In progress | - |
-| 12. Prompt Flow & Cork Board Reveal | 1/2 | In Progress|  | - |
+| 12. Prompt Flow & Cork Board Reveal | v1.2 | 2/2 | Complete (human verify pending) | 2026-04-05 |
 | 13. Journal Integration | v1.2 | 0/? | Not started | - |
