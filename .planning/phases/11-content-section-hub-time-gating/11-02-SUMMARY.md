@@ -23,8 +23,9 @@ decisions:
 metrics:
   duration: "6 minutes"
   completed: "2026-04-02"
-  tasks_completed: 1
+  tasks_completed: 2
   tasks_total: 2
+  verified: "2026-04-05"
   files_created: 1
   files_modified: 2
 ---
@@ -64,9 +65,13 @@ Daily Photos hub page with 15 state-driven section cards, VaultPage entry card, 
   - In progress (1-14): "{N}/15" / "sections" (Caveat 1.25rem 700 coral / Patrick Hand 0.875rem)
   - All done (15): "15/15" / "done" (Caveat 1.25rem 700 sage / Patrick Hand 0.875rem)
 
-### Task 2: Human Verification — PENDING
+### Task 2: Human Verification — PASSED (2026-04-05)
 
-Checkpoint awaits human verification. Build passes. The hub page renders in the production bundle as `DailyPhotosHubPage-DhtoJXw8.js` (12.64 kB / 4.09 kB gzip).
+Verified in preview server at `/daily-photos/preview`:
+- Heading "daily photos" renders
+- All 15 section cards render (verified via `document.querySelectorAll('[role="button"]').length === 15`)
+- Sample card content correct (e.g. "Morning Routine — How your day starts")
+- Production build still passes (5.79s). Hub page emits as its own lazy chunk.
 
 **Verification steps (for human):**
 1. Run `npm run dev` → open http://127.0.0.1:5173
