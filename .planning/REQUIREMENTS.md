@@ -36,8 +36,8 @@ Requirements for Daily Photo Challenge milestone. Each maps to roadmap phases.
 
 ### Journal
 
-- [ ] **JRNL-01**: Journal page has a dedicated tab for Daily Photo Challenge photos
-- [ ] **JRNL-02**: Journal tab displays all completed section photos organized by theme
+- [x] **JRNL-01**: Journal page has a dedicated tab for Daily Photo Challenge photos
+- [x] **JRNL-02**: Journal tab displays all completed section photos organized by theme
 
 ### Navigation
 
@@ -81,8 +81,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DISP-01 | Phase 12 | Complete |
 | DISP-02 | Phase 12 | Complete |
 | DISP-03 | Phase 11 | Pending |
-| JRNL-01 | Phase 13 | Pending |
-| JRNL-02 | Phase 13 | Pending |
+| JRNL-01 | Phase 13 | Complete |
+| JRNL-02 | Phase 13 | Complete |
 | NAV-01 | Phase 11 | Pending |
 
 **Coverage:**

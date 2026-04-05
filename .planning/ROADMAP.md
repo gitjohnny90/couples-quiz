@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 Polish & Security** — Phases 1-4 (shipped 2026-03-12)
 - ✅ **v1.1 Audit Remediation** — Phases 5-9 (shipped 2026-03-15)
-- 🚧 **v1.2 Daily Photo Challenge** — Phases 10-13 (in progress)
+- ✅ **v1.2 Daily Photo Challenge** — Phases 10-13 (feature-complete 2026-04-05)
 
 ## Phases
 
@@ -29,14 +29,14 @@
 
 </details>
 
-### 🚧 v1.2 Daily Photo Challenge (In Progress)
+### ✅ v1.2 Daily Photo Challenge (Feature-Complete 2026-04-05)
 
 **Milestone Goal:** A time-gated photo challenge where couples answer 3 daily prompts with photos and captions, unlocking one section per day across 15 themed days.
 
 - [x] **Phase 10: Storage & Photo Capture** - Supabase Storage bucket, photo upload/camera component with caption
 - [x] **Phase 11: Content, Section Hub & Time-Gating** - 15 themed sections data, hub page with lock/unlock state and nav entry point
 - [x] **Phase 12: Prompt Flow & Cork Board Reveal** - Per-section answering flow, partner wait state, and side-by-side cork board reveal
-- [ ] **Phase 13: Journal Integration** - Dedicated photo tab in Journal showing completed sections by theme
+- [x] **Phase 13: Journal Integration** - Dedicated photo tab in Journal showing completed sections by theme
 
 ## Phase Details
 
@@ -94,7 +94,7 @@ Plans:
   3. Tapping a completed section in the journal opens or shows that section's photos (does not allow re-answering)
 **Plans**: 1 plan
 Plans:
-- [ ] 13-01-PLAN.md — Extend JournalPage with photos tab (fetch, filter, empty state, card list, navigation)
+- [x] 13-01-PLAN.md — Extend JournalPage with photos tab (fetch, filter, empty state, card list, navigation)
 
 ## Progress
 
@@ -112,4 +112,4 @@ Plans:
 | 10. Storage & Photo Capture | v1.2 | 2/2 | Complete (human verify pending) | 2026-04-02 |
 | 11. Content, Section Hub & Time-Gating | v1.2 | 1/2 | In progress | - |
 | 12. Prompt Flow & Cork Board Reveal | v1.2 | 2/2 | Complete (human verify pending) | 2026-04-05 |
-| 13. Journal Integration | v1.2 | 0/? | Not started | - |
+| 13. Journal Integration | v1.2 | 1/1 | Complete | 2026-04-05 |

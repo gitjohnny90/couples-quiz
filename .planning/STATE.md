@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Daily Photo Challenge
-status: executing
-stopped_at: Phase 12 verified — ready for Phase 13 (Journal Integration)
-last_updated: "2026-04-05T00:25:00Z"
-last_activity: 2026-04-05 — Phase 12 complete and verified (5/5 automated must-haves passing)
+status: complete
+stopped_at: Phase 13 complete and verified — v1.2 milestone Journal surface feature-complete
+last_updated: "2026-04-05T01:45:00Z"
+last_activity: 2026-04-05 — Phase 13 (Journal Integration) complete and verified
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
-  percent: 87
+  completed_phases: 4
+  total_plans: 9
+  completed_plans: 9
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-30)
 
 **Core value:** Partners can connect and learn about each other through shared interactive experiences that update live for both players
-**Current focus:** Phase 11 — Content, Section Hub & Time-Gating
+**Current focus:** v1.2 Daily Photo Challenge — complete
 
 ## Current Position
 
-Phase: 13 of 13 (Journal Integration) — ready to plan
-Plan: Phase 12 complete and verified
-Status: Phase 12 verified — 5/5 automated must-haves passing (GATE-04, DISP-01, DISP-02)
-Last activity: 2026-04-05 — Phase 12 verified, ready for Phase 13 planning
+Phase: 13 of 13 (Journal Integration) — complete
+Plan: 13-01 complete and verified
+Status: v1.2 milestone feature-complete for Journal surface (JRNL-01, JRNL-02 satisfied)
+Last activity: 2026-04-05 — Phase 13 verified, v1.2 milestone closed
 
-Progress: [████████░░] 87% (v1.2 milestone — 3/4 phases, 8/8 plans complete)
+Progress: [██████████] 100% (v1.2 milestone — 4/4 phases, 9/9 plans complete)
 
 ## Accumulated Context
 
@@ -54,6 +54,9 @@ Recent decisions affecting current work:
 - [Phase 12-prompt-flow-cork-board-reveal]: buildPlayerAnswersShape helper bridges UI-SPEC photo shape to isSectionCompleteForPlayer array shape
 - [12-02]: buildBridgeShape pattern in DailyPhotoRevealPage converts answers.photos array to { [sectionId]: [{path, caption}] } shape for isSectionCompleteForPlayer
 - [12-02]: Back link uses "← back to sections" per UI-SPEC copywriting contract
+- [13-01]: Piggybacked on existing fetchAll useEffect — zero extra Supabase round trips for new photos tab
+- [13-01]: Photo cards navigate to canonical reveal page instead of accordion-expanding inline — avoids duplicating cork board rendering
+- [13-01]: Explicit exclusion of both daily-photo-challenge and daily-photo-section pack_ids from mcResponses filter (required by UI-SPEC)
 
 ### Pending Todos
 
@@ -66,6 +69,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-05T00:09:30Z
-Stopped at: Completed 12-02-PLAN.md (checkpoint:human-verify pending)
+Last session: 2026-04-05T01:45:00Z
+Stopped at: Completed 13-01-PLAN.md — v1.2 milestone feature-complete
 Resume file: None
