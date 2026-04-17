@@ -32,10 +32,18 @@ No test runner or linter is configured.
 
 `SessionContext` (in `App.jsx`) holds `sessionId`, `playerName`, and `playerId`, persisted to localStorage. Sessions are auto-created on first sign-in: if a `pendingInviteCode` exists in localStorage or `user_metadata.invite_code`, the user auto-joins their partner's session as player2; otherwise the user sees a manual join/create UI — they can enter an invite code to join, or create a new session with a `LOVE-XXXX` invite code as player1. The `user_sessions` table links Supabase auth users to sessions so they can resume on login. Legacy sessions (pre-auth) are auto-claimed when a user signs in. The home page (`/`) acts as an auto-setup redirector — users with existing sessions are sent straight to the vault. Player2 join uses an atomic conditional UPDATE (`WHERE player2_user_id IS NULL`) to prevent race-condition double-joins — only one user can claim the slot. `playerName` is sourced from the `sessions` table (authoritative) rather than auth metadata to avoid name mismatches. Pages that display player names (PredictPartner, DeepDive, etc.) also fetch names directly from the session DB record via a `sessionMyName` state variable (or via the `useSessionSetup` hook).
 
-## CEO Reporting (Automatic)
+## Command Center Brain (Read + Write Access)
 
-After every `git push`, write a brief report to:
-C:\Users\mcfat\projects\us-quiz-ceo\reports\build-YYYY-MM-DD.md
+The Command Center brain is an Obsidian vault at `C:\My Vaults\CommandCenter\` that serves as the central knowledge base across all of John's projects. You have access to it.
+
+**Read:** When you need context on strategy, decisions, positioning, pricing, or anything cross-project, check the brain:
+- `C:\My Vaults\CommandCenter\wiki\` — Compiled knowledge pages (concepts, people-and-tools, overviews, frameworks)
+- `C:\My Vaults\CommandCenter\reports\decisions\` — All strategic decisions (DEC-001 through DEC-036+)
+- `C:\My Vaults\CommandCenter\reports\priorities.md` — Current priority stack
+- `C:\My Vaults\CommandCenter\index.md` — Master catalog of all wiki pages
+
+**Write:** After every `git push`, write a brief report to:
+C:\My Vaults\CommandCenter\reports\team\build-YYYY-MM-DD.md
 
 If a report for today already exists, append to it — don't overwrite.
 
