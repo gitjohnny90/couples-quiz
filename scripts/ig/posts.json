@@ -1,0 +1,252 @@
+{
+  "_note": "Generated from content_queue sheet on 2026-04-16. One cover image per row; carousels use their slide-1 prompt; video-only rows get a still card from caption content.",
+  "posts": [
+    {
+      "id": "IG-001",
+      "aspect_ratio": "1x1",
+      "template": "headline",
+      "data": {
+        "eyebrow": "true story",
+        "headline": "i built an app<br/>for <span class=\"accent-coral-word\">love</span>.",
+        "body": "the love didn't last.<br/>the app did."
+      }
+    },
+    {
+      "id": "IG-002",
+      "aspect_ratio": "9x16",
+      "template": "quiz",
+      "data": {
+        "qLabel": "ldr couples —",
+        "question": "what's your biggest<br/>facetime struggle?",
+        "options": ["running out of things<br/>to talk about", "time zone<br/>chaos"]
+      }
+    },
+    {
+      "id": "IG-003",
+      "aspect_ratio": "9x16",
+      "template": "headline",
+      "data": {
+        "eyebrow": "pov:",
+        "headline": "finding hidden love notes<br/>from your person",
+        "body": "\u201ci smile every time<br/>you text me.\u201d"
+      }
+    },
+    {
+      "id": "IG-004",
+      "aspect_ratio": "9x16",
+      "template": "cover",
+      "data": {
+        "eyebrow": "the us quiz \u2192",
+        "title": "love note hunt",
+        "subtitle": "hide love notes.<br/>your partner hunts them down.",
+        "swipeText": "free at theusquiz.com"
+      }
+    },
+    {
+      "id": "IG-005",
+      "aspect_ratio": "1x1",
+      "template": "cover",
+      "data": {
+        "eyebrow": "save this",
+        "title": "7 facetime date ideas<br/>that aren't netflix",
+        "swipeText": "swipe \u2192"
+      }
+    },
+    {
+      "id": "IG-006",
+      "aspect_ratio": "9x16",
+      "template": "quiz",
+      "data": {
+        "qLabel": "saturday night pick \u2014",
+        "question": "which would you play<br/>with your partner?",
+        "options": ["love note<br/>hunt", "hot takes<br/>debate"],
+        "footer": "(or \u2014 predict your partner.)"
+      }
+    },
+    {
+      "id": "IG-007",
+      "aspect_ratio": "9x16",
+      "template": "headline",
+      "data": {
+        "eyebrow": "\u201cyeah we're dating\u201d",
+        "headline": "\u201cthey live<br/><span class=\"accent-coral-word\">8,000 miles</span><br/>away\u201d",
+        "body": "*awkward pause*<br/>it's fine.<br/>we have the us quiz."
+      }
+    },
+    {
+      "id": "IG-008",
+      "aspect_ratio": "1x1",
+      "template": "quote",
+      "data": {
+        "quote": "the hardest part of an ldr isn't the distance. it's running out of things to do together."
+      }
+    },
+    {
+      "id": "IG-009",
+      "aspect_ratio": "9x16",
+      "template": "headline",
+      "data": {
+        "eyebrow": "reveal feature \u2192",
+        "headline": "both answer.<br/>then see each other<br/>for the first time.",
+        "body": "this is what it looks like<br/>when the answers drop."
+      }
+    },
+    {
+      "id": "IG-010",
+      "aspect_ratio": "9x16",
+      "template": "cover",
+      "data": {
+        "eyebrow": "the us quiz \u2192",
+        "title": "predict your<br/>partner",
+        "subtitle": "how well do you<br/>actually know them?",
+        "swipeText": "free at theusquiz.com"
+      }
+    },
+    {
+      "id": "IG-011",
+      "aspect_ratio": "1x1",
+      "template": "cover",
+      "data": {
+        "eyebrow": "pull these on your next facetime \u2192",
+        "title": "questions that'll<br/>bring you closer\u2026<br/>or start a fight",
+        "swipeText": "swipe \u2192"
+      }
+    },
+    {
+      "id": "IG-012",
+      "aspect_ratio": "1x1",
+      "template": "list",
+      "data": {
+        "title": "things couples<br/>tell us",
+        "items": [
+          "\u201cwe played love note hunt for 2 hours\u201d",
+          "\u201cour best facetime call in months\u201d",
+          "\u201cfirst app that makes distance feel smaller\u201d"
+        ],
+        "footer": "\u2192 theusquiz.com"
+      }
+    },
+    {
+      "id": "IG-013",
+      "aspect_ratio": "9x16",
+      "template": "list",
+      "data": {
+        "title": "ldr love<br/>languages",
+        "items": [
+          "falling asleep on facetime",
+          "\u201ci miss you\u201d \u00d7 47 a day",
+          "memes at 3am their time",
+          "planning trips we can't afford yet",
+          "counting days on the calendar"
+        ],
+        "footer": "\u2026 and the us quiz."
+      }
+    },
+    {
+      "id": "IG-014",
+      "aspect_ratio": "9x16",
+      "template": "quiz",
+      "data": {
+        "qLabel": "hot take \u2014",
+        "question": "\u201cit's okay to go<br/>to bed angry.\u201d",
+        "options": ["AGREE", "DISAGREE"],
+        "footer": "couple therapy, disguised as a game."
+      }
+    },
+    {
+      "id": "IG-015",
+      "aspect_ratio": "9x16",
+      "template": "quiz",
+      "data": {
+        "qLabel": "saturday hot take \u2014",
+        "question": "\u201cit's okay to go<br/>to bed angry<br/>in an ldr.\u201d",
+        "options": ["AGREE", "DISAGREE"]
+      }
+    },
+    {
+      "id": "IG-016",
+      "aspect_ratio": "9x16",
+      "template": "headline",
+      "data": {
+        "eyebrow": "sunday check-in \u2014",
+        "headline": "how are my<br/>ldr couples<br/>doing today?",
+        "body": "counting down to when?<br/>drop your reunion date below."
+      }
+    },
+    {
+      "id": "IG-017",
+      "aspect_ratio": "9x16",
+      "template": "cover",
+      "data": {
+        "eyebrow": "the us quiz \u2192",
+        "title": "finish my<br/>sentence",
+        "subtitle": "you start. they finish.<br/>some sweet. some unhinged.",
+        "swipeText": "free at theusquiz.com"
+      }
+    },
+    {
+      "id": "IG-018",
+      "aspect_ratio": "1x1",
+      "template": "cover",
+      "data": {
+        "eyebrow": "save this reminder \u2192",
+        "title": "5 signs your ldr<br/>is actually thriving",
+        "subtitle": "(you're doing great.)"
+      }
+    },
+    {
+      "id": "IG-019",
+      "aspect_ratio": "9x16",
+      "template": "cover",
+      "data": {
+        "eyebrow": "the us quiz \u2192",
+        "title": "our vision<br/>board",
+        "subtitle": "pin photos. track dreams.<br/>every one achieved = a star.",
+        "swipeText": "free at theusquiz.com"
+      }
+    },
+    {
+      "id": "IG-020",
+      "aspect_ratio": "1x1",
+      "template": "list",
+      "data": {
+        "title": "how well do you<br/>really know<br/>each other?",
+        "items": [
+          "love languages",
+          "mbti / 16 personalities",
+          "enneagram",
+          "working genius",
+          "attachment style",
+          "conflict style"
+        ],
+        "footer": "compare side by side \u2192"
+      }
+    },
+    {
+      "id": "IG-021",
+      "aspect_ratio": "9x16",
+      "template": "list",
+      "data": {
+        "title": "things<br/>couples<br/>say",
+        "items": [
+          "\u201clove note hunt for 2 hours\u201d",
+          "\u201chot takes started a fight \u2014 we loved it\u201d",
+          "\u201cmakes distance feel smaller\u201d",
+          "\u201cquiz night every thursday now\u201d",
+          "\u201cdeep dives hit different\u201d"
+        ],
+        "footer": "\u2192 theusquiz.com"
+      }
+    },
+    {
+      "id": "IG-022",
+      "aspect_ratio": "1x1",
+      "template": "headline",
+      "data": {
+        "eyebrow": "two weeks in \u2014",
+        "headline": "thank<br/><span class=\"accent-coral-word\">you</span>.",
+        "body": "2 minutes to set up.<br/>free forever.<br/>theusquiz.com"
+      }
+    }
+  ]
+}

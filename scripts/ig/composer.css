@@ -1,0 +1,406 @@
+/* ===== IG COMPOSER — mirrors The Us Quiz notebook aesthetic ===== */
+/* Tokens lifted from src/index.css so posts match the live app exactly. */
+
+:root {
+  --bg-paper: #FFF8F0;
+  --bg-card: #FFFDF7;
+  --bg-card-hover: #FFF5E9;
+  --border-pencil: #D4C4B0;
+  --border-pencil-dark: #B8A08A;
+  --text-primary: #3D2C2C;
+  --text-secondary: #8B7367;
+  --text-light: #A89888;
+  --accent-coral: #E88D7A;
+  --accent-mustard: #D4A843;
+  --accent-sage: #7CAE7A;
+  --accent-blue: #6B8DAD;
+  --accent-coral-light: #F5C4BA;
+  --accent-sage-light: #C5E0C4;
+  --margin-line: #E8B4B8;
+  --rule-line: #E8E0D6;
+  --font-hand: 'Caveat', cursive;
+  --font-body: 'Patrick Hand', cursive;
+  --font-ui: 'Inter', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  background: #888;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+}
+
+/* The stage is sized precisely by JS per aspect ratio so Playwright can screenshot it pixel-perfect. */
+#stage {
+  display: block;
+  background-color: var(--bg-paper);
+  background-image:
+    linear-gradient(to right, transparent 58px, var(--margin-line) 58px, var(--margin-line) 60px, transparent 60px),
+    repeating-linear-gradient(to bottom, transparent, transparent 31px, var(--rule-line) 31px, var(--rule-line) 32px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 100% auto, 100% auto, 256px 256px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Aspect-ratio sizes — exact pixel dims for IG */
+#stage.aspect-1x1 { width: 1080px; height: 1080px; }
+#stage.aspect-9x16 { width: 1080px; height: 1920px; }
+#stage.aspect-16x9 { width: 1920px; height: 1080px; }
+
+/* ===== Notebook card (paper) ===== */
+.paper {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-pencil);
+  border-radius: 3px;
+  position: relative;
+  box-shadow: 2px 3px 12px rgba(61, 44, 44, 0.1), 0 1px 2px rgba(61, 44, 44, 0.05);
+}
+
+.paper.tape-top::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 120px;
+  height: 28px;
+  background: rgba(212, 168, 67, 0.35);
+  border: 1px dashed rgba(212, 168, 67, 0.55);
+  border-radius: 1px;
+}
+
+/* ===== Torn caption (polaroid caption vibe) ===== */
+.torn-caption {
+  display: inline-block;
+  background: var(--bg-card);
+  padding: 14px 26px 18px;
+  font-family: var(--font-hand);
+  color: var(--text-primary);
+  position: relative;
+  box-shadow: 2px 3px 8px rgba(61, 44, 44, 0.08);
+  clip-path: polygon(
+    0% 8%, 3% 0%, 12% 5%, 22% 1%, 34% 6%, 48% 2%, 60% 5%, 74% 1%, 88% 6%, 97% 2%, 100% 10%,
+    100% 90%, 97% 100%, 85% 95%, 72% 99%, 58% 94%, 44% 99%, 30% 94%, 18% 98%, 6% 94%, 0% 92%
+  );
+}
+
+/* ===== Template: headline ===== */
+.tpl-headline {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 60px;
+  text-align: center;
+  gap: 28px;
+}
+
+.tpl-headline .eyebrow {
+  font-family: var(--font-body);
+  font-size: 42px;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+}
+
+.tpl-headline .headline {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: 180px;
+  line-height: 0.95;
+  color: var(--text-primary);
+  max-width: 14ch;
+}
+
+.tpl-headline .headline .accent-coral-word { color: var(--accent-coral); }
+.tpl-headline .headline .accent-blue-word { color: var(--accent-blue); }
+
+.tpl-headline .body {
+  font-family: var(--font-body);
+  font-size: 52px;
+  color: var(--text-primary);
+  max-width: 22ch;
+  line-height: 1.3;
+}
+
+.tpl-headline .tag {
+  margin-top: 20px;
+  font-family: var(--font-body);
+  font-size: 38px;
+  color: var(--text-light);
+}
+
+/* Stage variants scale headline appropriately for tall/wide */
+#stage.aspect-9x16 .tpl-headline .headline { font-size: 220px; }
+#stage.aspect-9x16 .tpl-headline .body { font-size: 60px; }
+#stage.aspect-16x9 .tpl-headline .headline { font-size: 160px; }
+#stage.aspect-16x9 .tpl-headline .body { font-size: 46px; }
+
+/* ===== Template: quiz snippet (two-option reveal) ===== */
+.tpl-quiz {
+  width: 100%;
+  height: 100%;
+  padding: 90px 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 40px;
+}
+
+.tpl-quiz .question-card {
+  padding: 46px 56px;
+  text-align: center;
+}
+
+.tpl-quiz .question-card .q-label {
+  font-family: var(--font-body);
+  font-size: 34px;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.tpl-quiz .question-card .q-text {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: 96px;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+
+.tpl-quiz .options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+  margin-top: 20px;
+}
+
+.tpl-quiz .option {
+  padding: 38px 28px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 42px;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.tpl-quiz .option.coral {
+  border: 2px solid var(--accent-coral);
+  background: rgba(232, 141, 122, 0.1);
+  transform: rotate(-0.8deg);
+}
+
+.tpl-quiz .option.blue {
+  border: 2px solid var(--accent-blue);
+  background: rgba(107, 141, 173, 0.1);
+  transform: rotate(0.8deg);
+}
+
+.tpl-quiz .footer {
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: 54px;
+  color: var(--accent-coral);
+  margin-top: 20px;
+}
+
+/* ===== Template: quote ===== */
+.tpl-quote {
+  width: 100%;
+  height: 100%;
+  padding: 90px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  text-align: center;
+}
+
+.tpl-quote .mark {
+  font-family: var(--font-hand);
+  font-size: 240px;
+  color: var(--accent-coral);
+  line-height: 0.7;
+  opacity: 0.55;
+}
+
+.tpl-quote .quote {
+  font-family: var(--font-hand);
+  font-weight: 500;
+  font-size: 108px;
+  line-height: 1.12;
+  color: var(--text-primary);
+  max-width: 16ch;
+}
+
+.tpl-quote .attribution {
+  font-family: var(--font-body);
+  font-size: 42px;
+  color: var(--text-secondary);
+  margin-top: 14px;
+}
+
+/* ===== Template: stat ===== */
+.tpl-stat {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 60px;
+  text-align: center;
+  gap: 30px;
+}
+
+.tpl-stat .eyebrow {
+  font-family: var(--font-body);
+  font-size: 46px;
+  color: var(--text-secondary);
+}
+
+.tpl-stat .number {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 420px;
+  line-height: 0.95;
+  color: var(--accent-coral);
+}
+
+.tpl-stat .label {
+  font-family: var(--font-body);
+  font-size: 58px;
+  color: var(--text-primary);
+  max-width: 20ch;
+  line-height: 1.25;
+}
+
+/* ===== Template: list (up to 6 bullet items) ===== */
+.tpl-list {
+  width: 100%;
+  height: 100%;
+  padding: 90px 70px 130px 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+
+.tpl-list .title {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: 120px;
+  line-height: 1.05;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+}
+
+.tpl-list .item {
+  font-family: var(--font-body);
+  font-size: 52px;
+  line-height: 1.3;
+  color: var(--text-primary);
+  padding-left: 46px;
+  position: relative;
+}
+
+.tpl-list .item::before {
+  content: '♥';
+  position: absolute;
+  left: 0;
+  color: var(--accent-coral);
+}
+
+.tpl-list .footer {
+  margin-top: 26px;
+  font-family: var(--font-hand);
+  font-size: 54px;
+  color: var(--accent-coral);
+}
+
+/* Tight layout when list has 6+ items on 1:1 */
+#stage.aspect-1x1 .tpl-list.dense .title { font-size: 100px; margin-bottom: 12px; }
+#stage.aspect-1x1 .tpl-list.dense .item { font-size: 46px; }
+#stage.aspect-1x1 .tpl-list.dense { gap: 18px; }
+
+/* ===== Template: carousel cover (with swipe cue) ===== */
+.tpl-cover {
+  width: 100%;
+  height: 100%;
+  padding: 80px 60px 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 40px;
+}
+
+.tpl-cover .eyebrow {
+  font-family: var(--font-body);
+  font-size: 48px;
+  color: var(--text-secondary);
+}
+
+.tpl-cover .title {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 160px;
+  line-height: 1.02;
+  color: var(--text-primary);
+  max-width: 16ch;
+}
+
+.tpl-cover .subtitle {
+  font-family: var(--font-body);
+  font-size: 54px;
+  color: var(--text-primary);
+  max-width: 22ch;
+  line-height: 1.3;
+}
+
+.tpl-cover .swipe-cue {
+  margin-top: auto;
+  padding-top: 40px;
+  font-family: var(--font-hand);
+  font-size: 58px;
+  color: var(--accent-coral);
+}
+
+/* 9:16 has more vertical room — scale cover title up */
+#stage.aspect-9x16 .tpl-cover .title { font-size: 220px; }
+#stage.aspect-9x16 .tpl-cover .subtitle { font-size: 60px; }
+#stage.aspect-9x16 .tpl-cover .swipe-cue { font-size: 64px; }
+
+/* ===== Doodle hearts scattered in margins ===== */
+.doodle {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.doodle-heart-1 { top: 6%; right: 8%; transform: rotate(14deg); }
+.doodle-heart-2 { bottom: 9%; left: 6%; transform: rotate(-18deg); }
+.doodle-star-1 { top: 10%; left: 7%; transform: rotate(-8deg); }
+.doodle-sparkle-1 { bottom: 12%; right: 10%; transform: rotate(22deg); }
+
+/* Brand mark bottom corner */
+.brand-mark {
+  position: absolute;
+  bottom: 36px;
+  right: 52px;
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: 48px;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+
+.brand-mark::before {
+  content: '♥ ';
+  color: var(--accent-coral);
+}
