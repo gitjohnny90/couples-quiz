@@ -398,20 +398,6 @@ export default function DailyPhotoSectionPage() {
         {stepIndicator}
         {progressBar}
 
-        {currentPromptIndex > 0 && (
-          <button
-            onClick={handleBackPrompt}
-            type="button"
-            className="btn btn-secondary"
-            style={{
-              width: '100%', marginBottom: 12,
-              fontFamily: 'var(--font-hand)', fontSize: '1rem',
-            }}
-          >
-            ← back to previous prompt
-          </button>
-        )}
-
         {existingPhotoForCurrent && (
           <p style={{
             fontFamily: 'var(--font-hand)', fontSize: '0.9rem',
@@ -439,6 +425,20 @@ export default function DailyPhotoSectionPage() {
             />
           </motion.div>
         </AnimatePresence>
+
+        {currentPromptIndex > 0 && (
+          <button
+            onClick={handleBackPrompt}
+            type="button"
+            className="btn btn-secondary"
+            style={{
+              width: '100%', marginTop: 12,
+              fontFamily: 'var(--font-hand)', fontSize: '1rem',
+            }}
+          >
+            ← back to previous prompt
+          </button>
+        )}
       </motion.div>
     </div>
   )
