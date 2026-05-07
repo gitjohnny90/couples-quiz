@@ -249,111 +249,112 @@ export default function PersonalityPage() {
           )}
           {activeTab === 'compare' && (
             <motion.div key="compare" initial={{ opacity: 0, x: 15 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 15 }}>
-              {!partnerProfile ? (
-                <div className="glass" style={{ padding: 28, textAlign: 'center' }}>
-                  <DoodleFlower size={30} opacity={0.4} style={{ margin: '0 auto 10px' }} />
-                  <h3 style={{ fontFamily: 'var(--font-hand)', fontSize: '1.4rem', marginBottom: 8 }}>
+              <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic', lineHeight: 1.4, marginBottom: 6 }}>
+                  compatibility is fun to compare, but don't get too caught up in the score
+                </p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', lineHeight: 1.4 }}>
+                  differences and opposite traits can bring balance in a lifelong partnership — it's all about understanding each other
+                </p>
+              </div>
+
+              {!partnerProfile && (
+                <div className="glass" style={{ padding: 14, marginBottom: 14, textAlign: 'center' }}>
+                  <DoodleFlower size={22} opacity={0.4} style={{ margin: '0 auto 6px' }} />
+                  <p style={{ fontFamily: 'var(--font-hand)', fontSize: '1.05rem', color: 'var(--text-primary)', marginBottom: 2 }}>
                     {partnerName ? `${partnerName} hasn't filled this in yet` : 'waiting for your person to join'}
-                  </h3>
-                  <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-                    once they save their profile, comparisons show up here!
+                  </p>
+                  <p style={{ color: 'var(--text-light)', fontSize: '0.8rem', fontStyle: 'italic' }}>
+                    your side fills in as soon as you save — their side appears once they save theirs
                   </p>
                 </div>
-              ) : (
-                <>
-                  <div style={{ textAlign: 'center', marginBottom: 16 }}>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic', lineHeight: 1.4, marginBottom: 6 }}>
-                      compatibility is fun to compare, but don't get too caught up in the score
-                    </p>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontStyle: 'italic', lineHeight: 1.4 }}>
-                      differences and opposite traits can bring balance in a lifelong partnership — it's all about understanding each other
-                    </p>
-                  </div>
+              )}
 
-                  {/* Love Languages comparison */}
-                  <div className="glass" style={sectionStyle}>
-                    {sectionTitle('💕', 'love languages')}
-                    {LOVE_LANGUAGES.map((lang) => {
-                      const my = myProfile.love_languages?.[lang] || 0
-                      const their = partnerProfile.love_languages?.[lang] || 0
-                      return (
-                        <div key={lang} style={{ marginBottom: 14 }}>
-                          <p style={{ fontSize: '0.9rem', marginBottom: 6 }}>{lang}</p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--accent-coral)', fontFamily: 'var(--font-hand)', width: 55, flexShrink: 0 }}>{playerName}</span>
-                            <div style={{ flex: 1, height: 6, background: 'var(--rule-line)', borderRadius: 3, overflow: 'hidden' }}>
-                              <div style={{ width: `${my * 10}%`, height: '100%', background: 'var(--accent-coral)', borderRadius: 3 }} />
-                            </div>
-                            <span style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', width: 20 }}>{my}</span>
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <span style={{ fontSize: '0.8rem', color: 'var(--accent-blue)', fontFamily: 'var(--font-hand)', width: 55, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{partnerName}</span>
-                            <div style={{ flex: 1, height: 6, background: 'var(--rule-line)', borderRadius: 3, overflow: 'hidden' }}>
-                              <div style={{ width: `${their * 10}%`, height: '100%', background: 'var(--accent-blue)', borderRadius: 3 }} />
-                            </div>
-                            <span style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', width: 20 }}>{their}</span>
-                          </div>
+              {/* Love Languages comparison */}
+              <div className="glass" style={sectionStyle}>
+                {sectionTitle('💕', 'love languages')}
+                {LOVE_LANGUAGES.map((lang) => {
+                  const my = myProfile.love_languages?.[lang] || 0
+                  const their = partnerProfile?.love_languages?.[lang]
+                  const theirSet = typeof their === 'number'
+                  return (
+                    <div key={lang} style={{ marginBottom: 14 }}>
+                      <p style={{ fontSize: '0.9rem', marginBottom: 6 }}>{lang}</p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--accent-coral)', fontFamily: 'var(--font-hand)', width: 55, flexShrink: 0 }}>{playerName}</span>
+                        <div style={{ flex: 1, height: 6, background: 'var(--rule-line)', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{ width: `${my * 10}%`, height: '100%', background: 'var(--accent-coral)', borderRadius: 3 }} />
                         </div>
-                      )
-                    })}
-                  </div>
-
-                  {/* Side by side cards */}
-                  {[
-                    { emoji: '🧠', label: 'mbti / 16 personalities', key: 'mbti' },
-                    { emoji: '🔢', label: 'enneagram', key: 'enneagram' },
-                    { emoji: '🔗', label: 'attachment style', key: 'attachment_style' },
-                    { emoji: '⚔️', label: 'conflict style', key: 'conflict_style' },
-                  ].map(({ emoji, label, key }) => {
-                    const myV = myProfile[key] || 'not set'
-                    const theirV = partnerProfile[key] || 'not set'
-                    const match = myV === theirV && myV !== 'not set'
-                    return (
-                      <div key={key} className="glass" style={sectionStyle}>
-                        {sectionTitle(emoji, label)}
-                        <div style={{ display: 'flex', gap: 10 }}>
-                          <div style={{ flex: 1, textAlign: 'center' }}>
-                            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-coral)', marginBottom: 4 }}>{playerName}</p>
-                            <div style={{ background: '#FFF5E9', border: '1px solid var(--accent-coral-light)', borderRadius: 3, padding: '10px 8px', fontWeight: 600, fontSize: '0.9rem' }}>{myV}</div>
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', fontFamily: 'var(--font-hand)', fontSize: '1.2rem' }}>
-                            {match ? <DoodleHeart size={18} color="var(--accent-sage)" opacity={0.7} /> : '~'}
-                          </div>
-                          <div style={{ flex: 1, textAlign: 'center' }}>
-                            <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-blue)', marginBottom: 4 }}>{partnerName}</p>
-                            <div style={{ background: '#EDF3F8', border: '1px solid #B8CFDF', borderRadius: 3, padding: '10px 8px', fontWeight: 600, fontSize: '0.9rem' }}>{theirV}</div>
-                          </div>
-                        </div>
+                        <span style={{ fontFamily: 'var(--font-hand)', fontSize: '1rem', width: 20 }}>{my}</span>
                       </div>
-                    )
-                  })}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--accent-blue)', fontFamily: 'var(--font-hand)', width: 55, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{partnerName || 'partner'}</span>
+                        <div style={{ flex: 1, height: 6, background: 'var(--rule-line)', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{ width: `${(theirSet ? their : 0) * 10}%`, height: '100%', background: 'var(--accent-blue)', borderRadius: 3 }} />
+                        </div>
+                        <span style={{ fontFamily: 'var(--font-hand)', fontSize: theirSet ? '1rem' : '0.75rem', color: theirSet ? 'inherit' : 'var(--text-light)', fontStyle: theirSet ? 'normal' : 'italic', width: 28, textAlign: 'right' }}>
+                          {theirSet ? their : '—'}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
 
-                  {/* Working Genius */}
-                  <div className="glass" style={sectionStyle}>
-                    {sectionTitle('⚡', 'working genius')}
+              {/* Side by side cards */}
+              {[
+                { emoji: '🧠', label: 'mbti / 16 personalities', key: 'mbti' },
+                { emoji: '🔢', label: 'enneagram', key: 'enneagram' },
+                { emoji: '🔗', label: 'attachment style', key: 'attachment_style' },
+                { emoji: '⚔️', label: 'conflict style', key: 'conflict_style' },
+              ].map(({ emoji, label, key }) => {
+                const myV = myProfile[key] || 'not set'
+                const theirV = partnerProfile?.[key] || 'not set'
+                const match = myV === theirV && myV !== 'not set'
+                return (
+                  <div key={key} className="glass" style={sectionStyle}>
+                    {sectionTitle(emoji, label)}
                     <div style={{ display: 'flex', gap: 10 }}>
-                      <div style={{ flex: 1 }}>
-                        <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-coral)', marginBottom: 6 }}>{playerName}</p>
-                        {(myProfile.working_genius || []).length > 0
-                          ? (myProfile.working_genius || []).map((g) => (
-                              <div key={g} style={{ background: '#FFF5E9', border: '1px solid var(--accent-coral-light)', borderRadius: 3, padding: '6px 10px', marginBottom: 5, fontSize: '0.85rem' }}>{g}</div>
-                            ))
-                          : <p style={{ color: 'var(--text-light)', fontStyle: 'italic', fontSize: '0.85rem' }}>not set</p>
-                        }
+                      <div style={{ flex: 1, textAlign: 'center' }}>
+                        <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-coral)', marginBottom: 4 }}>{playerName}</p>
+                        <div style={{ background: '#FFF5E9', border: '1px solid var(--accent-coral-light)', borderRadius: 3, padding: '10px 8px', fontWeight: 600, fontSize: '0.9rem' }}>{myV}</div>
                       </div>
-                      <div style={{ flex: 1 }}>
-                        <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-blue)', marginBottom: 6 }}>{partnerName}</p>
-                        {(partnerProfile.working_genius || []).length > 0
-                          ? (partnerProfile.working_genius || []).map((g) => (
-                              <div key={g} style={{ background: '#EDF3F8', border: '1px solid #B8CFDF', borderRadius: 3, padding: '6px 10px', marginBottom: 5, fontSize: '0.85rem' }}>{g}</div>
-                            ))
-                          : <p style={{ color: 'var(--text-light)', fontStyle: 'italic', fontSize: '0.85rem' }}>not set</p>
-                        }
+                      <div style={{ display: 'flex', alignItems: 'center', fontFamily: 'var(--font-hand)', fontSize: '1.2rem' }}>
+                        {match ? <DoodleHeart size={18} color="var(--accent-sage)" opacity={0.7} /> : '~'}
+                      </div>
+                      <div style={{ flex: 1, textAlign: 'center' }}>
+                        <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-blue)', marginBottom: 4 }}>{partnerName || 'partner'}</p>
+                        <div style={{ background: '#EDF3F8', border: '1px solid #B8CFDF', borderRadius: 3, padding: '10px 8px', fontWeight: 600, fontSize: '0.9rem' }}>{theirV}</div>
                       </div>
                     </div>
                   </div>
-                </>
-              )}
+                )
+              })}
+
+              {/* Working Genius */}
+              <div className="glass" style={sectionStyle}>
+                {sectionTitle('⚡', 'working genius')}
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-coral)', marginBottom: 6 }}>{playerName}</p>
+                    {(myProfile.working_genius || []).length > 0
+                      ? (myProfile.working_genius || []).map((g) => (
+                          <div key={g} style={{ background: '#FFF5E9', border: '1px solid var(--accent-coral-light)', borderRadius: 3, padding: '6px 10px', marginBottom: 5, fontSize: '0.85rem' }}>{g}</div>
+                        ))
+                      : <p style={{ color: 'var(--text-light)', fontStyle: 'italic', fontSize: '0.85rem' }}>not set</p>
+                    }
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.95rem', color: 'var(--accent-blue)', marginBottom: 6 }}>{partnerName || 'partner'}</p>
+                    {(partnerProfile?.working_genius || []).length > 0
+                      ? (partnerProfile.working_genius || []).map((g) => (
+                          <div key={g} style={{ background: '#EDF3F8', border: '1px solid #B8CFDF', borderRadius: 3, padding: '6px 10px', marginBottom: 5, fontSize: '0.85rem' }}>{g}</div>
+                        ))
+                      : <p style={{ color: 'var(--text-light)', fontStyle: 'italic', fontSize: '0.85rem' }}>not set</p>
+                    }
+                  </div>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
