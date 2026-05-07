@@ -1,5 +1,5 @@
 /**
- * Hot Takes statements — 80 total across 4 categories, 16 groups of 5.
+ * Hot Takes statements — 100 total across 5 categories, 20 groups of 5.
  */
 
 const hotTakesCategories = [
@@ -207,6 +207,58 @@ const hotTakesCategories = [
           { id: 'gb-takes-18', text: 'If a road\'s empty at 3am, the speed limit is just a suggestion' },
           { id: 'gb-takes-19', text: 'Saying "bless you" after a sneeze is mandatory — people who skip it are choosing chaos' },
           { id: 'gb-takes-20', text: 'You\'re either a person who reads cereal boxes at breakfast or you\'re not, and that says everything' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'end-of-world',
+    label: 'End of the World',
+    emoji: '🧟',
+    description: 'apocalypse roles and survival hypotheticals',
+    groups: [
+      {
+        id: 'eotw-1',
+        label: 'Apocalypse Roles',
+        statements: [
+          { id: 'eotw-takes-1', text: 'In a zombie apocalypse, you\'d die in the first week trying to do something heroic' },
+          { id: 'eotw-takes-2', text: 'If aliens invaded, I\'d absolutely try to negotiate before fighting' },
+          { id: 'eotw-takes-3', text: 'In a horror movie, you\'d be the one who splits up from the group' },
+          { id: 'eotw-takes-4', text: 'If society collapsed, you\'d be cutting hair for cans of beans within 6 months' },
+          { id: 'eotw-takes-5', text: 'In a disaster movie, I\'d be the comedic relief who somehow survives' },
+        ],
+      },
+      {
+        id: 'eotw-2',
+        label: 'Stranded Together',
+        statements: [
+          { id: 'eotw-takes-6', text: 'If we were stuck on a deserted island, you\'d lose your mind first' },
+          { id: 'eotw-takes-7', text: 'I could start a fire from scratch in under 30 minutes' },
+          { id: 'eotw-takes-8', text: 'You\'d absolutely eat a weird-looking berry "just to see"' },
+          { id: 'eotw-takes-9', text: 'I\'d be the first one trying to build a shelter' },
+          { id: 'eotw-takes-10', text: 'You\'d waste all our energy trying to spell SOS in shells' },
+        ],
+      },
+      {
+        id: 'eotw-3',
+        label: 'Doomsday Prep',
+        statements: [
+          { id: 'eotw-takes-11', text: 'I have an actual go-bag (or I really should)' },
+          { id: 'eotw-takes-12', text: 'I know exactly which window I\'d break to escape our home' },
+          { id: 'eotw-takes-13', text: 'I\'ve thought about what I\'d grab in a fire and the list is too long' },
+          { id: 'eotw-takes-14', text: 'I keep a flashlight in a specific place "just in case"' },
+          { id: 'eotw-takes-15', text: 'I have a fully formed plan for if the power went out for a week' },
+        ],
+      },
+      {
+        id: 'eotw-4',
+        label: 'Final Hours',
+        statements: [
+          { id: 'eotw-takes-16', text: 'If we had 24 hours left, you\'d absolutely spend the first 3 of them stuck in traffic somewhere stupid' },
+          { id: 'eotw-takes-17', text: 'If I had one last meal, it would be something embarrassingly basic' },
+          { id: 'eotw-takes-18', text: 'If the world ended tomorrow, you\'d still try to hit the gym in the morning' },
+          { id: 'eotw-takes-19', text: 'If I had one hour left, I\'d waste at least 15 minutes scrolling my phone' },
+          { id: 'eotw-takes-20', text: 'I\'d be eerily calm if we had 24 hours left' },
         ],
       },
     ],
