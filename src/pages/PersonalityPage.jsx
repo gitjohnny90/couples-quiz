@@ -44,22 +44,20 @@ export default function PersonalityPage() {
   const [activeTab, setActiveTab] = useState('edit')
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => { fetchProfiles() }, [sessionId])
+  useEffect(() => { fetchProfiles({ includeMine: true }) }, [sessionId])
 
-  useEffect(() => {
-    if (partnerProfile) return
-    const interval = setInterval(fetchProfiles, 5000)
-    return () => clearInterval(interval)
-  }, [sessionId, partnerProfile])
-
-  const fetchProfiles = async () => {
+  // Fetch profiles. Pass includeMine: true only on initial load and immediately after a save.
+  // Polling and tab switches use includeMine: false so we never overwrite unsaved local edits.
+  const fetchProfiles = async ({ includeMine = false } = {}) => {
     const { data: session } = await supabase.from('sessions').select('player1_name, player2_name').eq('id', sessionId).single()
     if (session) setPartnerName(playerId === 'player1' ? session.player2_name : session.player1_name || '')
     const { data: profiles } = await supabase.from('profiles').select('player_id, profile_data').eq('session_id', sessionId)
     if (profiles) {
-      const mine = profiles.find((p) => p.player_id === playerId)
+      if (includeMine) {
+        const mine = profiles.find((p) => p.player_id === playerId)
+        if (mine?.profile_data) setMyProfile({ ...defaultProfile, ...mine.profile_data })
+      }
       const theirs = profiles.find((p) => p.player_id !== playerId)
-      if (mine?.profile_data) setMyProfile({ ...defaultProfile, ...mine.profile_data })
       if (theirs?.profile_data) setPartnerProfile(theirs.profile_data)
     }
     setLoading(false)
@@ -75,6 +73,8 @@ export default function PersonalityPage() {
       )
       if (error) throw error
       setSaved(true); setTimeout(() => setSaved(false), 2000)
+      // Refresh partner data after a successful save (in case they saved while we were editing)
+      fetchProfiles({ includeMine: false })
     } catch (err) {
       setSaveError("couldn't save — try again")
       setTimeout(() => setSaveError(''), 3000)
@@ -136,7 +136,10 @@ export default function PersonalityPage() {
           {[['edit', 'my page'], ['compare', 'compare']].map(([key, label]) => (
             <button
               key={key}
-              onClick={() => setActiveTab(key)}
+              onClick={() => {
+                setActiveTab(key)
+                if (key === 'compare') fetchProfiles({ includeMine: false })
+              }}
               style={{
                 flex: 1, padding: '10px 0', borderRadius: '6px 6px 0 0',
                 border: `1.5px solid ${activeTab === key ? 'var(--border-pencil-dark)' : 'var(--border-pencil)'}`,
