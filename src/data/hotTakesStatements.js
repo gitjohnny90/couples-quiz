@@ -1,5 +1,5 @@
 /**
- * Hot Takes statements — 100 total across 5 categories, 20 groups of 5.
+ * Hot Takes statements — 120 total across 6 categories, 24 groups of 5.
  */
 
 const hotTakesCategories = [
@@ -259,6 +259,58 @@ const hotTakesCategories = [
           { id: 'eotw-takes-18', text: 'If the world ended tomorrow, you\'d still try to hit the gym in the morning' },
           { id: 'eotw-takes-19', text: 'If I had one hour left, I\'d waste at least 15 minutes scrolling my phone' },
           { id: 'eotw-takes-20', text: 'I\'d be eerily calm if we had 24 hours left' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'brain-goblins',
+    label: 'Brain Goblins',
+    emoji: '🧠',
+    description: 'weird thoughts you\'ve never said out loud',
+    groups: [
+      {
+        id: 'bg-1',
+        label: 'Intrusive Thoughts',
+        statements: [
+          { id: 'bg-takes-1', text: 'I sometimes imagine just dropping the thing I\'m holding for no reason' },
+          { id: 'bg-takes-2', text: 'I\'ve had the thought "what if I just yelled right now" in a quiet public place' },
+          { id: 'bg-takes-3', text: 'My brain offers up a cringe memory from 8 years ago, completely unprompted, on a regular basis' },
+          { id: 'bg-takes-4', text: 'I\'ve imagined wildly inappropriate responses to normal questions and had to actively not say them' },
+          { id: 'bg-takes-5', text: 'My brain occasionally suggests something chaotic just to see if I\'d do it — I won\'t, but it\'s loud' },
+        ],
+      },
+      {
+        id: 'bg-2',
+        label: 'Irrational Fears',
+        statements: [
+          { id: 'bg-takes-6', text: 'I do not trust escalators and I have a backup plan for every single one' },
+          { id: 'bg-takes-7', text: 'I\'m convinced something is in the dark hallway when I have to walk past it' },
+          { id: 'bg-takes-8', text: 'I cannot eat the last piece of food in front of people, even close friends' },
+          { id: 'bg-takes-9', text: 'I check the back seat of my car for murderers — even when I just got out of it' },
+          { id: 'bg-takes-10', text: 'I think a wave will come up and grab me at the beach if I turn my back to the ocean' },
+        ],
+      },
+      {
+        id: 'bg-3',
+        label: 'Daydream Plans',
+        statements: [
+          { id: 'bg-takes-11', text: 'I have a fully-rehearsed speech for what I\'d say if I went viral' },
+          { id: 'bg-takes-12', text: 'I have an exact plan for what I\'d do if I won the lottery and it\'s surprisingly weird' },
+          { id: 'bg-takes-13', text: 'I\'ve imagined how I\'d react in an emergency so many times it might actually backfire' },
+          { id: 'bg-takes-14', text: 'I have a dream house designed in my head that has at least one impractical room' },
+          { id: 'bg-takes-15', text: 'I\'ve cast a movie about my own life and I won\'t reveal who plays me' },
+        ],
+      },
+      {
+        id: 'bg-4',
+        label: '2 AM Brain',
+        statements: [
+          { id: 'bg-takes-16', text: 'I\'ve been kept awake by a conversation from 6 years ago that I should have ended differently' },
+          { id: 'bg-takes-17', text: 'My brain has full panic attacks about something I forgot — that I actually didn\'t forget' },
+          { id: 'bg-takes-18', text: 'I lie awake spiraling about a specific embarrassing thing I did that no one else remembers' },
+          { id: 'bg-takes-19', text: 'I\'ve stayed up writing imaginary text messages I\'ll never send' },
+          { id: 'bg-takes-20', text: 'My brain saves the heaviest existential questions specifically for 3am' },
         ],
       },
     ],
