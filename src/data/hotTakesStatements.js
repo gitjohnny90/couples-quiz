@@ -1,5 +1,5 @@
 /**
- * Hot Takes statements — 50 total across 3 categories, 10 groups of 5.
+ * Hot Takes statements — 80 total across 4 categories, 16 groups of 5.
  */
 
 const hotTakesCategories = [
@@ -155,6 +155,58 @@ const hotTakesCategories = [
           { id: 'takes-48', text: 'Ranch goes on everything' },
           { id: 'takes-49', text: 'The best part of the Oreo is the cookie, not the cream' },
           { id: 'takes-50', text: 'You\'re either a shower thinker or a can\'t-think-in-the-shower person and this says everything about you' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'goofball',
+    label: 'Goofball',
+    emoji: '🦆',
+    description: 'pure chaos, accuse each other freely',
+    groups: [
+      {
+        id: 'goofball-1',
+        label: 'Confess Your Crimes',
+        statements: [
+          { id: 'gb-takes-1', text: 'I\'ve had a full conversation with a pet I\'m 90% sure understood every word' },
+          { id: 'gb-takes-2', text: 'I rehearse phone calls in my head before I make them' },
+          { id: 'gb-takes-3', text: 'I\'ve eaten food off the floor and acted like nothing happened' },
+          { id: 'gb-takes-4', text: 'I\'ve absolutely faked knowing a song\'s lyrics by mumbling the whole way through' },
+          { id: 'gb-takes-5', text: 'I\'ve parked, turned off the car, and then just sat there way longer than I meant to' },
+        ],
+      },
+      {
+        id: 'goofball-2',
+        label: 'In an Emergency',
+        statements: [
+          { id: 'gb-takes-6', text: 'If we got attacked by a flock of geese right now, you\'d freeze and I\'d carry the team' },
+          { id: 'gb-takes-7', text: 'If we got dropped in the wilderness with nothing, you\'d last about 36 hours' },
+          { id: 'gb-takes-8', text: 'If a horror movie scenario started in real life, you\'d be the one going to investigate the noise' },
+          { id: 'gb-takes-9', text: 'If we had to fight one angry toddler, only one of us is making it home' },
+          { id: 'gb-takes-10', text: 'If a zombie outbreak hit, you\'d panic-buy something pointless in the first hour' },
+        ],
+      },
+      {
+        id: 'goofball-3',
+        label: 'You Specifically',
+        statements: [
+          { id: 'gb-takes-11', text: 'You\'d 100% try to befriend a wild raccoon' },
+          { id: 'gb-takes-12', text: 'You walk into rooms and forget why you came in there at least twice a day' },
+          { id: 'gb-takes-13', text: 'You talk to the GPS like it can hear you' },
+          { id: 'gb-takes-14', text: 'You\'d lose a 1v1 fight against a goose' },
+          { id: 'gb-takes-15', text: 'You\'d absolutely try to swim across that body of water "just to see"' },
+        ],
+      },
+      {
+        id: 'goofball-4',
+        label: 'Hot-Button Nonsense',
+        statements: [
+          { id: 'gb-takes-16', text: 'Talking to plants makes them grow better and I will defend this with my life' },
+          { id: 'gb-takes-17', text: 'The 5-second rule is real and the science backs me up' },
+          { id: 'gb-takes-18', text: 'If a road\'s empty at 3am, the speed limit is just a suggestion' },
+          { id: 'gb-takes-19', text: 'Saying "bless you" after a sneeze is mandatory — people who skip it are choosing chaos' },
+          { id: 'gb-takes-20', text: 'You\'re either a person who reads cereal boxes at breakfast or you\'re not, and that says everything' },
         ],
       },
     ],
