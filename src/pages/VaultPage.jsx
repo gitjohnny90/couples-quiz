@@ -48,11 +48,19 @@ export default function VaultPage() {
 
     setSession(sessionData)
 
-    // Multiple choice completion count
+    // Multiple choice completion count — only count rows for actual quiz pack IDs.
+    // The responses table also holds drawings, tic-tac-toe, heartline, daily-photos,
+    // study-together, vision, love-notes guesses, and nudges, which would otherwise
+    // inflate the count.
+    const validQuizPackIds = new Set(quizPacks.map(p => p.id))
     const { data: responseData } = await supabase.from('responses').select('pack_id, player_id, answers').eq('session_id', sessionId)
     if (responseData) {
       const packMap = {}
-      responseData.forEach((r) => { if (!packMap[r.pack_id]) packMap[r.pack_id] = []; packMap[r.pack_id].push(r) })
+      responseData.forEach((r) => {
+        if (!validQuizPackIds.has(r.pack_id)) return
+        if (!packMap[r.pack_id]) packMap[r.pack_id] = []
+        packMap[r.pack_id].push(r)
+      })
       const done = Object.values(packMap).filter((responses) => responses.length >= 2).length
       setMcCompletedCount(done)
     }
@@ -89,11 +97,13 @@ export default function VaultPage() {
       .select('statement_id, player_id, vote, defense')
       .eq('session_id', sessionId)
     if (htData) {
+      // A group is complete when both partners have voted on all 5 statements.
+      // Defenses are optional in the game, so don't require them.
       const done = allHotTakeGroups.filter(group =>
         group.statements.every(st => {
           const mine = htData.find(v => v.statement_id === st.id && v.player_id === playerId)
           const theirs = htData.find(v => v.statement_id === st.id && v.player_id !== playerId)
-          return mine && theirs && (mine.vote === theirs.vote || (mine.defense && theirs.defense))
+          return mine && theirs
         })
       ).length
       setHtCompletedGroups(done)
