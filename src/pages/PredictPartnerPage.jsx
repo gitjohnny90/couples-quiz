@@ -214,6 +214,16 @@ export default function PredictPartnerPage() {
     setError('')
   }
 
+  const handleBackQuestion = () => {
+    if (questionIndex === 0 || submittedAnswers.length === 0) return
+    const prev = submittedAnswers[submittedAnswers.length - 1]
+    setSubmittedAnswers(submittedAnswers.slice(0, -1))
+    setQuestionIndex(questionIndex - 1)
+    setOwnAnswer(prev.ownAnswer)
+    setPrediction(prev.prediction)
+    setError('')
+  }
+
   // ── Loading ──
 
   if (loading) {
@@ -451,14 +461,26 @@ export default function PredictPartnerPage() {
           </div>
 
           {/* Submit */}
-          <button
-            className="btn btn-primary"
-            onClick={handleSubmitAnswer}
-            disabled={saving || !ownAnswer.trim() || !prediction.trim()}
-            style={{ width: '100%' }}
-          >
-            {saving ? 'saving...' : questionIndex < 2 ? 'next →' : 'submit'}
-          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            {questionIndex > 0 && (
+              <button
+                className="btn btn-secondary"
+                onClick={handleBackQuestion}
+                disabled={saving}
+                style={{ flex: 1 }}
+              >
+                ← back
+              </button>
+            )}
+            <button
+              className="btn btn-primary"
+              onClick={handleSubmitAnswer}
+              disabled={saving || !ownAnswer.trim() || !prediction.trim()}
+              style={{ flex: questionIndex > 0 ? 2 : 1 }}
+            >
+              {saving ? 'saving...' : questionIndex < 2 ? 'next →' : 'submit'}
+            </button>
+          </div>
 
           {error && (
             <p style={{ color: 'var(--accent-coral)', fontSize: '0.85rem', textAlign: 'center', marginTop: 10, fontStyle: 'italic' }}>

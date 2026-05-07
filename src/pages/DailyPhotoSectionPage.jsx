@@ -22,6 +22,7 @@ export default function DailyPhotoSectionPage() {
 
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0)
   const [screen, setScreen] = useState('loading') // 'loading' | 'prompting' | 'waiting'
+  const [submittedPhotos, setSubmittedPhotos] = useState([]) // photos saved this session, used to show "previously submitted" preview when going back
 
   // On mount, fetch existing player row and resume at correct prompt index
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function DailyPhotoSectionPage() {
       // answers shape: { [sectionId]: { photos: [...], completedAt? }, ... }
       const sectionData = answers?.[sectionId]
       if (sectionData && Array.isArray(sectionData.photos)) {
+        setSubmittedPhotos(sectionData.photos)
         if (sectionData.completedAt) {
           // Player already completed this section — go to waiting
           setScreen('waiting')
@@ -56,6 +58,7 @@ export default function DailyPhotoSectionPage() {
           setScreen('prompting')
         }
       } else {
+        setSubmittedPhotos([])
         setCurrentPromptIndex(0)
         setScreen('prompting')
       }
@@ -198,12 +201,23 @@ export default function DailyPhotoSectionPage() {
 
   async function handlePhotoSubmit(path, caption) {
     await savePromptAnswer(path, caption, currentPromptIndex)
+    setSubmittedPhotos(prev => {
+      const next = prev.filter(p => p.promptIndex !== currentPromptIndex)
+      next.push({ promptIndex: currentPromptIndex, path, caption })
+      return next
+    })
     if (currentPromptIndex < 2) {
       setCurrentPromptIndex(prev => prev + 1)
     } else {
       // Last prompt submitted — move to waiting and check partner
       setScreen('waiting')
       checkBothComplete()
+    }
+  }
+
+  function handleBackPrompt() {
+    if (currentPromptIndex > 0) {
+      setCurrentPromptIndex(prev => prev - 1)
     }
   }
 
@@ -369,6 +383,8 @@ export default function DailyPhotoSectionPage() {
 
   // ── Prompting screen ─────────────────────────────────────────────────────
 
+  const existingPhotoForCurrent = submittedPhotos.find(p => p.promptIndex === currentPromptIndex)
+
   return (
     <div className="page" style={{ position: 'relative' }}>
       <PageGuide pageKey="dailyPhotoSection" />
@@ -381,6 +397,30 @@ export default function DailyPhotoSectionPage() {
         {header}
         {stepIndicator}
         {progressBar}
+
+        {currentPromptIndex > 0 && (
+          <button
+            onClick={handleBackPrompt}
+            type="button"
+            className="btn btn-secondary"
+            style={{
+              width: '100%', marginBottom: 12,
+              fontFamily: 'var(--font-hand)', fontSize: '1rem',
+            }}
+          >
+            ← back to previous prompt
+          </button>
+        )}
+
+        {existingPhotoForCurrent && (
+          <p style={{
+            fontFamily: 'var(--font-hand)', fontSize: '0.9rem',
+            color: 'var(--accent-coral)', textAlign: 'center',
+            marginBottom: 12, fontStyle: 'italic',
+          }}>
+            you already saved a photo here — adding a new one will replace it
+          </p>
+        )}
 
         <AnimatePresence mode="wait">
           <motion.div

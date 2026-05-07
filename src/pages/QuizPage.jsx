@@ -249,7 +249,9 @@ export default function QuizPage() {
                 ← back
               </button>
             ) : (
-              <div style={{ flex: 1 }} />
+              <button className="btn btn-secondary" onClick={() => navigate(`/quiz-packs/${sessionId}`)} disabled={submitted} style={{ flex: 1 }}>
+                ← packs
+              </button>
             )}
             <button className="btn btn-primary" onClick={handleNext} disabled={!hasCurrentAnswer || submitted} style={{ flex: 1 }}>
               {submitted ? "saving..." : isLastQuestion ? "done!" : "next →"}

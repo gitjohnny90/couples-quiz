@@ -77,7 +77,7 @@ export default function HotTakesPage() {
       if (sessionData) setSession(sessionData)
 
       const { data: votes, error: vErr } = await supabase
-        .from('hot_takes').select('player_id, statement_id, vote, defense').eq('session_id', sessionId)
+        .from('hot_takes').select('id, player_id, statement_id, vote, defense').eq('session_id', sessionId)
       if (!mountedRef.current) return
       if (vErr) throw vErr
       setAllVotes(votes || [])
@@ -157,13 +157,22 @@ export default function HotTakesPage() {
     setSubmitting(true)
     setError('')
     try {
-      const { error: err } = await supabase.from('hot_takes').insert({
-        session_id: sessionId,
-        player_id: playerId,
-        statement_id: activeStatement.id,
-        vote,
-      })
-      if (err) throw err
+      const existing = allVotes.find(v => v.statement_id === activeStatement.id && v.player_id === playerId)
+      if (existing) {
+        const { error: err } = await supabase
+          .from('hot_takes')
+          .update({ vote })
+          .eq('id', existing.id)
+        if (err) throw err
+      } else {
+        const { error: err } = await supabase.from('hot_takes').insert({
+          session_id: sessionId,
+          player_id: playerId,
+          statement_id: activeStatement.id,
+          vote,
+        })
+        if (err) throw err
+      }
       await fetchAll()
 
       // Auto-advance to next statement or finish group
@@ -400,34 +409,56 @@ export default function HotTakesPage() {
                 {activeStatement.text}
               </p>
             </div>
-            <div style={{ display: 'flex', gap: 12 }}>
+            {(() => {
+              const myExistingVote = allVotes.find(v => v.statement_id === activeStatement.id && v.player_id === playerId)?.vote
+              return (
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button
+                    className="btn"
+                    disabled={submitting}
+                    onClick={() => handleVote('agree')}
+                    style={{
+                      flex: 1, padding: '16px 12px',
+                      background: AGREE_COLOR, color: '#fff',
+                      fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 700,
+                      border: myExistingVote === 'agree' ? '3px solid var(--text-primary)' : 'none',
+                      borderRadius: 6, cursor: 'pointer',
+                      opacity: myExistingVote && myExistingVote !== 'agree' ? 0.55 : 1,
+                    }}
+                  >
+                    agree{myExistingVote === 'agree' ? ' ✓' : ''}
+                  </button>
+                  <button
+                    className="btn"
+                    disabled={submitting}
+                    onClick={() => handleVote('disagree')}
+                    style={{
+                      flex: 1, padding: '16px 12px',
+                      background: DISAGREE_COLOR, color: '#fff',
+                      fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 700,
+                      border: myExistingVote === 'disagree' ? '3px solid var(--text-primary)' : 'none',
+                      borderRadius: 6, cursor: 'pointer',
+                      opacity: myExistingVote && myExistingVote !== 'disagree' ? 0.55 : 1,
+                    }}
+                  >
+                    disagree{myExistingVote === 'disagree' ? ' ✓' : ''}
+                  </button>
+                </div>
+              )
+            })()}
+            {statementIndex > 0 && (
               <button
-                className="btn"
+                onClick={() => { if (!submitting) setStatementIndex(statementIndex - 1) }}
                 disabled={submitting}
-                onClick={() => handleVote('agree')}
+                className="btn btn-secondary"
                 style={{
-                  flex: 1, padding: '16px 12px',
-                  background: AGREE_COLOR, color: '#fff',
-                  fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 700,
-                  border: 'none', borderRadius: 6, cursor: 'pointer',
+                  width: '100%', marginTop: 12,
+                  fontFamily: 'var(--font-hand)', fontSize: '1rem',
                 }}
               >
-                agree
+                ← back to previous take
               </button>
-              <button
-                className="btn"
-                disabled={submitting}
-                onClick={() => handleVote('disagree')}
-                style={{
-                  flex: 1, padding: '16px 12px',
-                  background: DISAGREE_COLOR, color: '#fff',
-                  fontFamily: 'var(--font-hand)', fontSize: '1.2rem', fontWeight: 700,
-                  border: 'none', borderRadius: 6, cursor: 'pointer',
-                }}
-              >
-                disagree
-              </button>
-            </div>
+            )}
           </motion.div>
         )}
 
