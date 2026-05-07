@@ -40,6 +40,7 @@ export default function LoveNoteHuntPage() {
   const [activeCell, setActiveCell] = useState(null)
   const [noteText, setNoteText] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   // Hunting state
   const [partnerNotes, setPartnerNotes] = useState([]) // fetched when hunting starts
@@ -71,7 +72,7 @@ export default function LoveNoteHuntPage() {
 
     // Find current round — latest round number for this session
     const { data: allNotes, error: notesErr } = await supabase
-      .from('love_notes').select('round, player_id, notes, note_cells, grid_position, message')
+      .from('love_notes').select('id, round, player_id, grid_position, message')
       .eq('session_id', sessionId)
       .order('round', { ascending: false })
 
@@ -120,7 +121,7 @@ export default function LoveNoteHuntPage() {
   // Fetch partner notes (for hunting phase)
   const fetchPartnerNotes = async () => {
     const { data, error } = await supabase
-      .from('love_notes').select('round, player_id, notes, note_cells, grid_position, message')
+      .from('love_notes').select('id, round, player_id, grid_position, message')
       .eq('session_id', sessionId)
       .eq('round', round)
       .neq('player_id', playerId)
@@ -175,6 +176,7 @@ export default function LoveNoteHuntPage() {
   const handleReady = async () => {
     if (myNotes.length < NOTES_REQUIRED || submitting) return
     setSubmitting(true)
+    setSubmitError('')
 
     const rows = myNotes.map(n => ({
       session_id: sessionId,
@@ -187,6 +189,8 @@ export default function LoveNoteHuntPage() {
     const { error } = await supabase.from('love_notes').insert(rows)
 
     if (error) {
+      console.error('love note insert failed:', error)
+      setSubmitError("couldn't hide your notes — try again")
       setSubmitting(false)
       return
     }
@@ -524,6 +528,14 @@ export default function LoveNoteHuntPage() {
               >
                 {submitting ? 'hiding notes...' : "i'm ready!"}
               </button>
+              {submitError && (
+                <p style={{
+                  color: 'var(--accent-coral)', fontSize: '0.85rem',
+                  marginTop: 8, textAlign: 'center', fontStyle: 'italic',
+                }}>
+                  {submitError}
+                </p>
+              )}
             </motion.div>
           )}
 
