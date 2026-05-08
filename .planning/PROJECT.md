@@ -47,29 +47,51 @@ Partners can connect and learn about each other through shared interactive exper
 - ✓ VisionTab state-driven CSS (no DOM mutations) — v1.1
 - ✓ Custom hooks: useRealtimeSync, useSessionSetup — v1.1
 - ✓ useCallback compliance for all useRealtimeSync consumers — v1.1
+- ✓ Daily photo prompt sections (15 themes × 3 questions) — v1.2
+- ✓ PhotoCaptureInput component with native file input + image compression — v1.2
+- ✓ Daily Photos hub + section + cork-board reveal pages — v1.2
+- ✓ 6am-local-time gating between sections — v1.2
+- ✓ Supabase Storage bucket with per-session RLS for photo uploads — v1.2
+- ✓ Journal photos tab aggregating completed sections — v1.2
+- ✓ Heart Line couples Connect Four (post-v1.2) — 2026-03-28
+- ✓ Code splitting via React.lazy + Vite vendor chunks (post-v1.2) — 2026-05-07
+- ✓ npm audit + dependency hygiene (post-v1.2) — 2026-05-07
+- ✓ Multiplayer concurrency fixes (Heart Line/Tic-Tac-Toe race, Love Note Hunt phase guard) — 2026-05-07
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-**Current Milestone: v1.2 Daily Photo Challenge**
+**Current Milestone: v2.0 Capacitor Native Wrap**
 
-**Goal:** A time-gated photo challenge where couples answer 3 daily prompts with photos and captions, unlocking one section per day across 15 themed days.
+**Goal:** Wrap the existing web app as native iOS and Android apps with push notifications, native capabilities (camera, haptics, deep links, share sheet), App Store + Google Play submission.
 
 **Target features:**
-- Daily photo prompt sections (15 themes × 3 questions each)
-- Photo capture with small torn-paper caption (no scrolling)
-- Time-gating: complete a section → frozen until 6am next day → pick any remaining
-- Per-section cork board reveal showing both partners' photos side by side
-- Supabase Storage for photo uploads
-- Journal integration with dedicated photo section
+- Capacitor 6+ integration with bundled assets (no remote-loaded WebView)
+- iOS + Android platform configuration with build pipeline
+- Push notifications via `@capacitor/push-notifications` for 5 partner-action event types
+- Notification controls: master on/off + configurable quiet-hours window
+- Native camera + camera-roll integration for Daily Photos
+- Universal Links / App Links so invite-code URLs deep-link into the installed app
+- Haptic feedback on Heart Line, Miss U Heart receive, partner reactions
+- Native share sheet for Daily Photo cork-board reveals
+- Status bar styling + safe-area handling for notched devices
+- App icons + splash screens in notebook aesthetic for both platforms
+- App Store Connect + Google Play Console listings with privacy nutrition labels
+- Submission to TestFlight + Internal Testing track
 
 ### Out of Scope
 
-- Native app (Capacitor wrap) — deferred to v1.2+
-- New features or game modes — pending next milestone definition
+- Home screen widget — deferred to v2.1 (substantial scope, ship wrap first)
+- PWA / service worker — Capacitor covers home-screen need, no PWA bridge needed
+- Background sync of offline-drafted love notes/answers — defer to v2.1 if requested
+- Biometric auth (Face ID / fingerprint) — low value relative to effort
+- App Clips / Instant Apps — separate scope, defer
+- iPad-specific layout / Apple Pencil support — niche, defer
+- Per-event push notification preferences — v2.0 ships fixed event set; granular toggles are v2.1
+- Capacitor Live Updates / OTA — bundled assets for v2.0; add OTA only if release cadence becomes painful
+- New features or game modes — v2.0 is wrap-and-ship, not new functionality
 - UI redesign — visual theme stays as-is
-- Full component refactoring — light touch only
 - TypeScript migration — not planned
 
 ## Context
@@ -103,6 +125,11 @@ Partners can connect and learn about each other through shared interactive exper
 | Belt-and-suspenders invite code (localStorage + user_metadata) | Covers same-device and cross-device email confirmation flows | ✓ Good — works on all paths |
 | useRealtimeSync + useSessionSetup as standard hooks | Reduces boilerplate; enforces consistent patterns across pages | ✓ Good — adopted by 3 largest pages |
 | CSS class hover instead of DOM mutations | React state drives styles; no direct .style access | ✓ Good — cleaner, more predictable |
+| Capacitor over PWA-only or full native rewrite (DEC-005) | PWA can't push on iOS reliably; native rewrite would mean rebuilding everything | — Pending v2.0 |
+| Quality gate, not calendar dates, drives App Store submission (DEC-011) | Sloppy launch kills first impressions and risks Apple rejection | — Pending v2.0 |
+| Bundle web assets into IPA/APK rather than remote-load WebView | Apple Section 4.2 rejects "thin wrappers"; cold-launch + offline matter | — Pending v2.0 |
+| Fixed push event set + global on/off + quiet hours (no per-event toggles) | Avoids settings-page bloat; per-event preferences are v2.1 if asked | — Pending v2.0 |
+| Defer home screen widget to v2.1 | Substantial separate platform-specific work; ship wrap + push first | ✓ Good — keeps v2.0 focused |
 
 ---
-*Last updated: 2026-03-30 after v1.2 milestone start*
+*Last updated: 2026-05-08 after v2.0 milestone start*
