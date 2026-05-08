@@ -246,6 +246,15 @@ Set `VITE_DEV_BYPASS_AUTH=true` in `.env` to bypass Supabase auth during local d
 - `SessionContext` defaults to `sessionId: "preview"`, `playerName: "Preview"`, `playerId: "player1"` when no localStorage values exist
 - All authenticated pages render with their layouts and empty data states
 
+## Test Sweeps
+
+Two Playwright-based sweep scripts live in `.claude/sweep/` (gitignored — they create real Supabase auth users and write to production tables, so they're not part of the build pipeline):
+
+- **`sweep.mjs`** — single-player smoke sweep. Walks all 29 routes under `VITE_DEV_BYPASS_AUTH=true` against `npm run dev`, captures console errors, page errors, and network 4xx per route. Output: `.claude/sweep/sweep-results.json` + per-route screenshots. Use to catch lazy-chunk load failures, route-render regressions, and React component errors.
+- **`two-player.mjs`** — seven-phase multiplayer sweep. Drives two browser contexts in parallel against `npm run preview` (production build, no dev-bypass) with real Supabase auth using fake `@example.test` emails. Phases: P1 sign-up → P2 sign-up + auto-join via invite code → vault renders for both → Heart Line bidirectional realtime → Love Notes mount → Hot Takes group with disagreement → Love Note Hunt full setup-and-handshake round → TicTacToe simultaneous-mount race regression check. Use before any major refactor that touches realtime, RLS, or session bootstrapping — and before kicking off the Capacitor native wrap.
+
+The methodology, selector patterns, and 4xx triage rules are documented in `wiki/concepts/Two-Player Sweep Methodology.md` in the Command Center vault. First-time setup on a new machine needs `npx playwright install chromium` since `playwright` is a devDependency but its browser binary isn't downloaded by `npm install` alone.
+
 ## Environment Variables
 
 Required in `.env` (prefixed with `VITE_` for Vite):
