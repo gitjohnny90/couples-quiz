@@ -118,21 +118,37 @@ export default function HeartLinePage() {
     if (!error && data && data.length > 0) {
       setGameState(data[0].answers)
     } else if (!error && (!data || data.length === 0)) {
-      const { data: newRow, error: insertErr } = await supabase
+      // Bootstrap the shared game row. Use upsert with ignoreDuplicates so
+      // simultaneous mounts by both partners don't race-collide on the
+      // (session_id, pack_id, player_id) unique constraint — first writer
+      // creates the row, second is a silent no-op.
+      const { data: upserted } = await supabase
         .from('responses')
-        .insert({
-          session_id: sessionId,
-          pack_id: PACK_ID,
-          player_id: GAME_PLAYER_ID,
-          player_name: 'game',
-          answers: INITIAL_STATE,
-        })
-        .select()
-        .single()
+        .upsert(
+          {
+            session_id: sessionId,
+            pack_id: PACK_ID,
+            player_id: GAME_PLAYER_ID,
+            player_name: 'game',
+            answers: INITIAL_STATE,
+          },
+          { onConflict: 'session_id,pack_id,player_id', ignoreDuplicates: true }
+        )
+        .select('answers')
+        .maybeSingle()
 
       if (!mountedRef.current) return
-      if (!insertErr && newRow) {
-        setGameState(newRow.answers)
+      if (upserted) {
+        setGameState(upserted.answers)
+      } else {
+        const { data: existing } = await supabase
+          .from('responses')
+          .select('answers')
+          .eq('session_id', sessionId)
+          .eq('pack_id', PACK_ID)
+          .eq('player_id', GAME_PLAYER_ID)
+          .maybeSingle()
+        if (mountedRef.current && existing) setGameState(existing.answers)
       }
     }
     if (mountedRef.current) setLoading(false)

@@ -32,6 +32,8 @@ export default function LoveNoteHuntPage() {
   const longPress = useLongPress(onLongPressCard)
 
   const [phase, setPhase] = useState(PHASE.SETUP)
+  const phaseRef = useRef(PHASE.SETUP)
+  useEffect(() => { phaseRef.current = phase }, [phase])
   const [round, setRound] = useState(1)
   const [loading, setLoading] = useState(true)
 
@@ -134,8 +136,11 @@ export default function LoveNoteHuntPage() {
     return []
   }
 
-  // Check for partner notes during waiting phase and transition to hunting
+  // Check for partner notes during waiting phase and transition to hunting.
+  // Guard on phaseRef so realtime events fired during SETUP (when partner finishes
+  // first) don't yank our setup screen to HUNTING before we've placed our notes.
   const handleWaitingUpdate = useCallback(async () => {
+    if (phaseRef.current !== PHASE.WAITING) return
     const notes = await fetchPartnerNotes()
     if (notes.length >= NOTES_REQUIRED) {
       setPhase(PHASE.HUNTING)
