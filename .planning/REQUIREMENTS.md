@@ -1,64 +1,97 @@
-# Requirements: The Us Quiz
+# Requirements: The Us Quiz — v2.0 Capacitor Native Wrap
 
-**Defined:** 2026-03-30
+**Defined:** 2026-05-08
 **Core Value:** Partners can connect and learn about each other through shared interactive experiences that update live for both players
 
-## v1.2 Requirements
+> Prior milestones (v1.0 / v1.1 / v1.2) are recorded as Validated requirements in PROJECT.md and as completed milestones in MILESTONES.md. This document covers v2.0 only.
 
-Requirements for Daily Photo Challenge milestone. Each maps to roadmap phases.
+## v2.0 Requirements
 
-### Photo Capture
+Requirements for the v2.0 milestone — wrapping the existing web app as native iOS and Android apps with push notifications, native capabilities, and App Store / Google Play submission. Each maps to roadmap phases.
 
-- [x] **PHOTO-01**: User can take a photo with their device camera to answer a prompt
-- [x] **PHOTO-02**: User can upload a photo from their device gallery to answer a prompt
-- [x] **PHOTO-03**: User can add a short text caption below their photo (torn-paper style, no scrolling required)
-- [x] **PHOTO-04**: Photos are uploaded to Supabase Storage bucket with session-scoped access
+### Native Wrap
 
-### Content
+- [ ] **NATIVE-01**: Capacitor 6+ installed and configured for the existing React + Vite project
+- [ ] **NATIVE-02**: iOS platform configured (Xcode project, Info.plist, signing capabilities)
+- [ ] **NATIVE-03**: Android platform configured (Android Studio project, AndroidManifest.xml, signing keystore)
+- [ ] **NATIVE-04**: Web build bundles into native IPA/APK assets (no remote URL load)
+- [ ] **NATIVE-05**: App lifecycle handling — backgrounding mid-game (Heart Line, Tic-Tac-Toe) preserves state via existing Supabase persistence
+- [ ] **NATIVE-06**: Supabase auth session persists across app cold launches in WebView
+- [ ] **NATIVE-07**: Supabase realtime WebSockets work through WebView on both iOS and Android
+- [ ] **NATIVE-08**: Build documentation in repo for both platforms (one-command build for each)
 
-- [x] **CONT-01**: 15 themed sections exist with 3 photo prompts each (45 total)
-- [x] **CONT-02**: First prompt in every section is "What are you up to?"
-- [x] **CONT-03**: Last prompt in each section is a funny/unhinged question matching the theme
-- [x] **CONT-04**: Themed prompts cover a variety of subjects (food, travel, date night, etc.)
+### Push Notifications
 
-### Time Gating
+- [ ] **PUSH-01**: User grants push permission on first app launch with friendly pre-prompt explaining why
+- [ ] **PUSH-02**: User receives notification when partner finishes a quiz, Hot Takes group, PYP pack, or Finish My Sentence round
+- [ ] **PUSH-03**: User receives notification when partner sends a Love Note Hunt round
+- [ ] **PUSH-04**: User receives notification when partner drops a Miss U Heart
+- [ ] **PUSH-05**: User receives notification when partner completes a Daily Photo section
+- [ ] **PUSH-06**: User receives notification when partner reacts to one of their answers or drawings
+- [ ] **PUSH-07**: User can toggle all notifications on/off in app settings
+- [ ] **PUSH-08**: User can configure a quiet-hours window (default 10pm-8am local time) where notifications are silenced
+- [ ] **PUSH-09**: Tapping a notification deep-links to the relevant page (the quiz that was finished, the love notes round, etc.)
 
-- [x] **GATE-01**: Completing a section freezes all sections until 6am the next day
-- [x] **GATE-02**: After 6am unlock, all remaining sections are available to choose from
-- [x] **GATE-03**: Once a user picks a section, all other sections lock until that section is completed
-- [x] **GATE-04**: Both partners must complete a section before the cork board reveals
+### Native Capabilities
 
-### Display
+- [ ] **NCAP-01**: User can pick photo from camera roll (gallery) for Daily Photos via native picker
+- [ ] **NCAP-02**: User can capture photo with native camera UX (not browser file input) for Daily Photos
+- [ ] **NCAP-03**: Universal Links — tapping a `theusquiz.com/join/LOVE-XXXX` URL opens the installed iOS app to the join flow
+- [ ] **NCAP-04**: Android App Links equivalent — same behavior on Android
+- [ ] **NCAP-05**: Haptic feedback on Heart Line heart drop, Miss U Heart receive, partner reaction receive
+- [ ] **NCAP-06**: Native share sheet for Daily Photo cork-board reveal (replaces Web Share API on native)
+- [ ] **NCAP-07**: Status bar styling matches paper aesthetic; safe-area insets respected on notched devices
 
-- [x] **DISP-01**: Per-section cork board shows both partners' 3 photos side by side after completion
-- [x] **DISP-02**: Cork board uses the same visual style as the Us tab vision board
-- [x] **DISP-03**: Section hub page shows all 15 sections with completion status and lock state
+### App Store Submission
 
-### Journal
+- [ ] **STORE-01**: App icon designed in notebook aesthetic, all required iOS sizes (1024px master + auto-scaling)
+- [ ] **STORE-02**: App icon for Android (adaptive icon: foreground + background layers, monochrome variant for themed icons)
+- [ ] **STORE-03**: Splash screens for iOS (multiple aspect ratios) matching warm paper aesthetic
+- [ ] **STORE-04**: Splash screens for Android (vector drawable)
+- [ ] **STORE-05**: App Store Connect listing — name, subtitle, description, keywords, screenshots (5 sizes minimum)
+- [ ] **STORE-06**: Google Play Console listing — short + long description, feature graphic, screenshots
+- [ ] **STORE-07**: Privacy nutrition labels (iOS) accurately reflect Supabase data collection
+- [ ] **STORE-08**: Privacy policy and terms of service published at theusquiz.com
+- [ ] **STORE-09**: Apple Developer account active ($99/yr) with team configured
+- [ ] **STORE-10**: Google Play Developer account active ($25 one-time) with team configured
+- [ ] **STORE-11**: Both apps submitted, pass review, published to TestFlight + Internal Testing track
+- [ ] **STORE-12**: Versioning strategy documented: native app version follows web app version (both bumped together for releases that ship native changes)
 
-- [x] **JRNL-01**: Journal page has a dedicated tab for Daily Photo Challenge photos
-- [x] **JRNL-02**: Journal tab displays all completed section photos organized by theme
+## v2.1 Requirements
 
-### Navigation
+Deferred to a future release. Tracked but not in v2.0 roadmap.
 
-- [x] **NAV-01**: Daily Photo Challenge is accessible from the quizzes tab in bottom nav
+### Home Screen Widget
 
-## Future Requirements
+- **WIDGET-01**: iOS widget (small + medium sizes) showing partner's most recent action
+- **WIDGET-02**: Android widget equivalent with same content
+- **WIDGET-03**: Widget tap deep-links to the relevant page in the app
+- **WIDGET-04**: Widget refreshes content at most every 15 minutes (iOS budget) without burning battery
 
-### Photo Challenge Expansion
+### Push Notification Granularity
 
-- **PHOTO-05**: Additional themed section packs beyond the initial 15
-- **PHOTO-06**: Emoji reactions on individual photos (reuse existing reaction system)
-- **PHOTO-07**: Photo filters or stickers before submitting
+- **PUSH-EXT-01**: Per-event push notification preferences (toggle each of the 5 event types independently)
+- **PUSH-EXT-02**: Push notification grouping / threading by partner action type
+
+### Other deferred
+
+- **OFFLINE-01**: Background sync of offline-drafted love notes and answers (Capacitor Background Sync)
+- **OTA-01**: Capacitor Live Updates / OTA mechanism for JS-only updates without App Store resubmission
 
 ## Out of Scope
 
+Explicitly excluded. Documented to prevent scope creep.
+
 | Feature | Reason |
 |---------|--------|
-| Video prompts | Complexity and storage costs; photos only for v1.2 |
-| Social sharing of photos outside the app | Privacy-first approach; couples-only |
-| AI-generated photo prompts | Keep content hand-crafted for quality |
-| Photo editing/cropping in-app | Rely on device camera/gallery for editing |
+| PWA / service worker bridge | Capacitor covers home-screen need; PWA adds maintenance without value |
+| Biometric auth (Face ID / fingerprint) | Low value relative to effort; couples app, not banking |
+| App Clips / Instant Apps | Separate scope and flow; defer until install friction is proven a problem |
+| iPad-specific layout / Apple Pencil support | Niche audience; phone-first product |
+| Remote-loaded WebView (load from theusquiz.com) | Apple Section 4.2 rejection risk; cold-launch performance worse |
+| TypeScript migration | Codebase is pure JS by design |
+| New features or game modes in v2.0 | v2.0 is wrap-and-ship, not new functionality |
+| UI redesign | Visual theme stays as-is |
 
 ## Traceability
 
@@ -66,30 +99,48 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PHOTO-01 | Phase 10 | Complete |
-| PHOTO-02 | Phase 10 | Complete |
-| PHOTO-03 | Phase 10 | Complete |
-| PHOTO-04 | Phase 10 | Complete |
-| CONT-01 | Phase 11 | Complete |
-| CONT-02 | Phase 11 | Complete |
-| CONT-03 | Phase 11 | Complete |
-| CONT-04 | Phase 11 | Complete |
-| GATE-01 | Phase 11 | Complete |
-| GATE-02 | Phase 11 | Complete |
-| GATE-03 | Phase 11 | Complete |
-| GATE-04 | Phase 12 | Complete |
-| DISP-01 | Phase 12 | Complete |
-| DISP-02 | Phase 12 | Complete |
-| DISP-03 | Phase 11 | Pending |
-| JRNL-01 | Phase 13 | Complete |
-| JRNL-02 | Phase 13 | Complete |
-| NAV-01 | Phase 11 | Pending |
+| NATIVE-01 | TBD | Pending |
+| NATIVE-02 | TBD | Pending |
+| NATIVE-03 | TBD | Pending |
+| NATIVE-04 | TBD | Pending |
+| NATIVE-05 | TBD | Pending |
+| NATIVE-06 | TBD | Pending |
+| NATIVE-07 | TBD | Pending |
+| NATIVE-08 | TBD | Pending |
+| PUSH-01 | TBD | Pending |
+| PUSH-02 | TBD | Pending |
+| PUSH-03 | TBD | Pending |
+| PUSH-04 | TBD | Pending |
+| PUSH-05 | TBD | Pending |
+| PUSH-06 | TBD | Pending |
+| PUSH-07 | TBD | Pending |
+| PUSH-08 | TBD | Pending |
+| PUSH-09 | TBD | Pending |
+| NCAP-01 | TBD | Pending |
+| NCAP-02 | TBD | Pending |
+| NCAP-03 | TBD | Pending |
+| NCAP-04 | TBD | Pending |
+| NCAP-05 | TBD | Pending |
+| NCAP-06 | TBD | Pending |
+| NCAP-07 | TBD | Pending |
+| STORE-01 | TBD | Pending |
+| STORE-02 | TBD | Pending |
+| STORE-03 | TBD | Pending |
+| STORE-04 | TBD | Pending |
+| STORE-05 | TBD | Pending |
+| STORE-06 | TBD | Pending |
+| STORE-07 | TBD | Pending |
+| STORE-08 | TBD | Pending |
+| STORE-09 | TBD | Pending |
+| STORE-10 | TBD | Pending |
+| STORE-11 | TBD | Pending |
+| STORE-12 | TBD | Pending |
 
 **Coverage:**
-- v1.2 requirements: 18 total
-- Mapped to phases: 18
-- Unmapped: 0 ✓
+- v2.0 requirements: 36 total
+- Mapped to phases: 0 (awaiting roadmap)
+- Unmapped: 36 ⚠️
 
 ---
-*Requirements defined: 2026-03-30*
-*Last updated: 2026-04-05 — DISP-01, DISP-02 marked complete (Phase 12 Plan 02)*
+*Requirements defined: 2026-05-08*
+*Last updated: 2026-05-08 after initial definition*
