@@ -99,48 +99,48 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NATIVE-01 | TBD | Pending |
-| NATIVE-02 | TBD | Pending |
-| NATIVE-03 | TBD | Pending |
-| NATIVE-04 | TBD | Pending |
-| NATIVE-05 | TBD | Pending |
-| NATIVE-06 | TBD | Pending |
-| NATIVE-07 | TBD | Pending |
-| NATIVE-08 | TBD | Pending |
-| PUSH-01 | TBD | Pending |
-| PUSH-02 | TBD | Pending |
-| PUSH-03 | TBD | Pending |
-| PUSH-04 | TBD | Pending |
-| PUSH-05 | TBD | Pending |
-| PUSH-06 | TBD | Pending |
-| PUSH-07 | TBD | Pending |
-| PUSH-08 | TBD | Pending |
-| PUSH-09 | TBD | Pending |
-| NCAP-01 | TBD | Pending |
-| NCAP-02 | TBD | Pending |
-| NCAP-03 | TBD | Pending |
-| NCAP-04 | TBD | Pending |
-| NCAP-05 | TBD | Pending |
-| NCAP-06 | TBD | Pending |
-| NCAP-07 | TBD | Pending |
-| STORE-01 | TBD | Pending |
-| STORE-02 | TBD | Pending |
-| STORE-03 | TBD | Pending |
-| STORE-04 | TBD | Pending |
-| STORE-05 | TBD | Pending |
-| STORE-06 | TBD | Pending |
-| STORE-07 | TBD | Pending |
-| STORE-08 | TBD | Pending |
-| STORE-09 | TBD | Pending |
-| STORE-10 | TBD | Pending |
-| STORE-11 | TBD | Pending |
-| STORE-12 | TBD | Pending |
+| NATIVE-01 | Phase 14 | Pending |
+| NATIVE-02 | Phase 14 | Pending |
+| NATIVE-03 | Phase 14 | Pending |
+| NATIVE-04 | Phase 14 | Pending |
+| NATIVE-05 | Phase 15 | Pending |
+| NATIVE-06 | Phase 15 | Pending |
+| NATIVE-07 | Phase 15 | Pending |
+| NATIVE-08 | Phase 14 | Pending |
+| PUSH-01 | Phase 17 | Pending |
+| PUSH-02 | Phase 17 | Pending |
+| PUSH-03 | Phase 17 | Pending |
+| PUSH-04 | Phase 17 | Pending |
+| PUSH-05 | Phase 17 | Pending |
+| PUSH-06 | Phase 17 | Pending |
+| PUSH-07 | Phase 17 | Pending |
+| PUSH-08 | Phase 17 | Pending |
+| PUSH-09 | Phase 17 | Pending |
+| NCAP-01 | Phase 16 | Pending |
+| NCAP-02 | Phase 16 | Pending |
+| NCAP-03 | Phase 16 | Pending |
+| NCAP-04 | Phase 16 | Pending |
+| NCAP-05 | Phase 16 | Pending |
+| NCAP-06 | Phase 16 | Pending |
+| NCAP-07 | Phase 14 | Pending |
+| STORE-01 | Phase 18 | Pending |
+| STORE-02 | Phase 18 | Pending |
+| STORE-03 | Phase 18 | Pending |
+| STORE-04 | Phase 18 | Pending |
+| STORE-05 | Phase 19 | Pending |
+| STORE-06 | Phase 19 | Pending |
+| STORE-07 | Phase 19 | Pending |
+| STORE-08 | Phase 19 | Pending |
+| STORE-09 | Phase 19 | Pending |
+| STORE-10 | Phase 19 | Pending |
+| STORE-11 | Phase 19 | Pending |
+| STORE-12 | Phase 19 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 36 total
-- Mapped to phases: 0 (awaiting roadmap)
-- Unmapped: 36 ⚠️
+- Mapped to phases: 36 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-08 after initial definition*
+*Last updated: 2026-05-08 after roadmap creation (all 36 requirements mapped)*
