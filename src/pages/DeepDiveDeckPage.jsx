@@ -504,7 +504,7 @@ export default function DeepDiveDeckPage() {
           className="btn btn-secondary"
           style={{ width: '100%', marginTop: 14 }}
           onClick={() => {
-            const hasUnsaved = Object.values(answers).some(a => a && a.trim())
+            const hasUnsaved = phase === PHASE.ANSWERING && Object.values(answers).some(a => a && a.trim())
             if (hasUnsaved && !window.confirm('You have unsaved answers — leave anyway?')) return
             navigate(`/deep-dive/${sessionId}`)
           }}
