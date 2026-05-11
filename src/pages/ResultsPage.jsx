@@ -303,7 +303,7 @@ export default function ResultsPage() {
                 ) : (
                   <div>
                     <div style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
-                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'none' }} {...answerLongPress(p1TargetId)}>
+                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'pan-y' }} {...answerLongPress(p1TargetId)}>
                         <p style={{ color: 'var(--accent-coral)', fontFamily: 'var(--font-hand)', fontSize: '0.95rem', marginBottom: 4 }}>
                           {p1?.player_name || 'Player 1'}
                         </p>
@@ -318,7 +318,7 @@ export default function ResultsPage() {
                           partnerReaction={reactionMap[p1TargetId]?.[partnerId] || null}
                         />
                       </div>
-                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'none' }} {...answerLongPress(p2TargetId)}>
+                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'pan-y' }} {...answerLongPress(p2TargetId)}>
                         <p style={{ color: 'var(--accent-blue)', fontFamily: 'var(--font-hand)', fontSize: '0.95rem', marginBottom: 4 }}>
                           {p2?.player_name || 'Player 2'}
                         </p>

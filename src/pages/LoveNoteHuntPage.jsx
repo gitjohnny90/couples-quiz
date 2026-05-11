@@ -750,7 +750,7 @@ export default function LoveNoteHuntPage() {
                   transform: `rotate(${i === 0 ? -0.8 : i === 1 ? 0.5 : -0.3}deg)`,
                   position: 'relative',
                   overflow: 'visible',
-                  touchAction: 'none',
+                  touchAction: 'pan-y',
                 }}
                 onPointerDown={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect()

@@ -389,7 +389,7 @@ export default function JournalPage() {
                                       {q.text}
                                     </p>
                                     <div style={{ display: 'flex', gap: 10, marginBottom: 6 }}>
-                                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'none' }} {...answerLP(p1TargetId)}>
+                                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'pan-y' }} {...answerLP(p1TargetId)}>
                                         <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.92rem', color: 'var(--accent-coral)', marginBottom: 3 }}>
                                           {p1?.player_name || 'Player 1'}
                                         </p>
@@ -401,7 +401,7 @@ export default function JournalPage() {
                                           partnerReaction={quizReactions[p1TargetId]?.[partnerId] || null}
                                         />
                                       </div>
-                                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'none' }} {...answerLP(p2TargetId)}>
+                                      <div style={{ flex: 1, position: 'relative', overflow: 'visible', touchAction: 'pan-y' }} {...answerLP(p2TargetId)}>
                                         <p style={{ fontFamily: 'var(--font-hand)', fontSize: '0.92rem', color: 'var(--accent-blue)', marginBottom: 3 }}>
                                           {p2?.player_name || 'Player 2'}
                                         </p>
@@ -553,7 +553,7 @@ export default function JournalPage() {
                                     ].map(({ response, bg, border, nameColor }) => response ? (
                                       <div
                                         key={response.id}
-                                        style={{ marginBottom: 8, touchAction: 'none', position: 'relative', overflow: 'visible' }}
+                                        style={{ marginBottom: 8, touchAction: 'pan-y', position: 'relative', overflow: 'visible' }}
                                         onPointerDown={(e) => {
                                           const rect = e.currentTarget.getBoundingClientRect()
                                           pressedCardRef.current = { targetId: response.id, rect, type: 'deep_dive' }
@@ -674,7 +674,7 @@ export default function JournalPage() {
                               <div className="drawing-reveal-grid">
                                 <div
                                   className="drawing-reveal-card"
-                                  style={{ touchAction: 'none', position: 'relative', overflow: 'visible' }}
+                                  style={{ touchAction: 'pan-y', position: 'relative', overflow: 'visible' }}
                                   onPointerDown={(e) => {
                                     const rect = e.currentTarget.getBoundingClientRect()
                                     pressedCardRef.current = { targetId: `${drawing.packId}:player1`, rect, type: 'drawing' }
@@ -700,7 +700,7 @@ export default function JournalPage() {
                                 </div>
                                 <div
                                   className="drawing-reveal-card"
-                                  style={{ touchAction: 'none', position: 'relative', overflow: 'visible' }}
+                                  style={{ touchAction: 'pan-y', position: 'relative', overflow: 'visible' }}
                                   onPointerDown={(e) => {
                                     const rect = e.currentTarget.getBoundingClientRect()
                                     pressedCardRef.current = { targetId: `${drawing.packId}:player2`, rect, type: 'drawing' }

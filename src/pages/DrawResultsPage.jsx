@@ -262,7 +262,7 @@ export default function DrawResultsPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 }}
-                  style={{ touchAction: 'none', position: 'relative', overflow: 'visible' }}
+                  style={{ touchAction: 'pan-y', position: 'relative', overflow: 'visible' }}
                   onPointerDown={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     pressedCardRef.current = { targetId: `${targetPackId}:player1`, rect }
@@ -296,7 +296,7 @@ export default function DrawResultsPage() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  style={{ touchAction: 'none', position: 'relative', overflow: 'visible' }}
+                  style={{ touchAction: 'pan-y', position: 'relative', overflow: 'visible' }}
                   onPointerDown={(e) => {
                     const rect = e.currentTarget.getBoundingClientRect()
                     pressedCardRef.current = { targetId: `${targetPackId}:player2`, rect }

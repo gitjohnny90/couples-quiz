@@ -535,7 +535,7 @@ function JournalEntryPair({ mine, theirs, reactionMap, playerId, partnerId, long
       {entries.map(({ response, bg, border, nameColor, label }) => (
         <div
           key={response.id}
-          style={{ position: 'relative', overflow: 'visible', touchAction: 'none' }}
+          style={{ position: 'relative', overflow: 'visible', touchAction: 'pan-y' }}
           onPointerDown={(e) => {
             const rect = e.currentTarget.getBoundingClientRect()
             pressedCardRef.current = { targetId: response.id, rect }
