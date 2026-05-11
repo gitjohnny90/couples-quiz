@@ -56,7 +56,7 @@ export default function DeepDiveDeckPage() {
   // Fetch existing responses for this deck
   const fetchResponses = useCallback(async () => {
     const { data, error } = await supabase
-      .from('deep_dive_responses').select('question_id, player_id, player_name, answer')
+      .from('deep_dive_responses').select('id, question_id, player_id, player_name, answer')
       .eq('session_id', sessionId).eq('deck_id', deckId)
     if (!mountedRef.current) return []
     if (!error && data) {
