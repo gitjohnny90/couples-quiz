@@ -55,7 +55,13 @@ Progress: [░░░░░░░░░░] 0%
 ### Pending Todos
 
 - Clean fake-email test users from production Supabase before STORE-07 privacy validation (Phase 19)
-- Apple Developer account ($99/yr) and Google Play Developer ($25 one-time) must be active before Phase 19
+- **Apple Developer Program enrollment** ($99/yr) — REQUIRED before Phase 15 can validate iOS on real device; 24-48hr approval window so enroll early
+- **Codemagic free account** — REQUIRED before Phase 14 can produce an iOS IPA; sign up at codemagic.io and connect the GitHub repo
+- Google Play Developer ($25 one-time) — DEFERRED until actual Play Store submission (Phase 19). For testing, Android APKs are sideloaded directly to testers without an account.
+
+### Recent fixes since milestone setup
+
+- 2026-05-10: `/reset-password` silent-redirect bug fixed (commit 66354b1) — expired recovery links now show a clear error state with "get a new reset link" button instead of dumping users at /auth with no explanation. Discovered during admin password reset for a real user who got stranded in exactly that flow.
 
 ### Blockers/Concerns
 
