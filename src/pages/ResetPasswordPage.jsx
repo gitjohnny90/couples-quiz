@@ -5,6 +5,18 @@ import { supabase } from "../lib/supabase"
 import { motion } from "framer-motion"
 import PageDoodles, { DoodleHeart, SquigglyUnderline, DoodleStar } from "../components/Doodles"
 
+// Supabase redirects expired/invalid recovery links back to this page with
+// error params in the URL hash (e.g. #error=access_denied&error_code=otp_expired&...).
+// Parse them out so we can show a real message instead of a silent redirect.
+function parseHashError(hash) {
+  if (!hash || !hash.includes('error')) return null
+  const params = new URLSearchParams(hash.replace(/^#/, ''))
+  const code = params.get('error_code') || params.get('error') || null
+  if (!code) return null
+  const description = params.get('error_description') || ''
+  return { code, description: description.replace(/\+/g, ' ') }
+}
+
 export default function ResetPasswordPage() {
   const { user, authEvent } = useContext(AuthContext)
   const navigate = useNavigate()
@@ -16,10 +28,16 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const [ready, setReady] = useState(false)
+  const [linkError, setLinkError] = useState(null)
 
   // Detect recovery flow from URL hash (most reliable — fires before auth event)
   useEffect(() => {
     const hash = window.location.hash
+    const hashError = parseHashError(hash)
+    if (hashError) {
+      setLinkError(hashError)
+      return
+    }
     if (hash && hash.includes('type=recovery')) {
       setReady(true)
     }
@@ -41,6 +59,7 @@ export default function ResetPasswordPage() {
 
   // If user lands here without hash tokens, redirect after timeout
   useEffect(() => {
+    if (linkError) return // show error state, don't redirect
     const hasRecoveryHash = window.location.hash.includes('type=recovery') ||
                             window.location.hash.includes('access_token')
     // Don't redirect if hash tokens are present — Supabase may still be processing
@@ -52,7 +71,7 @@ export default function ResetPasswordPage() {
       }
     }, 3000)
     return () => clearTimeout(timer)
-  }, [ready, user, navigate])
+  }, [ready, user, navigate, linkError])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -144,12 +163,56 @@ export default function ResetPasswordPage() {
         >
           {success
             ? ""
+            : linkError
+            ? "that reset link doesn't work anymore"
             : ready
             ? "pick a new password for your account"
             : "opening the notebook..."}
         </p>
 
-        {success ? (
+        {linkError ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="glass"
+            style={{
+              padding: "28px 24px",
+              textAlign: "center",
+              width: "100%",
+              maxWidth: 380,
+              transform: "rotate(-0.3deg)",
+            }}
+          >
+            <div style={{ fontSize: 36, marginBottom: 8 }}>⏰</div>
+            <p style={{
+              fontFamily: "var(--font-hand)",
+              fontSize: "1.3rem",
+              color: "var(--accent-coral)",
+              marginBottom: 8,
+              lineHeight: 1.3,
+            }}>
+              {linkError.code === 'otp_expired'
+                ? "this link expired"
+                : "this reset link isn't valid"}
+            </p>
+            <p style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "0.95rem",
+              color: "var(--text-secondary)",
+              marginBottom: 20,
+              lineHeight: 1.5,
+            }}>
+              reset links work for 1 hour, and only the most recent one. ask for a fresh one and click it right away.
+            </p>
+            <button
+              className="btn btn-primary"
+              style={{ width: "100%" }}
+              onClick={() => navigate("/auth", { replace: true })}
+            >
+              get a new reset link
+            </button>
+          </motion.div>
+        ) : success ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
