@@ -120,7 +120,10 @@ Plans:
   3. The installed Android app loads from bundled assets under the same condition
   4. On notched iPhones and modern Android devices, no UI element is clipped behind the status bar or home indicator; the warm paper background extends into safe areas
   5. Build instructions in the repo README (or a BUILDING.md) let a developer reproduce both builds from a clean checkout
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 14-01-PLAN.md — Install Capacitor 8.3.4, add iOS + Android platforms, Android keystore signing, bundled-asset verification (NATIVE-01/02/03/04)
+- [ ] 14-02-PLAN.md — Safe-area CSS + status bar + codemagic.yaml + BUILDING.md (NCAP-07, NATIVE-08; Wave-0-gated on Codemagic + Apple Dev)
 
 ### Phase 15: WebView Integration Validation
 **Goal**: A user's Supabase auth session survives cold launches, realtime WebSockets function normally through the WebView, and backgrounding mid-game loses no game state
@@ -204,7 +207,7 @@ Plans:
 | 11. Content, Section Hub & Time-Gating | v1.2 | 2/2 | Complete | 2026-04-05 |
 | 12. Prompt Flow & Cork Board Reveal | v1.2 | 2/2 | Complete | 2026-04-05 |
 | 13. Journal Integration | v1.2 | 1/1 | Complete | 2026-04-05 |
-| 14. Capacitor Install & Platform Setup | v2.0 | 0/TBD | Not started | - |
+| 14. Capacitor Install & Platform Setup | v2.0 | 0/2 | Planned | - |
 | 15. WebView Integration Validation | v2.0 | 0/TBD | Not started | - |
 | 16. Native Capabilities | v2.0 | 0/TBD | Not started | - |
 | 17. Push Notifications | v2.0 | 0/TBD | Not started | - |
