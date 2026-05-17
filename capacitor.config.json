@@ -1,0 +1,18 @@
+{
+  "appId": "com.theusquiz.app",
+  "appName": "The Us Quiz",
+  "webDir": "dist",
+  "android": {
+    "adjustMarginsForEdgeToEdge": "auto"
+  },
+  "ios": {
+    "contentInset": "always"
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#FFF8F0",
+      "overlaysWebView": false
+    }
+  }
+}
